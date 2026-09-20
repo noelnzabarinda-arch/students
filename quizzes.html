@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizzes | S1 Science Lab</title>
+<meta name="description" content="Test your understanding of Physics, Chemistry and Biology with interactive S1 Science Lab quizzes, instant feedback and explanations for every answer.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — BASE DESIGN SYSTEM
+   (Carried over unchanged from index.html / about.html so every page
+   looks like one site.)
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --red:#DC2626;
+  --quiz-primary:#E11D48;
+  --quiz-secondary:#F97316;
+  --quiz-navy:#2A0A18;
+  --navy:#0B1226;
+  --navy-2:#101B36;
+  --card-radius:20px;
+  --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+}
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+
+a{ text-decoration:none; }
+
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+
+a:focus-visible, button:focus-visible, .btn:focus-visible{
+  outline:3px solid var(--quiz-secondary);
+  outline-offset:2px;
+  border-radius:8px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* NAVBAR */
+/* ---------------------------------------------------------------------- */
+.lab-nav{
+  position:sticky; top:0; z-index:1000;
+  padding:.65rem 0;
+  background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  transition:box-shadow .25s ease, background .25s ease;
+}
+.lab-nav.is-scrolled{
+  box-shadow:0 6px 24px rgba(15,23,42,.08);
+  background:rgba(248,250,252,.92);
+}
+.lab-brand{
+  display:flex; align-items:center; gap:.6rem;
+  font-family:var(--display); font-weight:700; font-size:1.15rem;
+  color:var(--ink);
+}
+.lab-brand .mark{
+  width:38px; height:38px; border-radius:11px;
+  display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--quiz-primary),var(--quiz-secondary));
+  color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(225,29,72,.35);
+}
+.lab-brand:hover{ color:var(--ink); }
+
+.lab-links .nav-link{
+  color:var(--ink-soft);
+  font-weight:600;
+  font-size:.95rem;
+  padding:.5rem .85rem !important;
+  border-radius:10px;
+  transition:color .15s ease, background .15s ease;
+}
+.lab-links .nav-link:hover{ color:var(--quiz-primary); background:rgba(225,29,72,.07); }
+.lab-links .nav-link.active{ color:var(--quiz-primary); background:rgba(225,29,72,.1); }
+
+.btn-lab-primary{
+  background:linear-gradient(135deg,var(--quiz-primary),var(--quiz-secondary));
+  color:#fff; font-weight:600; border:none;
+  padding:.55rem 1.35rem; border-radius:12px;
+  box-shadow:0 8px 20px rgba(225,29,72,.28);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-lab-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(225,29,72,.36); }
+
+.btn-lab-outline{
+  border:1.5px solid rgba(15,23,42,.15);
+  color:var(--ink); font-weight:600;
+  padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.btn-lab-outline:hover{ color:var(--ink); border-color:var(--quiz-primary); transform:translateY(-2px); }
+
+/* ---------------------------------------------------------------------- */
+/* HERO */
+/* ---------------------------------------------------------------------- */
+.hero{
+  position:relative;
+  background:radial-gradient(120% 140% at 15% -10%, #64152D 0%, var(--quiz-navy) 55%, #16050D 100%);
+  color:#fff;
+  padding:5rem 0 5.5rem;
+  overflow:hidden;
+  isolation:isolate;
+}
+.hero::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%);
+  z-index:0;
+}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.78rem;
+  color:#FED7AA;
+  background:rgba(249,115,22,.12);
+  border:1px solid rgba(249,115,22,.35);
+  padding:.35rem .8rem; border-radius:999px;
+}
+.hero h1{
+  font-size:clamp(2.15rem, 4.4vw, 3.4rem);
+  font-weight:700; line-height:1.1;
+  margin:1.1rem 0 1.1rem;
+}
+.hero h1 .accent{
+  background:linear-gradient(100deg, #FDBA74, #FDA4AF 60%, #FDE68A);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.lead-copy{
+  color:#C7D2E3; font-size:1.08rem; max-width:36rem; line-height:1.65;
+}
+.hero p.lead-strong{
+  color:#E0F2FE; font-size:1.16rem; font-weight:600; max-width:36rem; line-height:1.55; margin-top:.9rem;
+}
+.hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+
+.btn-hero-primary{
+  background:linear-gradient(135deg,var(--quiz-secondary), var(--quiz-primary));
+  color:#fff; font-weight:700; border:none;
+  padding:.75rem 1.5rem; border-radius:13px;
+  box-shadow:0 10px 28px rgba(225,29,72,.35);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-hero-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 14px 34px rgba(225,29,72,.45); }
+.btn-hero-primary:disabled{ opacity:.55; transform:none; box-shadow:none; }
+
+.btn-hero-ghost{
+  border:1.5px solid rgba(255,255,255,.25);
+  color:#fff; font-weight:600;
+  padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.04);
+  transition:border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.btn-hero-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.09); transform:translateY(-2px); }
+
+.hero-lab{ position:relative; width:100%; max-width:430px; margin-inline:auto; z-index:1; }
+.hero-lab svg{ width:100%; height:auto; overflow:visible; }
+
+.orbit-ring{ transform-origin:center; animation:spin 22s linear infinite; }
+.orbit-ring.reverse{ animation-direction:reverse; animation-duration:30s; }
+.electron{ transform-origin:center; }
+
+.float-slow{ animation:float 6s ease-in-out infinite; }
+.float-slower{ animation:float 8s ease-in-out infinite; }
+.float-med{ animation:float 5s ease-in-out infinite; }
+.spin-slow{ animation:spin 18s linear infinite; transform-origin:center; }
+.pulse-dot{ animation:pulse 2.4s ease-in-out infinite; }
+.drift{ animation:drift 9s ease-in-out infinite; }
+
+@keyframes float{ 0%,100%{ transform:translateY(0px); } 50%{ transform:translateY(-12px); } }
+@keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes pulse{ 0%,100%{ opacity:.4; r:3; } 50%{ opacity:1; r:5; } }
+@keyframes drift{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(6px,-8px); } }
+
+/* ---------------------------------------------------------------------- */
+/* SECTION SCAFFOLDING */
+/* ---------------------------------------------------------------------- */
+.section{ padding:5.5rem 0; }
+.section-tight{ padding:4.5rem 0; }
+.section-head{ max-width:640px; }
+.section-head h2{ font-size:clamp(1.7rem,3vw,2.35rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.05rem; line-height:1.6; }
+
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+/* ---------------------------------------------------------------------- */
+/* SUBJECT CARDS */
+/* ---------------------------------------------------------------------- */
+.subject-card{
+  position:relative; background:#fff; border-radius:var(--card-radius);
+  padding:2.1rem 1.9rem 2rem; height:100%;
+  border:1px solid rgba(15,23,42,.06);
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  overflow:hidden;
+}
+.subject-card::after{
+  content:""; position:absolute; inset:auto -30% -40% auto;
+  width:220px; height:220px; border-radius:50%;
+  background:var(--accent, var(--blue)); opacity:.06;
+  transition:opacity .25s ease;
+}
+.subject-card:hover{ transform:translateY(-8px); box-shadow:0 20px 40px rgba(15,23,42,.12); border-color:var(--accent, var(--blue)); }
+.subject-card:hover::after{ opacity:.12; }
+.subject-card .icon-tile{
+  width:58px; height:58px; border-radius:16px;
+  display:grid; place-items:center; font-size:1.5rem;
+  color:#fff; background:var(--accent, var(--blue));
+  margin-bottom:1.2rem;
+  box-shadow:0 8px 18px color-mix(in srgb, var(--accent, var(--blue)) 45%, transparent);
+  transition:transform .25s ease;
+}
+.subject-card:hover .icon-tile{ transform:rotate(-6deg) scale(1.06); }
+.subject-card h3{ font-size:1.3rem; font-weight:700; margin-bottom:.55rem; }
+.subject-card p{ color:var(--ink-soft); font-size:.97rem; line-height:1.6; margin-bottom:1.4rem; }
+.subject-card .card-link{ font-weight:700; color:var(--accent, var(--blue)); display:inline-flex; align-items:center; gap:.4rem; }
+.subject-card .card-link i{ transition:transform .2s ease; }
+.subject-card:hover .card-link i{ transform:translateX(4px); }
+
+.subject-physics{ --accent:var(--blue); }
+.subject-chemistry{ --accent:var(--orange); }
+.subject-biology{ --accent:var(--green); }
+.subject-mixed{ --accent:var(--purple); }
+
+/* ---------------------------------------------------------------------- */
+/* FEATURE TILES */
+/* ---------------------------------------------------------------------- */
+.feature-tile{ display:flex; gap:1rem; align-items:flex-start; padding:1.5rem; border-radius:16px; transition:background .2s ease; height:100%; }
+.feature-tile:hover{ background:#fff; box-shadow:0 10px 26px rgba(15,23,42,.07); }
+.feature-tile .ico{ flex:0 0 auto; width:48px; height:48px; border-radius:13px; display:grid; place-items:center; font-size:1.2rem; color:#fff; }
+.feature-tile h4{ font-weight:700; font-size:1.05rem; margin-bottom:.35rem; }
+.feature-tile p{ color:var(--ink-soft); font-size:.93rem; line-height:1.55; margin:0; }
+
+/* ---------------------------------------------------------------------- */
+/* FINAL CTA */
+/* ---------------------------------------------------------------------- */
+.final-cta{
+  position:relative;
+  background:radial-gradient(120% 160% at 85% 0%, #16264F 0%, var(--navy) 60%, #060A16 100%);
+  border-radius:28px; color:#fff; text-align:center; padding:4rem 2rem; overflow:hidden; isolation:isolate;
+}
+.final-cta::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(6,182,212,.5) 1.4px, transparent 1.4px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(70% 90% at 50% 30%, #000 30%, transparent 100%);
+}
+.final-cta h2{ font-size:clamp(1.8rem,3.6vw,2.5rem); font-weight:700; position:relative; z-index:1; }
+.final-cta p{ color:#C7D2E3; font-size:1.05rem; margin:.8rem 0 1.8rem; position:relative; z-index:1; }
+.final-cta .cta-actions{ position:relative; z-index:1; display:flex; gap:.85rem; flex-wrap:wrap; justify-content:center; }
+
+/* ---------------------------------------------------------------------- */
+/* FOOTER */
+/* ---------------------------------------------------------------------- */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--cyan); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+/* Skip link */
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+
+/* ==========================================================================
+   QUIZZES PAGE — ADDITIONS
+   (New styles only. Nothing above this line is changed or removed.)
+   ========================================================================== */
+
+/* ---- Quiz picker cards (button behaviour on top of .subject-card) ---- */
+.quiz-pick{
+  display:block; width:100%; text-align:left; background:#fff; cursor:pointer;
+  font:inherit; color:inherit;
+}
+.quiz-pick .q-meta{
+  font-family:var(--mono); font-size:.74rem; color:var(--ink-soft);
+  display:flex; gap:.9rem; flex-wrap:wrap; margin-bottom:1.1rem;
+}
+.quiz-pick .q-meta span{ display:inline-flex; align-items:center; gap:.3rem; }
+.quiz-pick .start-hint{ font-weight:700; color:var(--accent,var(--blue)); display:inline-flex; align-items:center; gap:.4rem; }
+.quiz-pick .start-hint i{ transition:transform .2s ease; }
+.quiz-pick:hover .start-hint i{ transform:translateX(4px); }
+
+/* ---- Setup bar ---- */
+.setup-bar{
+  background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px;
+  padding:1.2rem 1.4rem; display:flex; gap:1.6rem; flex-wrap:wrap; align-items:center;
+  box-shadow:0 1px 2px rgba(15,23,42,.04); margin-bottom:2rem;
+}
+.setup-group{ display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.setup-group > .label{
+  font-family:var(--mono); font-size:.74rem; color:var(--ink-soft); margin-right:.15rem;
+}
+.chip-toggle{
+  border:1.5px solid rgba(15,23,42,.12); background:#fff; color:var(--ink-soft);
+  font-weight:600; font-size:.86rem; padding:.34rem .85rem; border-radius:999px;
+  cursor:pointer; transition:border-color .15s ease, color .15s ease, background .15s ease;
+}
+.chip-toggle:hover{ border-color:var(--blue); color:var(--blue); }
+.chip-toggle[aria-pressed="true"]{ background:rgba(37,99,235,.1); border-color:var(--blue); color:var(--blue); }
+
+/* ---- Quiz runner ---- */
+.quiz-stage{ max-width:820px; margin-inline:auto; }
+.quiz-shell{
+  background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:var(--card-radius);
+  box-shadow:0 18px 44px rgba(15,23,42,.08); overflow:hidden;
+}
+.quiz-topbar{
+  display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  padding:1.1rem 1.5rem; border-bottom:1px solid rgba(15,23,42,.07);
+  background:linear-gradient(180deg,#fff,#FBFCFE);
+}
+.subject-chip{
+  font-family:var(--mono); font-size:.72rem; font-weight:600; padding:.28rem .6rem;
+  border-radius:999px; color:#04121F; flex:0 0 auto;
+}
+.q-counter{ font-family:var(--mono); font-size:.8rem; color:var(--ink-soft); }
+.timer-pill{
+  margin-left:auto; display:inline-flex; align-items:center; gap:.4rem;
+  font-family:var(--mono); font-size:.82rem; font-weight:600;
+  background:rgba(37,99,235,.08); color:var(--blue);
+  border:1px solid rgba(37,99,235,.2); padding:.3rem .75rem; border-radius:999px;
+}
+.timer-pill.low{ background:rgba(220,38,38,.08); color:var(--red); border-color:rgba(220,38,38,.25); }
+.btn-quit{
+  background:none; border:none; color:var(--ink-soft); font-size:.86rem; font-weight:600;
+  padding:.3rem .5rem; border-radius:8px; cursor:pointer;
+}
+.btn-quit:hover{ color:var(--red); background:rgba(220,38,38,.07); }
+
+.progress-track{ height:5px; background:rgba(15,23,42,.07); }
+.progress-fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  transition:width .35s ease;
+}
+
+.quiz-body{ padding:2rem 1.8rem 1.8rem; }
+.q-text{
+  font-family:var(--display); font-weight:600; font-size:clamp(1.15rem,2.3vw,1.42rem);
+  line-height:1.4; margin-bottom:1.5rem;
+}
+.q-figure{
+  background:var(--paper); border:1px solid rgba(15,23,42,.06); border-radius:14px;
+  padding:.9rem 1.1rem; margin:-.6rem 0 1.4rem;
+  font-family:var(--mono); font-size:.9rem; color:var(--blue);
+}
+
+.opt-list{ display:grid; gap:.7rem; }
+.opt-btn{
+  display:flex; align-items:flex-start; gap:.85rem; width:100%; text-align:left;
+  background:#fff; border:1.5px solid rgba(15,23,42,.1); border-radius:14px;
+  padding:.95rem 1.1rem; font-size:.99rem; line-height:1.45; color:var(--ink);
+  cursor:pointer; transition:border-color .15s ease, background .15s ease, transform .12s ease;
+}
+.opt-btn:hover:not(:disabled){ border-color:var(--blue); background:rgba(37,99,235,.04); transform:translateX(3px); }
+.opt-btn:disabled{ cursor:default; }
+.opt-btn .key{
+  flex:0 0 auto; width:28px; height:28px; border-radius:9px; display:grid; place-items:center;
+  font-family:var(--mono); font-size:.8rem; font-weight:600;
+  background:rgba(15,23,42,.05); color:var(--ink-soft); transition:background .15s ease, color .15s ease;
+}
+.opt-btn.is-correct{ border-color:var(--green); background:rgba(22,163,74,.07); }
+.opt-btn.is-correct .key{ background:var(--green); color:#fff; }
+.opt-btn.is-wrong{ border-color:var(--red); background:rgba(220,38,38,.06); }
+.opt-btn.is-wrong .key{ background:var(--red); color:#fff; }
+.opt-btn.is-dim{ opacity:.55; }
+
+.feedback{
+  margin-top:1.3rem; border-radius:14px; padding:1.1rem 1.25rem;
+  display:flex; gap:.8rem; align-items:flex-start; font-size:.95rem; line-height:1.6;
+}
+.feedback.correct{ background:rgba(22,163,74,.07); border:1px solid rgba(22,163,74,.2); }
+.feedback.wrong{ background:rgba(245,158,11,.09); border:1px solid rgba(245,158,11,.28); }
+.feedback i{ font-size:1.1rem; margin-top:.1rem; flex:0 0 auto; }
+.feedback.correct i{ color:var(--green); }
+.feedback.wrong i{ color:var(--orange); }
+.feedback strong{ display:block; font-family:var(--display); margin-bottom:.15rem; }
+.feedback .why{ color:var(--ink-soft); }
+
+.quiz-foot{
+  display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+  padding:1.1rem 1.8rem 1.6rem;
+}
+.score-live{ font-family:var(--mono); font-size:.82rem; color:var(--ink-soft); }
+.quiz-foot .btn-hero-primary{ margin-left:auto; }
+
+/* ---- Results ---- */
+.result-head{ text-align:center; padding:2.4rem 1.6rem 1rem; }
+.ring-wrap{ position:relative; width:170px; height:170px; margin:0 auto 1.2rem; }
+.ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.ring-wrap .ring-bg{ stroke:rgba(15,23,42,.08); }
+.ring-wrap .ring-fg{
+  stroke:url(#ringGrad); stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);
+}
+.ring-center{
+  position:absolute; inset:0; display:grid; place-content:center; text-align:center;
+}
+.ring-center .pct{ font-family:var(--display); font-weight:700; font-size:2.3rem; line-height:1; }
+.ring-center .raw{ font-family:var(--mono); font-size:.78rem; color:var(--ink-soft); margin-top:.3rem; }
+.result-verdict{ font-family:var(--display); font-weight:700; font-size:1.35rem; margin-bottom:.3rem; }
+.result-sub{ color:var(--ink-soft); font-size:.98rem; margin:0; }
+
+.result-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; padding:1.4rem 1.8rem 0; }
+.stat-box{
+  background:var(--paper); border:1px solid rgba(15,23,42,.06); border-radius:14px;
+  padding:.9rem; text-align:center;
+}
+.stat-box .val{ font-family:var(--display); font-weight:700; font-size:1.3rem; }
+.stat-box .lab{ font-family:var(--mono); font-size:.7rem; color:var(--ink-soft); }
+
+.review-list{ display:grid; gap:.7rem; padding:1.6rem 1.8rem 0; }
+.review-item{
+  border:1px solid rgba(15,23,42,.08); border-radius:14px; padding:1rem 1.15rem; background:#fff;
+}
+.review-item .rq{ font-weight:600; font-size:.96rem; display:flex; gap:.6rem; align-items:flex-start; }
+.review-item .rq i{ margin-top:.18rem; flex:0 0 auto; }
+.review-item.ok .rq i{ color:var(--green); }
+.review-item.no .rq i{ color:var(--red); }
+.review-item .ra{ font-size:.89rem; color:var(--ink-soft); margin:.5rem 0 0 1.35rem; line-height:1.55; }
+.review-item .ra b{ color:var(--ink); font-weight:600; }
+
+.result-actions{ display:flex; gap:.75rem; flex-wrap:wrap; padding:1.6rem 1.8rem 2rem; }
+
+/* ---- Session tally ---- */
+.tally{
+  display:flex; gap:1.4rem; flex-wrap:wrap; justify-content:center;
+  margin-top:1.8rem; font-family:var(--mono); font-size:.8rem; color:var(--ink-soft);
+}
+.tally b{ color:var(--ink); }
+
+/* ---- Tips ---- */
+.tip-card{
+  background:#fff; border:1px solid rgba(15,23,42,.06); border-radius:16px; padding:1.5rem; height:100%;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.tip-card:hover{ transform:translateY(-5px); box-shadow:0 16px 32px rgba(15,23,42,.08); }
+.tip-card .t-ico{
+  width:48px; height:48px; border-radius:13px; display:grid; place-items:center;
+  color:#fff; font-size:1.15rem; margin-bottom:.9rem;
+}
+.tip-card h4{ font-weight:700; font-size:1.02rem; margin-bottom:.3rem; }
+.tip-card p{ font-size:.9rem; color:var(--ink-soft); margin:0; line-height:1.55; }
+
+/* ---- Responsive ---- */
+@media (max-width:575.98px){
+  .quiz-body{ padding:1.5rem 1.2rem 1.4rem; }
+  .quiz-topbar{ padding:.9rem 1.2rem; }
+  .quiz-foot{ padding:1rem 1.2rem 1.4rem; }
+  .quiz-foot .btn-hero-primary{ width:100%; margin-left:0; }
+  .result-stats, .review-list, .result-actions{ padding-inline:1.2rem; }
+  .result-stats{ grid-template-columns:1fr; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .orbit-ring, .electron, .float-slow, .float-slower, .float-med,
+  .spin-slow, .pulse-dot, .drift{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="#quiz-start" class="btn btn-lab-primary">Start a Quiz</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+  ==================================================================== -->
+  <header class="hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="hero-eyebrow"><i class="bi bi-patch-question"></i> Quizzes</span>
+          <h1>Check What You <span class="accent">Really Understand</span></h1>
+          <p class="lead-strong">Every question comes with an explanation, so a wrong answer is still a lesson.</p>
+          <p class="lead-copy mt-2">Pick a subject, answer at your own pace, and review exactly where your thinking went off track.</p>
+          <div class="hero-actions">
+            <a href="#quiz-start" class="btn btn-hero-primary">Choose a Quiz</a>
+            <a href="simulations.html" class="btn btn-hero-ghost">Revise in the Virtual Lab</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-lab" role="img" aria-label="Illustration of a quiz card with answer options, an atom and a score badge">
+            <svg viewBox="0 0 420 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Orbiting atom behind the card -->
+              <g transform="translate(300,110)" opacity="0.9">
+                <ellipse class="orbit-ring" rx="86" ry="33" stroke="#06B6D4" stroke-width="1.5" opacity="0.5"/>
+                <ellipse class="orbit-ring reverse" rx="86" ry="33" stroke="#7C3AED" stroke-width="1.5" opacity="0.4" transform="rotate(62)"/>
+                <circle r="11" fill="url(#nucleusGradQ)"/>
+                <circle class="electron spin-slow" r="4" cx="86" cy="0" fill="#67E8F9"/>
+                <circle class="electron spin-slow" r="4" cx="-74" cy="-28" fill="#C4B5FD" style="animation-direction:reverse;"/>
+              </g>
+
+              <!-- Quiz card -->
+              <g class="float-slow" transform="translate(40,90)">
+                <rect x="0" y="0" width="270" height="200" rx="18" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <rect x="20" y="22" width="86" height="14" rx="7" fill="#2563EB" fill-opacity="0.15"/>
+                <rect x="20" y="52" width="180" height="11" rx="5" fill="#0F172A" fill-opacity="0.16"/>
+                <rect x="20" y="70" width="130" height="11" rx="5" fill="#0F172A" fill-opacity="0.1"/>
+
+                <rect x="20" y="98" width="230" height="26" rx="9" fill="#16A34A" fill-opacity="0.1" stroke="#16A34A" stroke-width="1.6"/>
+                <circle cx="36" cy="111" r="7" fill="#16A34A"/>
+                <path d="M32.5 111 l2.6 2.6 l4.6 -5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="52" y="106" width="120" height="10" rx="5" fill="#0F172A" fill-opacity="0.14"/>
+
+                <rect x="20" y="134" width="230" height="26" rx="9" fill="#F8FAFC" stroke="#0F172A" stroke-opacity="0.1"/>
+                <circle cx="36" cy="147" r="7" fill="#0F172A" fill-opacity="0.08"/>
+                <rect x="52" y="142" width="96" height="10" rx="5" fill="#0F172A" fill-opacity="0.1"/>
+
+                <rect x="20" y="172" width="120" height="8" rx="4" fill="#0F172A" fill-opacity="0.06"/>
+                <rect x="20" y="172" width="74" height="8" rx="4" fill="#06B6D4"/>
+              </g>
+
+              <!-- Score badge -->
+              <g class="float-med" transform="translate(286,268)">
+                <circle r="38" fill="#0B1226" stroke="#06B6D4" stroke-opacity="0.45" stroke-width="2"/>
+                <text x="0" y="2" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="20" font-weight="700" fill="#67E8F9">8/10</text>
+                <text x="0" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#C7D2E3">SCORE</text>
+              </g>
+
+              <!-- Light bulb -->
+              <g class="float-slower" transform="translate(46,34)">
+                <circle cx="14" cy="14" r="14" fill="#FDE68A" stroke="#F59E0B" stroke-width="2"/>
+                <path d="M8 28 H20 V34 A4 4 0 0 1 16 38 H12 A4 4 0 0 1 8 34 Z" fill="#F59E0B"/>
+                <path d="M14 6 L14 20 M8 12 L20 16 M8 16 L20 12" stroke="#F59E0B" stroke-width="1.4"/>
+              </g>
+
+              <!-- Drifting DNA -->
+              <g class="drift" transform="translate(120,318)">
+                <path d="M0 0 C 14 12, 26 -12, 40 0" stroke="#7C3AED" stroke-width="2.2" fill="none"/>
+                <path d="M0 20 C 14 32, 26 8, 40 20" stroke="#A78BFA" stroke-width="2.2" fill="none"/>
+                <line x1="6" y1="3" x2="6" y2="16" stroke="#C4B5FD" stroke-width="1.8"/>
+                <line x1="20" y1="0" x2="20" y2="14" stroke="#C4B5FD" stroke-width="1.8"/>
+                <line x1="34" y1="3" x2="34" y2="16" stroke="#C4B5FD" stroke-width="1.8"/>
+              </g>
+
+              <defs>
+                <radialGradient id="nucleusGradQ" cx="0.35" cy="0.3" r="0.9">
+                  <stop offset="0%" stop-color="#7DD3FC"/>
+                  <stop offset="100%" stop-color="#2563EB"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       QUIZ PICKER + RUNNER
+  ==================================================================== -->
+  <section class="section" id="quiz-start" style="background:#fff;">
+    <div class="container container-narrow">
+
+      <!-- ---------- PICKER ---------- -->
+      <div id="pickerView">
+        <div class="section-head reveal mx-auto text-center">
+          <h2>Pick a Quiz</h2>
+          <p class="mx-auto">Set the length and timer first, then choose a subject to begin.</p>
+        </div>
+
+        <div class="setup-bar reveal mt-5" role="group" aria-label="Quiz settings">
+          <div class="setup-group">
+            <span class="label">Questions</span>
+            <button class="chip-toggle" type="button" data-count="5" aria-pressed="false">5</button>
+            <button class="chip-toggle" type="button" data-count="8" aria-pressed="true">8</button>
+            <button class="chip-toggle" type="button" data-count="12" aria-pressed="false">12</button>
+          </div>
+          <div class="setup-group">
+            <span class="label">Timer</span>
+            <button class="chip-toggle" type="button" data-timer="0" aria-pressed="true">Off</button>
+            <button class="chip-toggle" type="button" data-timer="30" aria-pressed="false">30s per question</button>
+            <button class="chip-toggle" type="button" data-timer="20" aria-pressed="false">20s per question</button>
+          </div>
+          <div class="setup-group ms-lg-auto">
+            <span class="label">Order</span>
+            <button class="chip-toggle" type="button" data-shuffle="1" aria-pressed="true">Shuffled</button>
+            <button class="chip-toggle" type="button" data-shuffle="0" aria-pressed="false">Fixed</button>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3 reveal">
+            <button class="subject-card subject-physics quiz-pick" data-subject="physics">
+              <div class="icon-tile" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></div>
+              <h3>Physics</h3>
+              <p>Force, motion, speed, pressure, energy and gravity.</p>
+              <div class="q-meta">
+                <span><i class="bi bi-collection"></i> <span data-bank="physics">0</span> questions</span>
+                <span><i class="bi bi-bar-chart"></i> Starter level</span>
+              </div>
+              <span class="start-hint">Start quiz <i class="bi bi-arrow-right"></i></span>
+            </button>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal">
+            <button class="subject-card subject-chemistry quiz-pick" data-subject="chemistry">
+              <div class="icon-tile" aria-hidden="true"><i class="bi bi-droplet-half"></i></div>
+              <h3>Chemistry</h3>
+              <p>Atoms, elements, particles, mixtures and changes of state.</p>
+              <div class="q-meta">
+                <span><i class="bi bi-collection"></i> <span data-bank="chemistry">0</span> questions</span>
+                <span><i class="bi bi-bar-chart"></i> Starter level</span>
+              </div>
+              <span class="start-hint">Start quiz <i class="bi bi-arrow-right"></i></span>
+            </button>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal">
+            <button class="subject-card subject-biology quiz-pick" data-subject="biology">
+              <div class="icon-tile" aria-hidden="true"><i class="bi bi-flower2"></i></div>
+              <h3>Biology</h3>
+              <p>Cells, plants, photosynthesis, respiration and the human body.</p>
+              <div class="q-meta">
+                <span><i class="bi bi-collection"></i> <span data-bank="biology">0</span> questions</span>
+                <span><i class="bi bi-bar-chart"></i> Starter level</span>
+              </div>
+              <span class="start-hint">Start quiz <i class="bi bi-arrow-right"></i></span>
+            </button>
+          </div>
+          <div class="col-md-6 col-lg-3 reveal">
+            <button class="subject-card subject-mixed quiz-pick" data-subject="mixed">
+              <div class="icon-tile" aria-hidden="true"><i class="bi bi-shuffle"></i></div>
+              <h3>Mixed Challenge</h3>
+              <p>Questions pulled from all three subjects at once.</p>
+              <div class="q-meta">
+                <span><i class="bi bi-collection"></i> <span data-bank="mixed">0</span> questions</span>
+                <span><i class="bi bi-bar-chart"></i> Harder</span>
+              </div>
+              <span class="start-hint">Start quiz <i class="bi bi-arrow-right"></i></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tally reveal" id="sessionTally" hidden>
+          <span>This session: <b id="tallyQuizzes">0</b> quizzes</span>
+          <span>Answered: <b id="tallyAnswered">0</b></span>
+          <span>Correct: <b id="tallyCorrect">0</b></span>
+          <span>Best score: <b id="tallyBest">—</b></span>
+        </div>
+      </div>
+
+      <!-- ---------- RUNNER ---------- -->
+      <div id="quizView" class="quiz-stage" hidden>
+        <div class="quiz-shell">
+          <div class="quiz-topbar">
+            <span class="subject-chip" id="runSubject">PHYSICS</span>
+            <span class="q-counter" id="runCounter">Question 1 of 8</span>
+            <span class="timer-pill" id="runTimer" hidden><i class="bi bi-stopwatch"></i> <span id="timerVal">30</span>s</span>
+            <button class="btn-quit" type="button" id="quitBtn">Leave quiz</button>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+
+          <div class="quiz-body">
+            <h3 class="q-text" id="questionText">Loading…</h3>
+            <div class="q-figure" id="questionFigure" hidden></div>
+            <div class="opt-list" id="optionList" role="group" aria-label="Answer options"></div>
+            <div class="feedback" id="feedback" hidden>
+              <i class="bi bi-check-circle-fill" id="feedbackIcon"></i>
+              <div>
+                <strong id="feedbackTitle">Correct</strong>
+                <span class="why" id="feedbackWhy"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="quiz-foot">
+            <span class="score-live" id="scoreLive">Score 0 / 0</span>
+            <button class="btn btn-hero-primary" id="nextBtn" type="button" disabled>Next question</button>
+          </div>
+        </div>
+        <p class="text-center mt-3 mb-0" style="color:var(--ink-soft); font-size:.86rem;">
+          Tip: press <b>1</b>–<b>4</b> to answer and <b>Enter</b> to move on.
+        </p>
+      </div>
+
+      <!-- ---------- RESULTS ---------- -->
+      <div id="resultView" class="quiz-stage" hidden>
+        <div class="quiz-shell">
+          <div class="result-head">
+            <div class="ring-wrap">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#2563EB"/>
+                    <stop offset="100%" stop-color="#06B6D4"/>
+                  </linearGradient>
+                </defs>
+                <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
+                <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" fill="none" stroke-width="11"
+                        stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+              </svg>
+              <div class="ring-center">
+                <span class="pct" id="resultPct">0%</span>
+                <span class="raw" id="resultRaw">0 of 0</span>
+              </div>
+            </div>
+            <p class="result-verdict" id="resultVerdict">Quiz complete</p>
+            <p class="result-sub" id="resultSub">Here is how it went.</p>
+          </div>
+
+          <div class="result-stats">
+            <div class="stat-box"><div class="val" id="statCorrect">0</div><div class="lab">CORRECT</div></div>
+            <div class="stat-box"><div class="val" id="statWrong">0</div><div class="lab">TO REVIEW</div></div>
+            <div class="stat-box"><div class="val" id="statTime">0:00</div><div class="lab">TIME TAKEN</div></div>
+          </div>
+
+          <div class="review-list" id="reviewList"></div>
+
+          <div class="result-actions">
+            <button class="btn btn-hero-primary" id="retryBtn" type="button">Try the same quiz again</button>
+            <button class="btn btn-lab-outline" id="backBtn" type="button">Choose another quiz</button>
+            <a class="btn btn-lab-outline" href="simulations.html">Revise in the lab</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       HOW THE QUIZZES WORK
+  ==================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>How the Quizzes Work</h2>
+        <p class="mx-auto">Answering is only half of it. The explanation after each question is where the learning happens.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--blue);"><i class="bi bi-cursor"></i></span>
+            <div><h4>One question at a time</h4><p>No rushing ahead. Each question is answered and explained before the next one appears.</p></div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--green);"><i class="bi bi-patch-check"></i></span>
+            <div><h4>Instant feedback</h4><p>The correct option is highlighted straight away, with the reasoning underneath it.</p></div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--orange);"><i class="bi bi-stopwatch"></i></span>
+            <div><h4>Timer when you want it</h4><p>Practise calmly with the timer off, or add pressure once a topic feels familiar.</p></div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--purple);"><i class="bi bi-journal-check"></i></span>
+            <div><h4>Full review at the end</h4><p>Every question comes back with your answer next to the correct one.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       STUDY TIPS
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Getting More Out of a Quiz</h2>
+        <p class="mx-auto">A few habits that turn a score into real understanding.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-md-4 reveal">
+          <div class="tip-card">
+            <div class="t-ico" style="background:var(--blue);"><i class="bi bi-lightbulb"></i></div>
+            <h4>Predict before you click</h4>
+            <p>Say the answer in your head first. If you cannot, that topic is worth revisiting.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="tip-card">
+            <div class="t-ico" style="background:var(--orange);"><i class="bi bi-arrow-repeat"></i></div>
+            <h4>Repeat the ones you missed</h4>
+            <p>Run the same quiz again after a simulation. The gap usually closes quickly.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="tip-card">
+            <div class="t-ico" style="background:var(--green);"><i class="bi bi-chat-quote"></i></div>
+            <h4>Explain it out loud</h4>
+            <p>If you can explain why an answer is right to a classmate, you understand it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FINAL CTA
+  ==================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="final-cta reveal">
+        <h2>Ready to Test Yourself?</h2>
+        <p>Start with one subject, review what you missed, then come back for the mixed challenge.</p>
+        <div class="cta-actions">
+          <a href="#quiz-start" class="btn btn-hero-primary">Choose a Quiz</a>
+          <a href="simulations.html" class="btn btn-hero-ghost">Enter Virtual Lab</a>
+          <a href="about.html" class="btn btn-hero-ghost">How It Works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Learn. Explore. Discover.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-4 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+        <div class="row row-cols-2 row-cols-sm-4 g-3 mt-1">
+          <div class="col"><a class="footer-link" href="physics.html">Subjects: Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<!-- Bootstrap bundle (navbar collapse) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   js/main.js  (shared site behaviour — kept inline per request)
+   Navbar scroll state, mobile menu auto-close, scroll-reveal, smooth scroll.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var nav = document.getElementById("labNav");
+  function updateNavState() {
+    if (window.scrollY > 12) nav.classList.add("is-scrolled");
+    else nav.classList.remove("is-scrolled");
+  }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl).hide();
+        }
+      });
+    });
+  }
+
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("href");
+      if (targetId.length > 1) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+})();
+</script>
+
+<script>
+/* ==========================================================================
+   js/quizzes.js  (Quiz engine — kept inline per request)
+   Question banks, settings, runner, timer, scoring, review, session tally.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------- */
+  /* QUESTION BANKS                                                    */
+  /* Each item: q (question), f (optional figure/formula line),        */
+  /* o (options), a (index of correct option), e (explanation)         */
+  /* ---------------------------------------------------------------- */
+  var BANK = {
+    physics: [
+      { q:"A car travels 120 metres in 20 seconds. What is its average speed?",
+        f:"speed = distance ÷ time",
+        o:["6 m/s","2400 m/s","0.17 m/s","140 m/s"], a:0,
+        e:"Divide distance by time: 120 ÷ 20 = 6 metres every second." },
+      { q:"Which unit is used to measure force?",
+        o:["Joule","Newton","Watt","Pascal"], a:1,
+        e:"Force is measured in newtons (N). Joules measure energy and watts measure power." },
+      { q:"What happens to the pressure on a surface if the same force is spread over a larger area?",
+        f:"pressure = force ÷ area",
+        o:["Pressure increases","Pressure decreases","Pressure stays the same","Pressure becomes zero"], a:1,
+        e:"Area is on the bottom of the fraction, so a larger area with the same force gives a smaller pressure. That is why wide skis stop you sinking into snow." },
+      { q:"An object is moving at a steady speed in a straight line. What can you say about the forces on it?",
+        o:["There are no forces at all","The forces are balanced","The forward force is bigger","Gravity has switched off"], a:1,
+        e:"Forces can still act, but they cancel out. Balanced forces mean no change in motion." },
+      { q:"Which of these increases the kinetic energy of a moving ball?",
+        o:["Making it slower","Making it heavier and faster","Painting it a darker colour","Letting it rest on the ground"], a:1,
+        e:"Kinetic energy depends on mass and speed. More of either means more kinetic energy." },
+      { q:"Why does a feather fall more slowly than a stone on Earth?",
+        o:["Gravity is weaker on the feather","Air resistance affects the feather more","The feather has no mass","The stone is magnetic"], a:1,
+        e:"Both are pulled by gravity, but the feather's large surface and small weight mean air resistance slows it much more." },
+      { q:"A force of 12 N acts on a 4 kg trolley. What is its acceleration?",
+        f:"F = m × a",
+        o:["48 m/s²","3 m/s²","0.33 m/s²","16 m/s²"], a:1,
+        e:"Rearrange to a = F ÷ m, so 12 ÷ 4 = 3 m/s²." },
+      { q:"What does a distance–time graph with a flat horizontal line show?",
+        o:["The object is speeding up","The object is stationary","The object is slowing down","The object is moving backwards"], a:1,
+        e:"Distance is not changing as time passes, so the object is not moving." },
+      { q:"Which energy change happens in a torch that is switched on?",
+        o:["Light to chemical","Chemical to light and heat","Sound to light","Heat to chemical"], a:1,
+        e:"Chemical energy stored in the battery is transferred to light energy, with some wasted as heat." },
+      { q:"Your weight would be smaller on the Moon than on Earth because the Moon has…",
+        o:["less mass and weaker gravity","no atmosphere","a colder surface","a slower spin"], a:0,
+        e:"Weight depends on gravitational pull. The Moon's smaller mass gives weaker gravity, so you weigh less, although your mass is unchanged." },
+      { q:"Which of these is a non-contact force?",
+        o:["Friction","Air resistance","Magnetism","Tension in a rope"], a:2,
+        e:"Magnetism acts at a distance without the objects touching. The others need contact." },
+      { q:"A runner covers 400 m in 50 s. How long would 1200 m take at the same speed?",
+        f:"time = distance ÷ speed",
+        o:["100 s","150 s","120 s","200 s"], a:1,
+        e:"Speed is 400 ÷ 50 = 8 m/s. Then 1200 ÷ 8 = 150 seconds." }
+    ],
+
+    chemistry: [
+      { q:"What is the smallest particle of an element that still has the properties of that element?",
+        o:["A mixture","An atom","A crystal","A compound"], a:1,
+        e:"Atoms are the basic building blocks of elements. Compounds and mixtures are made of more than one kind of particle." },
+      { q:"In which state of matter are the particles packed closely together in a fixed pattern?",
+        o:["Solid","Liquid","Gas","Plasma"], a:0,
+        e:"Solid particles vibrate in fixed positions, which is why solids keep their shape." },
+      { q:"What happens to the particles in a liquid when it is heated?",
+        o:["They gain energy and move faster","They stop moving","They become smaller","They lose mass"], a:0,
+        e:"Heating transfers energy to the particles, so they move faster and spread further apart." },
+      { q:"Which change of state is evaporation?",
+        o:["Solid to liquid","Liquid to gas","Gas to liquid","Liquid to solid"], a:1,
+        e:"Evaporation is liquid turning into gas at the surface, below boiling point." },
+      { q:"Air is best described as…",
+        o:["a pure element","a compound","a mixture of gases","a single molecule"], a:2,
+        e:"Air is mostly nitrogen and oxygen, not chemically joined, so it is a mixture and can be separated physically." },
+      { q:"Which method would best separate sand from water?",
+        o:["Filtration","Distillation","Magnetism","Chromatography"], a:0,
+        e:"Sand does not dissolve, so a filter traps the sand grains and lets the water pass through." },
+      { q:"A chemical change has taken place when…",
+        o:["ice melts into water","a new substance is formed","sugar dissolves in tea","water is poured into a jug"], a:1,
+        e:"Chemical changes make new substances and are usually hard to reverse. The others are physical changes." },
+      { q:"What is the chemical formula for water?",
+        f:"H = hydrogen,  O = oxygen",
+        o:["CO₂","H₂O","NaCl","O₂"], a:1,
+        e:"Each water molecule has two hydrogen atoms joined to one oxygen atom." },
+      { q:"Which particles are found in the nucleus of an atom?",
+        o:["Protons and neutrons","Electrons only","Neutrons and electrons","Protons and electrons"], a:0,
+        e:"Protons and neutrons sit in the central nucleus while electrons move around it." },
+      { q:"A solution is made of…",
+        o:["a solute dissolved in a solvent","two solids pressed together","a gas trapped in ice","oil floating on water"], a:0,
+        e:"The substance that dissolves is the solute and the liquid it dissolves into is the solvent, for example salt in water." },
+      { q:"Why do gases fill any container they are put into?",
+        o:["Their particles repel the walls","Their particles move freely in all directions","They have no mass","They are lighter than air"], a:1,
+        e:"Gas particles are far apart and move quickly in random directions, so they spread out to fill the space." },
+      { q:"Which of these is a sign that a chemical reaction may be happening?",
+        o:["A colour change and a gas given off","The liquid looks wet","The container is heavy","The substance is cold to start with"], a:0,
+        e:"Colour change, bubbles of gas, a temperature change or a new solid forming are all clues of a chemical reaction." }
+    ],
+
+    biology: [
+      { q:"Which part of a plant cell captures light for photosynthesis?",
+        o:["Nucleus","Chloroplast","Cell membrane","Vacuole"], a:1,
+        e:"Chloroplasts contain chlorophyll, the green pigment that absorbs light energy." },
+      { q:"What are the two raw materials a plant needs for photosynthesis?",
+        f:"light + ___ + ___ → glucose + oxygen",
+        o:["Oxygen and glucose","Carbon dioxide and water","Nitrogen and salt","Sugar and protein"], a:1,
+        e:"Plants take in carbon dioxide through their leaves and water through their roots, then use light to make glucose and release oxygen." },
+      { q:"Which structure is found in a plant cell but NOT in an animal cell?",
+        o:["Cell wall","Nucleus","Cell membrane","Cytoplasm"], a:0,
+        e:"The rigid cell wall made of cellulose gives plant cells their shape. Animal cells have only a membrane." },
+      { q:"What is the main job of the red blood cells?",
+        o:["Fight infection","Carry oxygen","Digest food","Send nerve signals"], a:1,
+        e:"Red blood cells contain haemoglobin, which picks up oxygen in the lungs and delivers it around the body." },
+      { q:"Respiration in your cells releases energy from…",
+        o:["glucose and oxygen","water and salt","light and air","protein and fat only"], a:0,
+        e:"Cells combine glucose with oxygen to release energy, producing carbon dioxide and water as waste." },
+      { q:"Which organ system moves blood around the body?",
+        o:["Digestive system","Circulatory system","Nervous system","Skeletal system"], a:1,
+        e:"The heart, blood and blood vessels together form the circulatory system." },
+      { q:"In a food chain, what does the arrow point towards?",
+        f:"grass → grasshopper → frog",
+        o:["The animal that is eaten","The organism receiving the energy","The producer","The sunlight"], a:1,
+        e:"Arrows show the direction energy flows, so they point from the food to the organism that eats it." },
+      { q:"What is the role of the nucleus in a cell?",
+        o:["Controls the cell's activities","Makes the cell green","Stores water","Keeps the cell rigid"], a:0,
+        e:"The nucleus holds the genetic material and controls what the cell does." },
+      { q:"Plants lose water vapour from their leaves in a process called…",
+        o:["respiration","transpiration","germination","digestion"], a:1,
+        e:"Transpiration is water evaporating from the leaves, which also helps pull more water up from the roots." },
+      { q:"Which of these organisms is a producer in an ecosystem?",
+        o:["Lion","Maize plant","Mushroom","Earthworm"], a:1,
+        e:"Producers make their own food by photosynthesis. Green plants such as maize are producers." },
+      { q:"Why do leaves have a broad, flat shape?",
+        o:["To store water","To catch as much light as possible","To keep insects away","To hold the plant upright"], a:1,
+        e:"A large flat surface gives more area for absorbing light and exchanging gases." },
+      { q:"During exercise your breathing rate increases mainly to…",
+        o:["cool the body down","supply more oxygen to the muscles","remove water from the blood","digest food faster"], a:1,
+        e:"Working muscles need more oxygen for respiration and produce more carbon dioxide that must be removed." }
+    ]
+  };
+
+  var SUBJECT_META = {
+    physics:   { label:"PHYSICS",   chip:"#67E8F9" },
+    chemistry: { label:"CHEMISTRY", chip:"#FBBF24" },
+    biology:   { label:"BIOLOGY",   chip:"#86EFAC" },
+    mixed:     { label:"MIXED",     chip:"#C4B5FD" }
+  };
+
+  /* ---------------------------------------------------------------- */
+  /* ELEMENTS                                                          */
+  /* ---------------------------------------------------------------- */
+  var pickerView  = document.getElementById("pickerView");
+  var quizView    = document.getElementById("quizView");
+  var resultView  = document.getElementById("resultView");
+
+  var runSubject  = document.getElementById("runSubject");
+  var runCounter  = document.getElementById("runCounter");
+  var runTimer    = document.getElementById("runTimer");
+  var timerVal    = document.getElementById("timerVal");
+  var progressBar = document.getElementById("progressBar");
+  var progressFill= document.getElementById("progressFill");
+  var questionText= document.getElementById("questionText");
+  var questionFig = document.getElementById("questionFigure");
+  var optionList  = document.getElementById("optionList");
+  var feedback    = document.getElementById("feedback");
+  var feedbackIcon= document.getElementById("feedbackIcon");
+  var feedbackTitle=document.getElementById("feedbackTitle");
+  var feedbackWhy = document.getElementById("feedbackWhy");
+  var scoreLive   = document.getElementById("scoreLive");
+  var nextBtn     = document.getElementById("nextBtn");
+  var quitBtn     = document.getElementById("quitBtn");
+
+  var ringFg      = document.getElementById("ringFg");
+  var reviewList  = document.getElementById("reviewList");
+
+  var RING_LEN = 2 * Math.PI * 52;
+
+  /* ---------------------------------------------------------------- */
+  /* SETTINGS                                                          */
+  /* ---------------------------------------------------------------- */
+  var settings = { count: 8, timer: 0, shuffle: true };
+
+  document.querySelectorAll(".chip-toggle").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var group = chip.parentElement;
+      group.querySelectorAll(".chip-toggle").forEach(function (c) {
+        c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+      });
+      if (chip.dataset.count)  settings.count   = parseInt(chip.dataset.count, 10);
+      if (chip.dataset.timer)  settings.timer   = parseInt(chip.dataset.timer, 10);
+      if (chip.dataset.shuffle) settings.shuffle = chip.dataset.shuffle === "1";
+    });
+  });
+
+  /* Show bank sizes on the picker cards */
+  document.querySelectorAll("[data-bank]").forEach(function (el) {
+    var key = el.dataset.bank;
+    el.textContent = key === "mixed"
+      ? (BANK.physics.length + BANK.chemistry.length + BANK.biology.length)
+      : BANK[key].length;
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* HELPERS                                                           */
+  /* ---------------------------------------------------------------- */
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildQuestions(subject) {
+    var pool;
+    if (subject === "mixed") {
+      pool = BANK.physics.map(tag("physics"))
+        .concat(BANK.chemistry.map(tag("chemistry")))
+        .concat(BANK.biology.map(tag("biology")));
+    } else {
+      pool = BANK[subject].map(tag(subject));
+    }
+    var picked = settings.shuffle ? shuffle(pool) : pool.slice();
+    picked = picked.slice(0, Math.min(settings.count, picked.length));
+
+    /* Shuffle the options too, keeping track of the right one */
+    return picked.map(function (item) {
+      if (!settings.shuffle) {
+        return { q:item.q, f:item.f, o:item.o.slice(), a:item.a, e:item.e, s:item.s };
+      }
+      var correctText = item.o[item.a];
+      var opts = shuffle(item.o);
+      return { q:item.q, f:item.f, o:opts, a:opts.indexOf(correctText), e:item.e, s:item.s };
+    });
+  }
+
+  function tag(subject) {
+    return function (item) {
+      return { q:item.q, f:item.f, o:item.o, a:item.a, e:item.e, s:subject };
+    };
+  }
+
+  function show(view) {
+    pickerView.hidden = view !== "picker";
+    quizView.hidden   = view !== "quiz";
+    resultView.hidden = view !== "result";
+  }
+
+  function fmtTime(sec) {
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* STATE                                                             */
+  /* ---------------------------------------------------------------- */
+  var run = null;
+  var tick = null;
+  var session = { quizzes:0, answered:0, correct:0, best:null };
+
+  function startQuiz(subject) {
+    var questions = buildQuestions(subject);
+    if (!questions.length) return;
+
+    run = {
+      subject: subject,
+      questions: questions,
+      index: 0,
+      score: 0,
+      answers: [],
+      locked: false,
+      startedAt: Date.now(),
+      remaining: settings.timer
+    };
+
+    var meta = SUBJECT_META[subject];
+    runSubject.textContent = meta.label;
+    runSubject.style.background = meta.chip;
+
+    show("quiz");
+    renderQuestion();
+    quizView.scrollIntoView({ block:"start", behavior:"smooth" });
+  }
+
+  function renderQuestion() {
+    var q = run.questions[run.index];
+    run.locked = false;
+
+    runCounter.textContent = "Question " + (run.index + 1) + " of " + run.questions.length;
+    var pct = Math.round((run.index / run.questions.length) * 100);
+    progressFill.style.width = pct + "%";
+    progressBar.setAttribute("aria-valuenow", String(pct));
+
+    questionText.textContent = q.q;
+    if (q.f) { questionFig.textContent = q.f; questionFig.hidden = false; }
+    else { questionFig.hidden = true; }
+
+    optionList.innerHTML = "";
+    q.o.forEach(function (text, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "opt-btn";
+      btn.dataset.index = String(i);
+      btn.innerHTML = '<span class="key">' + (i + 1) + '</span><span>' + text + '</span>';
+      btn.addEventListener("click", function () { answer(i); });
+      optionList.appendChild(btn);
+    });
+
+    feedback.hidden = true;
+    nextBtn.disabled = true;
+    nextBtn.textContent = (run.index === run.questions.length - 1) ? "See results" : "Next question";
+    scoreLive.textContent = "Score " + run.score + " / " + run.index;
+
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    if (!settings.timer) { runTimer.hidden = true; return; }
+    run.remaining = settings.timer;
+    runTimer.hidden = false;
+    runTimer.classList.remove("low");
+    timerVal.textContent = String(run.remaining);
+
+    tick = window.setInterval(function () {
+      run.remaining -= 1;
+      timerVal.textContent = String(Math.max(run.remaining, 0));
+      if (run.remaining <= 5) runTimer.classList.add("low");
+      if (run.remaining <= 0) {
+        stopTimer();
+        answer(-1);
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (tick) { window.clearInterval(tick); tick = null; }
+  }
+
+  function answer(choice) {
+    if (run.locked) return;
+    run.locked = true;
+    stopTimer();
+
+    var q = run.questions[run.index];
+    var isCorrect = choice === q.a;
+    if (isCorrect) run.score += 1;
+
+    run.answers.push({ q:q, chosen:choice, correct:isCorrect });
+    session.answered += 1;
+    if (isCorrect) session.correct += 1;
+
+    optionList.querySelectorAll(".opt-btn").forEach(function (btn) {
+      var i = parseInt(btn.dataset.index, 10);
+      btn.disabled = true;
+      if (i === q.a) btn.classList.add("is-correct");
+      else if (i === choice) btn.classList.add("is-wrong");
+      else btn.classList.add("is-dim");
+    });
+
+    feedback.hidden = false;
+    feedback.className = "feedback " + (isCorrect ? "correct" : "wrong");
+    feedbackIcon.className = isCorrect ? "bi bi-check-circle-fill" : "bi bi-lightbulb-fill";
+    feedbackTitle.textContent = isCorrect
+      ? "That's right"
+      : (choice === -1 ? "Time is up" : "Not this time");
+    feedbackWhy.textContent = q.e;
+
+    scoreLive.textContent = "Score " + run.score + " / " + (run.index + 1);
+    nextBtn.disabled = false;
+    nextBtn.focus();
+  }
+
+  function next() {
+    if (!run.locked) return;
+    if (run.index < run.questions.length - 1) {
+      run.index += 1;
+      renderQuestion();
+    } else {
+      finish();
+    }
+  }
+
+  function finish() {
+    stopTimer();
+    progressFill.style.width = "100%";
+
+    var total = run.questions.length;
+    var pct = Math.round((run.score / total) * 100);
+    var seconds = Math.round((Date.now() - run.startedAt) / 1000);
+
+    session.quizzes += 1;
+    if (session.best === null || pct > session.best) session.best = pct;
+
+    document.getElementById("resultPct").textContent = pct + "%";
+    document.getElementById("resultRaw").textContent = run.score + " of " + total;
+    document.getElementById("statCorrect").textContent = String(run.score);
+    document.getElementById("statWrong").textContent = String(total - run.score);
+    document.getElementById("statTime").textContent = fmtTime(seconds);
+
+    var verdict, sub;
+    if (pct === 100)      { verdict = "Every single one"; sub = "You have this topic sorted. Try the mixed challenge next."; }
+    else if (pct >= 80)   { verdict = "Strong understanding"; sub = "Just a couple to tidy up. Read the review below."; }
+    else if (pct >= 50)   { verdict = "Good start"; sub = "The ideas are there. Revisit the ones you missed and run it again."; }
+    else                  { verdict = "Worth another look"; sub = "Open the matching simulation, then come back and retry this quiz."; }
+    document.getElementById("resultVerdict").textContent = verdict;
+    document.getElementById("resultSub").textContent = sub;
+
+    ringFg.style.strokeDasharray = RING_LEN.toFixed(1);
+    ringFg.style.strokeDashoffset = RING_LEN.toFixed(1);
+
+    reviewList.innerHTML = "";
+    run.answers.forEach(function (rec, i) {
+      var item = document.createElement("div");
+      item.className = "review-item " + (rec.correct ? "ok" : "no");
+      var chosenText = rec.chosen === -1 ? "No answer (time ran out)" : rec.q.o[rec.chosen];
+      var html =
+        '<div class="rq"><i class="bi ' + (rec.correct ? "bi-check-circle-fill" : "bi-x-circle-fill") + '"></i>' +
+        '<span>' + (i + 1) + '. ' + rec.q.q + '</span></div>' +
+        '<p class="ra">Your answer: <b>' + chosenText + '</b>' +
+        (rec.correct ? "" : '<br>Correct answer: <b>' + rec.q.o[rec.q.a] + '</b>') +
+        '<br>' + rec.q.e + '</p>';
+      item.innerHTML = html;
+      reviewList.appendChild(item);
+    });
+
+    show("result");
+    resultView.scrollIntoView({ block:"start", behavior:"smooth" });
+
+    window.setTimeout(function () {
+      ringFg.style.strokeDashoffset = (RING_LEN * (1 - pct / 100)).toFixed(1);
+    }, 120);
+
+    updateTally();
+  }
+
+  function updateTally() {
+    var tally = document.getElementById("sessionTally");
+    tally.hidden = false;
+    document.getElementById("tallyQuizzes").textContent  = String(session.quizzes);
+    document.getElementById("tallyAnswered").textContent = String(session.answered);
+    document.getElementById("tallyCorrect").textContent  = String(session.correct);
+    document.getElementById("tallyBest").textContent     = session.best === null ? "—" : session.best + "%";
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* WIRING                                                            */
+  /* ---------------------------------------------------------------- */
+  document.querySelectorAll(".quiz-pick").forEach(function (card) {
+    card.addEventListener("click", function () { startQuiz(card.dataset.subject); });
+  });
+
+  nextBtn.addEventListener("click", next);
+
+  quitBtn.addEventListener("click", function () {
+    stopTimer();
+    run = null;
+    show("picker");
+    document.getElementById("quiz-start").scrollIntoView({ block:"start", behavior:"smooth" });
+  });
+
+  document.getElementById("retryBtn").addEventListener("click", function () {
+    startQuiz(run ? run.subject : "physics");
+  });
+
+  document.getElementById("backBtn").addEventListener("click", function () {
+    show("picker");
+    document.getElementById("quiz-start").scrollIntoView({ block:"start", behavior:"smooth" });
+  });
+
+  /* Keyboard: 1–4 to answer, Enter to advance */
+  document.addEventListener("keydown", function (e) {
+    if (quizView.hidden || !run) return;
+    if (e.key >= "1" && e.key <= "9") {
+      var i = parseInt(e.key, 10) - 1;
+      if (!run.locked && i < run.questions[run.index].o.length) {
+        e.preventDefault();
+        answer(i);
+      }
+    } else if (e.key === "Enter" && run.locked) {
+      e.preventDefault();
+      next();
+    }
+  });
+})();
+</script>
+</body>
+</html>

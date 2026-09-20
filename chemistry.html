@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemistry — S1 Science Lab</title>
+<meta name="description" content="Explore atoms, elements, states of matter, the periodic table and chemical changes through interactive simulations on S1 Science Lab.">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — shared design tokens (same system as index.html)
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --navy:#0B1226;
+  --card-radius:20px;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+
+  /* Chemistry-specific accents */
+  --chem-primary:#F97316;   /* orange   */
+  --chem-secondary:#FACC15; /* yellow   */
+  --chem-support:#7C3AED;   /* purple   */
+  --chem-navy:#241206;      /* warm dark surface for chemistry hero */
+  --chem-navy-2:#3A1B08;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{ font-family:var(--body); color:var(--ink); background:var(--paper); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+a{ text-decoration:none; }
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+a:focus-visible, button:focus-visible, .btn:focus-visible, input:focus-visible, [tabindex]:focus-visible{
+  outline:3px solid var(--chem-primary); outline-offset:2px; border-radius:8px;
+}
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+/* ---------------------------------------------------------------------- */
+/* NAVBAR (shared) */
+/* ---------------------------------------------------------------------- */
+.lab-nav{ position:sticky; top:0; z-index:1000; padding:.65rem 0; background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06); transition:box-shadow .25s ease, background .25s ease; }
+.lab-nav.is-scrolled{ box-shadow:0 6px 24px rgba(15,23,42,.08); background:rgba(248,250,252,.92); }
+.lab-brand{ display:flex; align-items:center; gap:.6rem; font-family:var(--display); font-weight:700; font-size:1.15rem; color:var(--ink); }
+.lab-brand .mark{ width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--chem-primary),var(--chem-secondary)); color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(249,115,22,.35); }
+.lab-brand:hover{ color:var(--ink); }
+.lab-links .nav-link{ color:var(--ink-soft); font-weight:600; font-size:.95rem; padding:.5rem .85rem !important; border-radius:10px;
+  transition:color .15s ease, background .15s ease; }
+.lab-links .nav-link:hover{ color:var(--chem-primary); background:rgba(249,115,22,.08); }
+.lab-links .nav-link.active{ color:var(--chem-primary); background:rgba(249,115,22,.12); }
+.btn-chem-primary{ background:linear-gradient(135deg,var(--chem-primary),var(--chem-secondary)); color:#3A1B08; font-weight:700; border:none;
+  padding:.55rem 1.35rem; border-radius:12px; box-shadow:0 8px 20px rgba(249,115,22,.3);
+  transition:transform .15s ease, box-shadow .15s ease; }
+.btn-chem-primary:hover{ color:#3A1B08; transform:translateY(-2px); box-shadow:0 12px 26px rgba(249,115,22,.4); }
+.btn-chem-outline{ border:1.5px solid rgba(15,23,42,.15); color:var(--ink); font-weight:600; padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff; transition:border-color .15s ease, transform .15s ease; }
+.btn-chem-outline:hover{ color:var(--ink); border-color:var(--chem-primary); transform:translateY(-2px); }
+.btn-chem-ghost{ border:1.5px solid rgba(255,255,255,.28); color:#fff; font-weight:600; padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.05); transition:border-color .15s ease, background .15s ease, transform .15s ease; }
+.btn-chem-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.1); transform:translateY(-2px); }
+
+/* ---------------------------------------------------------------------- */
+/* HERO */
+/* ---------------------------------------------------------------------- */
+.chem-hero{ position:relative; color:#fff; padding:5.5rem 0 6.5rem; overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 140% at 85% -10%, #4a2410 0%, var(--chem-navy) 55%, #170a03 100%); }
+.chem-hero::before{ content:""; position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(250,204,21,.35) 1.4px, transparent 1.4px);
+  background-size:36px 36px; mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%); }
+.chem-eyebrow{ display:inline-flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.78rem; color:#FDE68A;
+  background:rgba(250,204,21,.12); border:1px solid rgba(250,204,21,.35); padding:.35rem .8rem; border-radius:999px; }
+.chem-hero h1{ font-size:clamp(2.15rem,4.4vw,3.4rem); font-weight:700; line-height:1.1; margin:1.1rem 0; }
+.chem-hero h1 .accent{ background:linear-gradient(100deg,var(--chem-secondary),#FDBA74 60%,var(--chem-support));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.chem-hero p.lead-copy{ color:#FDE8CF; font-size:1.06rem; max-width:32rem; line-height:1.65; }
+.chem-hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+
+.chem-lab-art{ position:relative; width:100%; max-width:440px; margin-inline:auto; z-index:1; }
+.chem-lab-art svg{ width:100%; height:auto; overflow:visible; }
+.float-a{ animation:floatA 6s ease-in-out infinite; }
+.float-b{ animation:floatA 7.5s ease-in-out infinite; animation-delay:.4s; }
+.float-c{ animation:floatA 5.2s ease-in-out infinite; animation-delay:.8s; }
+.spin-a{ animation:spinA 20s linear infinite; transform-origin:center; }
+.bubble{ animation:bubbleUp 3.6s ease-in infinite; }
+.jiggle{ animation:jiggle 2.2s ease-in-out infinite; transform-origin:center; }
+@keyframes floatA{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+@keyframes spinA{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+@keyframes bubbleUp{ 0%{ transform:translateY(0); opacity:.9;} 100%{ transform:translateY(-70px); opacity:0;} }
+@keyframes jiggle{ 0%,100%{ transform:rotate(0deg);} 50%{ transform:rotate(3deg);} }
+
+/* ---------------------------------------------------------------------- */
+/* SECTION SCAFFOLDING */
+/* ---------------------------------------------------------------------- */
+.section{ padding:5.5rem 0; }
+.section-tight{ padding:4.5rem 0; }
+.section-head{ max-width:660px; }
+.section-head h2{ font-size:clamp(1.7rem,3vw,2.3rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.03rem; line-height:1.6; }
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+.step-flow{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; font-family:var(--mono); font-size:.78rem;
+  color:var(--ink-soft); margin-bottom:1rem; }
+.step-flow span{ padding:.25rem .6rem; border-radius:999px; background:#fff; border:1px solid rgba(15,23,42,.08); }
+.step-flow i{ font-size:.7rem; }
+
+/* ---------------------------------------------------------------------- */
+/* WHAT IS CHEMISTRY — concept cards */
+/* ---------------------------------------------------------------------- */
+.concept-card{ background:#fff; border-radius:var(--card-radius); padding:1.9rem; height:100%;
+  border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:transform .2s ease, box-shadow .2s ease; }
+.concept-card:hover{ transform:translateY(-6px); box-shadow:0 16px 32px rgba(15,23,42,.1); }
+.concept-card .icon-tile{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:1.3rem;
+  color:#fff; margin-bottom:1rem; }
+.concept-card h3{ font-size:1.15rem; font-weight:700; margin-bottom:.5rem; }
+.concept-card p{ color:var(--ink-soft); font-size:.95rem; line-height:1.6; margin:0; }
+
+/* ---------------------------------------------------------------------- */
+/* TOPIC CARDS */
+/* ---------------------------------------------------------------------- */
+.topic-card{ background:#fff; border-radius:16px; padding:1.5rem; height:100%; border:1px solid rgba(15,23,42,.06);
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; }
+.topic-card:hover{ transform:translateY(-5px); box-shadow:0 14px 28px rgba(15,23,42,.09); border-color:var(--chem-primary); }
+.topic-card .ico{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:1.15rem; color:#fff;
+  background:linear-gradient(135deg,var(--chem-primary),var(--chem-secondary)); margin-bottom:.9rem; }
+.topic-card h4{ font-size:1.02rem; font-weight:700; margin-bottom:.4rem; }
+.topic-card p{ color:var(--ink-soft); font-size:.88rem; line-height:1.5; margin-bottom:.9rem; flex:1; }
+.topic-card button{ align-self:flex-start; font-weight:700; font-size:.87rem; color:var(--chem-primary); background:none; border:none; padding:0;
+  display:inline-flex; align-items:center; gap:.35rem; }
+.topic-card button:hover{ text-decoration:underline; }
+
+/* ---------------------------------------------------------------------- */
+/* STATES OF MATTER SIMULATION */
+/* ---------------------------------------------------------------------- */
+.sim-lab{ background:linear-gradient(160deg,#1D1206 0%, #2E1809 100%); border-radius:26px; color:#fff; padding:2.2rem; overflow:hidden; }
+.sim-lab-badge{ display:inline-flex; align-items:center; gap:.45rem; font-family:var(--mono); font-size:.75rem; color:#FDE68A;
+  background:rgba(250,204,21,.12); border:1px solid rgba(250,204,21,.35); padding:.3rem .7rem; border-radius:999px; }
+.sim-stage-wrap{ display:grid; grid-template-columns:1.15fr .85fr; gap:1.6rem; margin-top:1.3rem; }
+@media (max-width:991.98px){ .sim-stage-wrap{ grid-template-columns:1fr; } }
+.sim-canvas-box{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1rem; }
+#matterCanvas{ width:100%; height:260px; display:block; border-radius:12px; background:rgba(0,0,0,.25); touch-action:none; }
+.sim-state-readout{ display:flex; justify-content:space-between; align-items:center; margin-top:1rem; flex-wrap:wrap; gap:.6rem; }
+.state-pill{ font-family:var(--mono); font-weight:700; letter-spacing:.02em; font-size:.85rem; padding:.4rem .9rem; border-radius:999px; }
+.state-pill.solid{ background:rgba(56,189,248,.18); color:#7DD3FC; }
+.state-pill.liquid{ background:rgba(34,197,94,.18); color:#86EFAC; }
+.state-pill.gas{ background:rgba(249,115,22,.2); color:#FDBA74; }
+.temp-readout{ font-family:var(--mono); font-size:.9rem; color:#FDE8CF; }
+
+.sim-controls{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1.3rem; }
+.sim-controls label{ font-weight:700; font-size:.85rem; color:#FDE8CF; display:block; margin-bottom:.5rem; }
+.temp-slider-row{ display:flex; align-items:center; gap:.6rem; }
+.temp-slider-row i{ font-size:1.1rem; }
+.form-range::-webkit-slider-thumb{ background:var(--chem-secondary); }
+.form-range::-moz-range-thumb{ background:var(--chem-secondary); }
+.quick-state-btns{ display:flex; gap:.5rem; margin-top:1rem; flex-wrap:wrap; }
+.quick-state-btns button{ flex:1; min-width:88px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.04); color:#fff;
+  border-radius:10px; padding:.45rem .5rem; font-size:.82rem; font-weight:600; transition:background .15s ease, border-color .15s ease; }
+.quick-state-btns button:hover, .quick-state-btns button.active{ background:rgba(250,204,21,.16); border-color:var(--chem-secondary); }
+.sim-explain{ margin-top:1rem; font-size:.9rem; color:#E9D5C0; line-height:1.55; min-height:3.4em; }
+.sim-substance-note{ font-size:.75rem; color:#B08966; margin-top:.6rem; }
+
+/* Transformation cards */
+.transform-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1.5rem; }
+@media (max-width:767.98px){ .transform-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width:479.98px){ .transform-grid{ grid-template-columns:1fr; } }
+.transform-card{ background:#fff; border:1.5px solid rgba(15,23,42,.08); border-radius:14px; padding:1.1rem; text-align:left;
+  cursor:pointer; transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.transform-card:hover, .transform-card.active{ border-color:var(--chem-primary); transform:translateY(-3px); box-shadow:0 10px 22px rgba(15,23,42,.08); }
+.transform-card .tlabel{ font-family:var(--mono); font-size:.78rem; color:var(--chem-primary); font-weight:700; margin-bottom:.3rem; }
+.transform-card h5{ font-size:.98rem; font-weight:700; margin-bottom:.35rem; }
+.transform-card p{ font-size:.83rem; color:var(--ink-soft); margin:0; line-height:1.5; }
+
+/* ---------------------------------------------------------------------- */
+/* PERIODIC TABLE */
+/* ---------------------------------------------------------------------- */
+.ptable-scroll{ overflow-x:auto; padding-bottom:.6rem; margin-top:1.6rem; }
+.ptable-scroll::-webkit-scrollbar{ height:8px; }
+.ptable-scroll::-webkit-scrollbar-thumb{ background:rgba(15,23,42,.18); border-radius:8px; }
+.ptable-hint{ font-size:.8rem; color:var(--ink-soft); display:flex; align-items:center; gap:.4rem; margin-top:.5rem; }
+.ptable-grid{ display:grid; grid-template-columns:repeat(18, minmax(46px,1fr)); gap:6px; min-width:900px; }
+.element-tile{ aspect-ratio:1/1; border-radius:8px; border:none; color:#1a1006; padding:.3rem; text-align:left;
+  display:flex; flex-direction:column; justify-content:space-between; cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease; }
+.element-tile:hover, .element-tile:focus-visible{ transform:translateY(-3px) scale(1.05); box-shadow:0 8px 16px rgba(15,23,42,.2); z-index:2; filter:brightness(1.05); }
+.element-tile.selected{ outline:3px solid var(--ink); outline-offset:1px; }
+.element-tile .z{ font-family:var(--mono); font-size:.62rem; font-weight:600; opacity:.75; }
+.element-tile .sym{ font-family:var(--display); font-size:1.05rem; font-weight:700; line-height:1; }
+.element-tile .nm{ font-size:.52rem; font-weight:600; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.ptable-legend{ display:flex; flex-wrap:wrap; gap:.6rem 1rem; margin-top:1.3rem; }
+.legend-item{ display:flex; align-items:center; gap:.45rem; font-size:.82rem; color:var(--ink-soft); }
+.legend-swatch{ width:14px; height:14px; border-radius:4px; display:inline-block; }
+
+.more-elements-row{ display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1rem; }
+.more-elements-row .element-tile{ width:78px; aspect-ratio:auto; height:78px; flex:0 0 auto; }
+
+/* Element detail panel */
+.element-panel{ background:#fff; border-radius:24px; border:1px solid rgba(15,23,42,.07); box-shadow:0 20px 45px rgba(15,23,42,.1);
+  padding:2rem; margin-top:1.8rem; display:none; }
+.element-panel.show{ display:block; }
+.element-panel-head{ display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; }
+.element-panel-symbol{ width:88px; height:88px; border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:#1a1006; flex:0 0 auto; }
+.element-panel-symbol .z{ font-family:var(--mono); font-size:.7rem; align-self:flex-start; margin-left:.5rem; opacity:.75; }
+.element-panel-symbol .sym{ font-family:var(--display); font-size:2rem; font-weight:700; line-height:1; }
+.element-panel-title h3{ font-size:1.5rem; font-weight:700; margin-bottom:.2rem; }
+.element-panel-title .cat-badge{ font-family:var(--mono); font-size:.72rem; padding:.25rem .65rem; border-radius:999px; color:#fff; }
+.element-facts{ display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; margin-top:1.4rem; }
+@media (max-width:767.98px){ .element-facts{ grid-template-columns:repeat(2,1fr); } }
+.element-fact{ background:var(--paper); border-radius:12px; padding:.8rem 1rem; }
+.element-fact .lbl{ font-size:.72rem; color:var(--ink-soft); text-transform:none; margin-bottom:.2rem; }
+.element-fact .val{ font-weight:700; font-family:var(--mono); font-size:1rem; }
+.element-panel-body{ display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; margin-top:1.6rem; }
+@media (max-width:767.98px){ .element-panel-body{ grid-template-columns:1fr; } }
+.element-panel-body h6{ font-weight:700; font-size:.92rem; margin-bottom:.4rem; }
+.element-panel-body p, .element-panel-body ul{ font-size:.9rem; color:var(--ink-soft); line-height:1.6; }
+.element-panel-body ul{ padding-left:1.1rem; margin-bottom:0; }
+.atom-model{ text-align:center; }
+.atom-model svg{ max-width:220px; }
+.atom-model .caption{ font-size:.78rem; color:var(--ink-soft); margin-top:.5rem; }
+.electron-e{ animation:spinA 6s linear infinite; transform-origin:center; }
+
+/* ---------------------------------------------------------------------- */
+/* MIXTURES */
+/* ---------------------------------------------------------------------- */
+.mix-btns{ display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1.4rem; }
+.mix-btn{ background:#fff; border:1.5px solid rgba(15,23,42,.08); border-radius:14px; padding:.9rem 1.2rem; font-weight:700; font-size:.92rem;
+  color:var(--ink); transition:border-color .2s ease, transform .2s ease; display:flex; align-items:center; gap:.6rem; }
+.mix-btn:hover, .mix-btn.active{ border-color:var(--chem-primary); transform:translateY(-2px); }
+.mix-visual{ margin-top:1.6rem; background:#fff; border-radius:20px; border:1px solid rgba(15,23,42,.07); padding:1.8rem; display:none; }
+.mix-visual.show{ display:block; }
+.mix-jar{ width:110px; height:130px; margin:0 auto 1rem; border:3px solid rgba(15,23,42,.15); border-top:none; border-radius:0 0 14px 14px;
+  position:relative; overflow:hidden; background:#fff; }
+.mix-layer{ position:absolute; left:0; right:0; bottom:0; transition:height .4s ease; }
+.mix-particle{ position:absolute; border-radius:50%; }
+
+/* ---------------------------------------------------------------------- */
+/* CHEMICAL CHANGES */
+/* ---------------------------------------------------------------------- */
+.change-card{ background:#fff; border-radius:18px; border:1px solid rgba(15,23,42,.06); padding:1.6rem; height:100%; }
+.change-arrow{ display:flex; align-items:center; justify-content:center; gap:.8rem; margin:1rem 0; }
+.change-state{ flex:1; text-align:center; padding:1rem .6rem; border-radius:12px; background:var(--paper); font-weight:700; font-size:.88rem; }
+.change-card p{ color:var(--ink-soft); font-size:.9rem; line-height:1.6; }
+
+/* ---------------------------------------------------------------------- */
+/* QUIZ */
+/* ---------------------------------------------------------------------- */
+.quiz-card{ background:#fff; border-radius:24px; border:1px solid rgba(15,23,42,.07); box-shadow:0 16px 36px rgba(15,23,42,.08);
+  padding:2.2rem; max-width:720px; margin-inline:auto; }
+.quiz-progress{ font-family:var(--mono); font-size:.78rem; color:var(--ink-soft); margin-bottom:.6rem; }
+.quiz-question{ font-size:1.15rem; font-weight:700; margin-bottom:1.3rem; }
+.quiz-options{ display:grid; gap:.7rem; }
+.quiz-option{ text-align:left; background:var(--paper); border:1.5px solid rgba(15,23,42,.08); border-radius:12px; padding:.85rem 1.1rem;
+  font-weight:600; font-size:.95rem; color:var(--ink); transition:border-color .15s ease, background .15s ease; }
+.quiz-option:hover{ border-color:var(--chem-primary); }
+.quiz-option.correct{ border-color:var(--green); background:rgba(22,163,74,.08); }
+.quiz-option.incorrect{ border-color:#EF4444; background:rgba(239,68,68,.07); }
+.quiz-feedback{ margin-top:1.1rem; font-weight:600; font-size:.95rem; min-height:1.4em; }
+.quiz-feedback.correct{ color:var(--green); }
+.quiz-feedback.incorrect{ color:#DC2626; }
+.quiz-next{ margin-top:1.2rem; display:none; }
+.quiz-next.show{ display:inline-flex; }
+.quiz-score{ font-family:var(--mono); font-size:.85rem; color:var(--ink-soft); margin-top:1.4rem; }
+
+/* ---------------------------------------------------------------------- */
+/* DID YOU KNOW (reused pattern) */
+/* ---------------------------------------------------------------------- */
+.fact-panel{ background:linear-gradient(135deg,#FFF7ED,#FDF4FF); border:1px solid rgba(249,115,22,.15); border-radius:24px;
+  padding:2.5rem; text-align:center; max-width:760px; margin-inline:auto; }
+.fact-panel .ico-badge{ width:54px; height:54px; border-radius:50%; display:grid; place-items:center; margin:0 auto 1rem;
+  background:linear-gradient(135deg,var(--chem-primary),var(--chem-support)); color:#fff; font-size:1.3rem; }
+#chemFactText{ font-family:var(--display); font-weight:600; font-size:clamp(1.05rem,2.3vw,1.35rem); color:var(--ink);
+  min-height:3.2em; display:flex; align-items:center; justify-content:center; transition:opacity .25s ease; }
+#chemFactText.fading{ opacity:0; }
+
+/* ---------------------------------------------------------------------- */
+/* FOOTER (shared) */
+/* ---------------------------------------------------------------------- */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--chem-secondary); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .float-a,.float-b,.float-c,.spin-a,.bubble,.jiggle,.electron-e{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="#matter-sim" class="btn btn-chem-primary">Start Learning</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+  ==================================================================== -->
+  <header class="chem-hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="chem-eyebrow"><i class="bi bi-droplet-half"></i> Chemistry Lab</span>
+          <h1>Explore the World of <span class="accent">Chemistry</span></h1>
+          <p class="lead-copy">Discover atoms, elements, matter and chemical changes by experimenting with interactive simulations.</p>
+          <div class="chem-hero-actions">
+            <a href="#topics" class="btn btn-chem-primary">Explore Chemistry</a>
+            <a href="#periodic-table" class="btn btn-chem-ghost">Open Periodic Table</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chem-lab-art" role="img" aria-label="Illustration of a chemistry lab with a bubbling flask, an atom, water droplets and floating molecules">
+            <svg viewBox="0 0 420 400" xmlns="http://www.w3.org/2000/svg">
+              <!-- Central atom -->
+              <g transform="translate(210,150)">
+                <ellipse class="spin-a" rx="98" ry="38" stroke="#FACC15" stroke-width="1.6" fill="none" opacity="0.6"/>
+                <ellipse class="spin-a" rx="98" ry="38" stroke="#7C3AED" stroke-width="1.6" fill="none" opacity="0.5" transform="rotate(65)" style="animation-direction:reverse;"/>
+                <circle r="14" fill="url(#chemNucleus)"/>
+                <circle class="spin-a" r="4" cx="98" cy="0" fill="#FDE68A"/>
+                <circle class="spin-a" r="4" cx="-84" cy="-33" fill="#C4B5FD" style="animation-direction:reverse; animation-duration:14s;"/>
+              </g>
+
+              <!-- Bubbling flask -->
+              <g transform="translate(150,230)">
+                <path d="M20 0 H40 V30 L64 88 A11 11 0 0 1 54 104 H6 A11 11 0 0 1 -4 88 L20 30 Z"
+                      fill="#0F172A" fill-opacity="0.04" stroke="#F97316" stroke-width="2.5"/>
+                <path d="M0 78 H60" stroke="#F97316" stroke-width="2"/>
+                <path d="M4 82 Q30 98 56 82 L54 104 A11 11 0 0 1 54 104 H6 A11 11 0 0 1 4 82 Z" fill="#FACC15" fill-opacity="0.65"/>
+                <circle class="bubble" cx="22" cy="90" r="3" fill="#fff" opacity="0.8"/>
+                <circle class="bubble" cx="34" cy="94" r="2.4" fill="#fff" opacity="0.8" style="animation-delay:.9s"/>
+                <circle class="bubble" cx="42" cy="88" r="2" fill="#fff" opacity="0.8" style="animation-delay:1.6s"/>
+              </g>
+
+              <!-- Water droplet -->
+              <g class="float-a" transform="translate(320,90)">
+                <path d="M12 0 C20 14 24 22 24 30 A12 12 0 0 1 0 30 C0 22 4 14 12 0 Z" fill="#38BDF8" opacity="0.85"/>
+              </g>
+
+              <!-- Molecule -->
+              <g class="float-b" transform="translate(60,110)">
+                <line x1="0" y1="0" x2="24" y2="12" stroke="#7C3AED" stroke-width="2"/>
+                <line x1="0" y1="0" x2="-6" y2="24" stroke="#7C3AED" stroke-width="2"/>
+                <circle cx="0" cy="0" r="7" fill="#7C3AED"/>
+                <circle cx="24" cy="12" r="5" fill="#C4B5FD"/>
+                <circle cx="-6" cy="24" r="5" fill="#C4B5FD"/>
+              </g>
+
+              <!-- Heat wisp -->
+              <g class="jiggle" transform="translate(300,260)">
+                <path d="M0 30 C-8 20 -8 10 0 0 C8 10 8 20 0 30 Z" fill="#F97316" opacity="0.55"/>
+                <path d="M-10 34 C-16 26 -16 18 -10 10 C-4 18 -4 26 -10 34 Z" fill="#FACC15" opacity="0.5"/>
+              </g>
+
+              <!-- Formula tag -->
+              <g class="float-c" transform="translate(148,26)">
+                <rect x="-6" y="-18" width="96" height="30" rx="9" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="42" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#F97316" font-weight="600">H₂O + heat</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       WHAT IS CHEMISTRY
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>What is Chemistry?</h2>
+        <p class="mx-auto">Chemistry is the study of matter — what things are made of, what properties they have, and how they can change.</p>
+      </div>
+      <div class="row g-4 mt-2">
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:var(--chem-primary);"><i class="bi bi-box"></i></div>
+            <h3>Matter</h3>
+            <p>Everything around us that has mass and takes up space.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:var(--chem-support);"><i class="bi bi-bullseye"></i></div>
+            <h3>Atoms</h3>
+            <p>Very small building blocks that make up matter.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:#EAB308;"><i class="bi bi-arrow-repeat"></i></div>
+            <h3>Changes</h3>
+            <p>Things can change from one form to another or form new substances.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       CHEMISTRY TOPICS
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="topics">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Chemistry Topics</h2>
+        <p class="mx-auto">Jump straight to the topic you want to explore.</p>
+      </div>
+      <div class="row g-3 mt-3">
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-thermometer-half"></i></div>
+            <h4>States of Matter</h4>
+            <p>Solid, liquid and gas explained with particles.</p>
+            <button type="button" data-scroll-to="#matter-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-bullseye"></i></div>
+            <h4>Atoms</h4>
+            <p>The tiny particles that build everything.</p>
+            <button type="button" data-scroll-to="#periodic-table">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-grid-3x3"></i></div>
+            <h4>Elements</h4>
+            <p>Pure substances made of just one type of atom.</p>
+            <button type="button" data-scroll-to="#periodic-table">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-table"></i></div>
+            <h4>Periodic Table</h4>
+            <p>How every known element is organised.</p>
+            <button type="button" data-scroll-to="#periodic-table">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-droplet"></i></div>
+            <h4>Mixtures</h4>
+            <p>What happens when substances combine.</p>
+            <button type="button" data-scroll-to="#mixtures">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-fire"></i></div>
+            <h4>Chemical Changes</h4>
+            <p>How new substances are formed.</p>
+            <button type="button" data-scroll-to="#chemical-changes">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       STATES OF MATTER SIMULATION
+  ==================================================================== -->
+  <section class="section" id="matter-sim">
+    <div class="container container-narrow">
+      <div class="step-flow reveal">
+        <span>SEE</span><i class="bi bi-chevron-right"></i><span>INTERACT</span><i class="bi bi-chevron-right"></i>
+        <span>OBSERVE</span><i class="bi bi-chevron-right"></i><span>EXPLAIN</span><i class="bi bi-chevron-right"></i><span>TRY</span>
+      </div>
+      <div class="section-head reveal">
+        <h2>Experiment 1: States of Matter</h2>
+        <p>Drag the temperature slider and watch how the same particles behave differently as solid, liquid and gas.</p>
+      </div>
+
+      <div class="sim-lab reveal mt-4">
+        <span class="sim-lab-badge"><i class="bi bi-flask"></i> Live particle simulation</span>
+
+        <div class="sim-stage-wrap">
+          <div class="sim-canvas-box">
+            <canvas id="matterCanvas" width="600" height="260" aria-label="Animated particle simulation showing solid, liquid or gas behaviour" role="img"></canvas>
+            <div class="sim-state-readout">
+              <span class="state-pill solid" id="statePill">STATE: SOLID</span>
+              <span class="temp-readout" id="tempReadout">Temperature: 20°C</span>
+            </div>
+            <p class="sim-explain" id="simExplain">Particles are close together and mainly vibrate in place.</p>
+            <p class="sim-substance-note">Using a simplified "example substance" — real substances melt and boil at different temperatures.</p>
+          </div>
+
+          <div class="sim-controls">
+            <label for="tempSlider">Temperature control</label>
+            <div class="temp-slider-row">
+              <i class="bi bi-snow2" style="color:#7DD3FC;" aria-hidden="true"></i>
+              <input type="range" class="form-range" min="0" max="100" value="15" id="tempSlider" aria-describedby="tempReadout">
+              <i class="bi bi-fire" style="color:#FDBA74;" aria-hidden="true"></i>
+            </div>
+            <div class="quick-state-btns" role="group" aria-label="Jump to a state">
+              <button type="button" data-state-btn="solid" class="active">Solid</button>
+              <button type="button" data-state-btn="liquid">Liquid</button>
+              <button type="button" data-state-btn="gas">Gas</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="transform-grid" id="transformGrid">
+          <button type="button" class="transform-card" data-from="solid" data-to="liquid">
+            <div class="tlabel">SOLID → LIQUID</div>
+            <h5>Melting</h5>
+            <p>Melting happens when a solid gains enough heat to become a liquid.</p>
+          </button>
+          <button type="button" class="transform-card" data-from="liquid" data-to="gas">
+            <div class="tlabel">LIQUID → GAS</div>
+            <h5>Evaporation</h5>
+            <p>Evaporation happens when a liquid gains enough heat to become a gas.</p>
+          </button>
+          <button type="button" class="transform-card" data-from="gas" data-to="liquid">
+            <div class="tlabel">GAS → LIQUID</div>
+            <h5>Condensation</h5>
+            <p>Condensation happens when a gas cools down and becomes a liquid.</p>
+          </button>
+          <button type="button" class="transform-card" data-from="liquid" data-to="solid">
+            <div class="tlabel">LIQUID → SOLID</div>
+            <h5>Freezing</h5>
+            <p>Freezing happens when a liquid cools down and becomes a solid.</p>
+          </button>
+          <button type="button" class="transform-card" data-from="solid" data-to="gas">
+            <div class="tlabel">SOLID → GAS</div>
+            <h5>Sublimation</h5>
+            <p>Sublimation happens when a solid changes straight into a gas without becoming liquid first.</p>
+          </button>
+          <button type="button" class="transform-card" data-from="gas" data-to="solid">
+            <div class="tlabel">GAS → SOLID</div>
+            <h5>Deposition</h5>
+            <p>Deposition happens when a gas changes straight into a solid without becoming liquid first.</p>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       PERIODIC TABLE
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="periodic-table">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Explore the Periodic Table</h2>
+        <p>Every element is a pure substance made of just one type of atom. Tap a tile to learn about it.</p>
+      </div>
+
+      <div class="ptable-scroll reveal">
+        <div class="ptable-grid" id="ptableGrid"></div>
+      </div>
+      <p class="ptable-hint"><i class="bi bi-arrow-left-right"></i> Scroll sideways to see the full table on a small screen.</p>
+
+      <div class="reveal">
+        <p class="fw-semibold mb-1 mt-4" style="font-size:.9rem;">A few more important elements</p>
+        <p style="font-size:.85rem; color:var(--ink-soft);">These belong further along the table, in the transition metals block.</p>
+        <div class="more-elements-row" id="moreElementsRow"></div>
+      </div>
+
+      <div class="ptable-legend reveal" id="ptableLegend"></div>
+
+      <div class="element-panel" id="elementPanel" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       MIXTURES
+  ==================================================================== -->
+  <section class="section" id="mixtures">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Mixtures Around Us</h2>
+        <p>A mixture is made when two or more substances are combined without a new substance forming. Choose an example to explore it.</p>
+      </div>
+
+      <div class="mix-btns reveal" id="mixButtons">
+        <button type="button" class="mix-btn active" data-mix="salt"><i class="bi bi-droplet"></i> Salt + Water</button>
+        <button type="button" class="mix-btn" data-mix="sand"><i class="bi bi-droplet"></i> Sand + Water</button>
+        <button type="button" class="mix-btn" data-mix="oil"><i class="bi bi-droplet"></i> Oil + Water</button>
+      </div>
+
+      <div class="mix-visual show reveal" id="mixVisual">
+        <div class="row align-items-center g-4">
+          <div class="col-md-4 text-center">
+            <div class="mix-jar" id="mixJar"></div>
+          </div>
+          <div class="col-md-8">
+            <h4 id="mixTitle" style="font-weight:700;">Salt + Water</h4>
+            <p class="mb-2" id="mixWhat" style="color:var(--ink-soft);">Salt dissolves in water and forms a solution.</p>
+            <p class="mb-0"><strong>Can it be separated?</strong> <span id="mixSeparate">Yes — by evaporating the water, the salt is left behind.</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       CHEMICAL CHANGES
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="chemical-changes">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Chemical Changes</h2>
+        <p>A chemical change produces one or more new substances. Here are three safe, everyday examples.</p>
+      </div>
+
+      <div class="row g-4 mt-2">
+        <div class="col-md-4 reveal">
+          <div class="change-card">
+            <i class="bi bi-droplet-half" style="font-size:1.6rem; color:var(--chem-primary);"></i>
+            <h5 class="mt-2" style="font-weight:700;">Iron Rusting</h5>
+            <div class="change-arrow">
+              <span class="change-state">Iron</span>
+              <i class="bi bi-arrow-right"></i>
+              <span class="change-state">Rust</span>
+            </div>
+            <p>When iron meets water and oxygen over time, it slowly turns into a new, reddish-brown substance called rust.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="change-card">
+            <i class="bi bi-egg-fried" style="font-size:1.6rem; color:var(--chem-primary);"></i>
+            <h5 class="mt-2" style="font-weight:700;">Cooking Food</h5>
+            <div class="change-arrow">
+              <span class="change-state">Raw egg</span>
+              <i class="bi bi-arrow-right"></i>
+              <span class="change-state">Cooked egg</span>
+            </div>
+            <p>Heat changes the structure of the ingredients, so cooked food cannot easily turn back into its raw form.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="change-card">
+            <i class="bi bi-cup-straw" style="font-size:1.6rem; color:var(--chem-primary);"></i>
+            <h5 class="mt-2" style="font-weight:700;">Vinegar + Baking Soda</h5>
+            <div class="change-arrow">
+              <span class="change-state">Vinegar + Soda</span>
+              <i class="bi bi-arrow-right"></i>
+              <span class="change-state">Gas bubbles</span>
+            </div>
+            <p>Mixing them produces bubbles of carbon dioxide gas — a classic sign that a new substance has formed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       CHEMISTRY CHALLENGE (QUIZ)
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Chemistry Challenge</h2>
+        <p class="mx-auto">Test what you've learned so far.</p>
+      </div>
+
+      <div class="quiz-card reveal mt-4" id="quizCard">
+        <div class="quiz-progress" id="quizProgress">Question 1 of 5</div>
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback" role="status"></div>
+        <button type="button" class="btn btn-chem-primary quiz-next" id="quizNextBtn">Next Question</button>
+        <div class="quiz-score" id="quizScore"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       DID YOU KNOW
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="fact-panel reveal">
+        <div class="ico-badge"><i class="bi bi-stars"></i></div>
+        <h2 class="h5 mb-1" style="font-weight:700;">Did You Know?</h2>
+        <p id="chemFactText">Water can exist naturally as a solid, liquid and gas.</p>
+        <button class="btn btn-chem-outline mt-2" id="chemFactBtn" type="button">
+          <i class="bi bi-arrow-repeat me-1"></i> Show Another Fact
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Making science easier to see, understand and explore.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-4 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   S1 SCIENCE LAB — Chemistry page script (internal js/chemistry.js + js/main.js
+   equivalent, inlined per request)
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------------------------------------------------------
+     SHARED (main.js-equivalent): navbar state, mobile menu, reveal,
+     smooth scroll — same behaviour as the Home and Physics pages.
+  --------------------------------------------------------------- */
+  var nav = document.getElementById("labNav");
+  function updateNavState() {
+    nav.classList.toggle("is-scrolled", window.scrollY > 12);
+  }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl).hide();
+        }
+      });
+    });
+  }
+
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  document.querySelectorAll('[data-scroll-to], a[href^="#"]').forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("data-scroll-to") || this.getAttribute("href");
+      if (targetId && targetId.length > 1 && targetId.indexOf("#") === 0) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+
+  /* =================================================================
+     STATES OF MATTER SIMULATION
+     Functions: initializeMatterSimulation, updateMatterParticles,
+     changeMatterState
+  ================================================================= */
+  var canvas = document.getElementById("matterCanvas");
+  var ctx = canvas.getContext("2d");
+  var tempSlider = document.getElementById("tempSlider");
+  var statePill = document.getElementById("statePill");
+  var tempReadout = document.getElementById("tempReadout");
+  var simExplain = document.getElementById("simExplain");
+  var quickStateBtns = document.querySelectorAll("[data-state-btn]");
+  var transformCards = document.querySelectorAll(".transform-card");
+
+  var particles = [];
+  var PARTICLE_COUNT_X = 7;
+  var PARTICLE_COUNT_Y = 4;
+  var canvasW = 600, canvasH = 260;
+  var currentTemp = 15;
+  var animHandle = null;
+  var transformTimer = null;
+
+  var stateExplanations = {
+    solid: "Particles are close together and mainly vibrate in place.",
+    liquid: "Particles are still close together, but they can move around each other.",
+    gas: "Particles move freely and spread out to fill the space."
+  };
+
+  function resizeCanvas() {
+    var box = canvas.parentElement;
+    var cssWidth = box.clientWidth - 32; /* minus padding */
+    canvasW = Math.max(280, cssWidth);
+    canvasH = 260;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    canvas.style.width = canvasW + "px";
+    canvas.style.height = canvasH + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function initializeMatterSimulation() {
+    resizeCanvas();
+    particles = [];
+    var marginX = canvasW * 0.12;
+    var marginY = canvasH * 0.15;
+    var spacingX = (canvasW - marginX * 2) / (PARTICLE_COUNT_X - 1);
+    var spacingY = (canvasH - marginY * 2) / (PARTICLE_COUNT_Y - 1);
+
+    for (var row = 0; row < PARTICLE_COUNT_Y; row++) {
+      for (var col = 0; col < PARTICLE_COUNT_X; col++) {
+        var bx = marginX + col * spacingX;
+        var by = marginY + row * spacingY;
+        particles.push({
+          baseX: bx, baseY: by,
+          x: bx, y: by,
+          vx: 0, vy: 0
+        });
+      }
+    }
+    setTemperature(currentTemp, true);
+    if (!animHandle) {
+      animHandle = requestAnimationFrame(animationLoop);
+    }
+  }
+
+  function stateForTemp(t) {
+    if (t < 33) return "solid";
+    if (t < 66) return "liquid";
+    return "gas";
+  }
+
+  function updateMatterParticles() {
+    var energy = currentTemp / 100;
+    var springK = (1 - energy) * 0.09;
+    var noiseForce = 0.03 + energy * 0.32;
+    var maxSpeed = 0.35 + energy * 3.6;
+    var damping = 0.92;
+
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      var ax = (p.baseX - p.x) * springK + (Math.random() - 0.5) * noiseForce;
+      var ay = (p.baseY - p.y) * springK + (Math.random() - 0.5) * noiseForce;
+      p.vx = (p.vx + ax) * damping;
+      p.vy = (p.vy + ay) * damping;
+
+      var speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > maxSpeed) {
+        p.vx = (p.vx / speed) * maxSpeed;
+        p.vy = (p.vy / speed) * maxSpeed;
+      }
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      var pad = 8;
+      if (p.x < pad) { p.x = pad; p.vx *= -0.7; }
+      if (p.x > canvasW - pad) { p.x = canvasW - pad; p.vx *= -0.7; }
+      if (p.y < pad) { p.y = pad; p.vy *= -0.7; }
+      if (p.y > canvasH - pad) { p.y = canvasH - pad; p.vy *= -0.7; }
+    }
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvasW, canvasH);
+    var state = stateForTemp(currentTemp);
+    var color = state === "solid" ? "#7DD3FC" : state === "liquid" ? "#86EFAC" : "#FDBA74";
+    var radius = state === "gas" ? 4.2 : 5.4;
+
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.92;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function animationLoop() {
+    if (!prefersReducedMotion) {
+      updateMatterParticles();
+    }
+    drawParticles();
+    animHandle = requestAnimationFrame(animationLoop);
+  }
+
+  function setTemperature(t, skipSlider) {
+    currentTemp = Math.max(0, Math.min(100, t));
+    if (!skipSlider) tempSlider.value = currentTemp;
+
+    var celsius = Math.round(-10 + (currentTemp / 100) * 130); /* purely illustrative scale */
+    tempReadout.textContent = "Temperature: " + celsius + "\u00B0C";
+
+    var state = stateForTemp(currentTemp);
+    statePill.textContent = "STATE: " + state.toUpperCase();
+    statePill.className = "state-pill " + state;
+    simExplain.textContent = stateExplanations[state];
+
+    quickStateBtns.forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-state-btn") === state);
+    });
+
+    if (prefersReducedMotion) drawParticles();
+  }
+
+  /* changeMatterState: animate the temperature toward the target state,
+     used by the quick-state buttons and the transformation cards */
+  function changeMatterState(targetState) {
+    var targets = { solid: 12, liquid: 50, gas: 88 };
+    var target = targets[targetState] !== undefined ? targets[targetState] : 50;
+    animateTempTo(target);
+  }
+
+  function animateTempTo(target) {
+    if (transformTimer) clearInterval(transformTimer);
+    if (prefersReducedMotion) {
+      setTemperature(target);
+      return;
+    }
+    transformTimer = setInterval(function () {
+      var diff = target - currentTemp;
+      if (Math.abs(diff) < 1) {
+        setTemperature(target);
+        clearInterval(transformTimer);
+        return;
+      }
+      setTemperature(currentTemp + diff * 0.12);
+    }, 30);
+  }
+
+  tempSlider.addEventListener("input", function () {
+    setTemperature(parseFloat(tempSlider.value));
+  });
+
+  quickStateBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      changeMatterState(btn.getAttribute("data-state-btn"));
+    });
+  });
+
+  transformCards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      transformCards.forEach(function (c) { c.classList.remove("active"); });
+      card.classList.add("active");
+      changeMatterState(card.getAttribute("data-to"));
+    });
+  });
+
+  window.addEventListener("resize", function () {
+    resizeCanvas();
+  });
+
+  initializeMatterSimulation();
+
+  /* =================================================================
+     PERIODIC TABLE
+     Functions: initializePeriodicTable, showElementDetails,
+     initializeAtomVisualization
+  ================================================================= */
+
+  /* Element data is stored locally in this array — no API is used.
+     protons/electrons are exact; neutrons are the common teaching
+     approximation (rounded atomic mass minus atomic number). */
+  var CATEGORY_COLORS = {
+    "alkali-metal":            "#F87171",
+    "alkaline-earth-metal":    "#FB923C",
+    "transition-metal":        "#FBBF24",
+    "post-transition-metal":   "#A3E635",
+    "metalloid":               "#2DD4BF",
+    "nonmetal":                "#38BDF8",
+    "halogen":                 "#818CF8",
+    "noble-gas":               "#C084FC"
+  };
+  var CATEGORY_LABELS = {
+    "alkali-metal": "Alkali metal",
+    "alkaline-earth-metal": "Alkaline earth metal",
+    "transition-metal": "Transition metal",
+    "post-transition-metal": "Post-transition metal",
+    "metalloid": "Metalloid",
+    "nonmetal": "Nonmetal",
+    "halogen": "Halogen",
+    "noble-gas": "Noble gas"
+  };
+
+  var elementsData = [
+    { z:1, sym:"H", name:"Hydrogen", period:1, group:1, category:"nonmetal", stateAtRoom:"Gas", mass:1.008,
+      found:["Water","Stars and the Sun","Natural gas"], used:["Rocket fuel","Making ammonia for fertiliser","Fuel cells"],
+      discovery:"Identified as a distinct substance by Henry Cavendish in 1766, in England." },
+    { z:2, sym:"He", name:"Helium", period:1, group:18, category:"noble-gas", stateAtRoom:"Gas", mass:4.003,
+      found:["Air (in tiny amounts)","Natural gas deposits"], used:["Party and weather balloons","Cooling MRI scanners"],
+      discovery:"First detected in the Sun's light by Pierre Janssen and Norman Lockyer in 1868; isolated on Earth by William Ramsay in 1895." },
+    { z:3, sym:"Li", name:"Lithium", period:2, group:1, category:"alkali-metal", stateAtRoom:"Solid", mass:6.94,
+      found:["Mineral ores","Salt lakes and brines"], used:["Rechargeable batteries","Some medicines"],
+      discovery:"Discovered by Johan August Arfwedson in 1817, in Sweden." },
+    { z:4, sym:"Be", name:"Beryllium", period:2, group:2, category:"alkaline-earth-metal", stateAtRoom:"Solid", mass:9.012,
+      found:["The mineral beryl","Emerald gemstones"], used:["Lightweight aerospace parts","X-ray equipment windows"],
+      discovery:"Discovered by Louis Nicolas Vauquelin in 1798, in France." },
+    { z:5, sym:"B", name:"Boron", period:2, group:13, category:"metalloid", stateAtRoom:"Solid", mass:10.81,
+      found:["Borax mineral deposits"], used:["Heat-resistant glass","Detergents"],
+      discovery:"Isolated in 1808, independently by Joseph Louis Gay-Lussac and Louis Jacques Thénard in France, and by Humphry Davy in England." },
+    { z:6, sym:"C", name:"Carbon", period:2, group:14, category:"nonmetal", stateAtRoom:"Solid", mass:12.011,
+      found:["Living things","Coal","Diamonds"], used:["Fuels","Pencil graphite","Making steel"],
+      discovery:"Known since ancient times — not credited to a single discoverer." },
+    { z:7, sym:"N", name:"Nitrogen", period:2, group:15, category:"nonmetal", stateAtRoom:"Gas", mass:14.007,
+      found:["About 78% of the air we breathe"], used:["Fertilisers","Food packaging (keeps food fresh)"],
+      discovery:"Discovered by Daniel Rutherford in 1772, in Scotland." },
+    { z:8, sym:"O", name:"Oxygen", period:2, group:16, category:"nonmetal", stateAtRoom:"Gas", mass:15.999,
+      found:["Air","Water","Living organisms"], used:["Breathing","Medical oxygen in hospitals","Welding"],
+      discovery:"Associated with the discovery of oxygen: Joseph Priestley and Carl Wilhelm Scheele, working independently around 1772–1774. Antoine Lavoisier later helped explain its role and gave it its name." },
+    { z:9, sym:"F", name:"Fluorine", period:2, group:17, category:"halogen", stateAtRoom:"Gas", mass:18.998,
+      found:["Fluorite and other minerals"], used:["Toothpaste","Non-stick coatings"],
+      discovery:"First isolated by Henri Moissan in 1886, in France." },
+    { z:10, sym:"Ne", name:"Neon", period:2, group:18, category:"noble-gas", stateAtRoom:"Gas", mass:20.180,
+      found:["Air (in tiny amounts)"], used:["Glowing signs and lights"],
+      discovery:"Discovered by William Ramsay and Morris Travers in 1898, in England." },
+    { z:11, sym:"Na", name:"Sodium", period:3, group:1, category:"alkali-metal", stateAtRoom:"Solid", mass:22.990,
+      found:["Table salt","Seawater"], used:["Table salt","Older types of street lighting"],
+      discovery:"Discovered by Humphry Davy in 1807, in England." },
+    { z:12, sym:"Mg", name:"Magnesium", period:3, group:2, category:"alkaline-earth-metal", stateAtRoom:"Solid", mass:24.305,
+      found:["Seawater","Mineral ores"], used:["Lightweight metal alloys","Fireworks"],
+      discovery:"Recognised as a distinct element by Joseph Black in 1755; first isolated by Humphry Davy in 1808." },
+    { z:13, sym:"Al", name:"Aluminium", period:3, group:13, category:"post-transition-metal", stateAtRoom:"Solid", mass:26.982,
+      found:["Bauxite ore"], used:["Drink cans","Kitchen foil","Aircraft parts"],
+      discovery:"First produced by Hans Christian Ørsted in 1825, in Denmark, with pure samples later made by Friedrich Wöhler." },
+    { z:14, sym:"Si", name:"Silicon", period:3, group:14, category:"metalloid", stateAtRoom:"Solid", mass:28.085,
+      found:["Sand","Rocks and quartz"], used:["Computer chips","Glass"],
+      discovery:"Discovered by Jöns Jacob Berzelius in 1824, in Sweden." },
+    { z:15, sym:"P", name:"Phosphorus", period:3, group:15, category:"nonmetal", stateAtRoom:"Solid", mass:30.974,
+      found:["Minerals","Living cells"], used:["Fertilisers","Match heads"],
+      discovery:"Discovered by Hennig Brand in 1669, in Germany." },
+    { z:16, sym:"S", name:"Sulfur", period:3, group:16, category:"nonmetal", stateAtRoom:"Solid", mass:32.06,
+      found:["Near volcanoes","Mineral deposits"], used:["Fertilisers","Making rubber"],
+      discovery:"Known since ancient times — not credited to a single discoverer." },
+    { z:17, sym:"Cl", name:"Chlorine", period:3, group:17, category:"halogen", stateAtRoom:"Gas", mass:35.45,
+      found:["Table salt","Seawater"], used:["Cleaning drinking water","Disinfectants"],
+      discovery:"Discovered by Carl Wilhelm Scheele in 1774, in Sweden." },
+    { z:18, sym:"Ar", name:"Argon", period:3, group:18, category:"noble-gas", stateAtRoom:"Gas", mass:39.948,
+      found:["About 1% of the air"], used:["Filling light bulbs","Protecting metal during welding"],
+      discovery:"Discovered by Lord Rayleigh and William Ramsay in 1894, in England." },
+    { z:19, sym:"K", name:"Potassium", period:4, group:1, category:"alkali-metal", stateAtRoom:"Solid", mass:39.098,
+      found:["Minerals","Plants and soil"], used:["Fertilisers"],
+      discovery:"Discovered by Humphry Davy in 1807, in England." },
+    { z:20, sym:"Ca", name:"Calcium", period:4, group:2, category:"alkaline-earth-metal", stateAtRoom:"Solid", mass:40.078,
+      found:["Bones and teeth","Limestone"], used:["Cement","Dietary supplements"],
+      discovery:"Discovered by Humphry Davy in 1808, in England." },
+    { z:31, sym:"Ga", name:"Gallium", period:4, group:13, category:"post-transition-metal", stateAtRoom:"Solid", mass:69.723,
+      found:["Trace amounts in ores"], used:["LEDs","Electronics"],
+      discovery:"Discovered by Paul-Émile Lecoq de Boisbaudran in 1875, in France." },
+    { z:32, sym:"Ge", name:"Germanium", period:4, group:14, category:"metalloid", stateAtRoom:"Solid", mass:72.630,
+      found:["Certain ores and coal"], used:["Fibre-optic cables","Electronics"],
+      discovery:"Discovered by Clemens Winkler in 1886, in Germany." },
+    { z:33, sym:"As", name:"Arsenic", period:4, group:15, category:"metalloid", stateAtRoom:"Solid", mass:74.922,
+      found:["Mineral ores"], used:["Some semiconductors (handled only in controlled industrial settings, as it is toxic)"],
+      discovery:"Known since ancient times; recognised as a distinct element by around 1250, associated with Albertus Magnus." },
+    { z:34, sym:"Se", name:"Selenium", period:4, group:16, category:"nonmetal", stateAtRoom:"Solid", mass:78.971,
+      found:["Certain ores"], used:["Electronics","Glass-making"],
+      discovery:"Discovered by Jöns Jacob Berzelius in 1817, in Sweden." },
+    { z:35, sym:"Br", name:"Bromine", period:4, group:17, category:"halogen", stateAtRoom:"Liquid", mass:79.904,
+      found:["Seawater","Salt lakes"], used:["Flame retardants","Some industrial chemicals"],
+      discovery:"Discovered by Antoine Balard in 1826, in France." },
+    { z:36, sym:"Kr", name:"Krypton", period:4, group:18, category:"noble-gas", stateAtRoom:"Gas", mass:83.798,
+      found:["Air (in tiny amounts)"], used:["Certain specialised lighting"],
+      discovery:"Discovered by William Ramsay and Morris Travers in 1898, in England." }
+  ];
+
+  var moreElements = [
+    { z:26, sym:"Fe", name:"Iron", category:"transition-metal", stateAtRoom:"Solid", mass:55.845,
+      found:["Iron ore","Haemoglobin in blood"], used:["Buildings","Tools","Vehicles"],
+      discovery:"Known and used since ancient times — not credited to a single discoverer." },
+    { z:29, sym:"Cu", name:"Copper", category:"transition-metal", stateAtRoom:"Solid", mass:63.546,
+      found:["Copper ore","Sometimes found as pure metal"], used:["Electrical wires","Plumbing pipes"],
+      discovery:"Known and used since ancient times — not credited to a single discoverer." },
+    { z:30, sym:"Zn", name:"Zinc", category:"transition-metal", stateAtRoom:"Solid", mass:65.38,
+      found:["Zinc ores"], used:["Coating (galvanising) steel to stop rust","Batteries"],
+      discovery:"Used in metal alloys since ancient times; first isolated in pure form and credited to Andreas Sigismund Marggraf in 1746, in Germany." },
+    { z:47, sym:"Ag", name:"Silver", category:"transition-metal", stateAtRoom:"Solid", mass:107.868,
+      found:["Silver ore","Sometimes found as pure metal"], used:["Jewellery","Electronics"],
+      discovery:"Known and used since ancient times — not credited to a single discoverer." },
+    { z:79, sym:"Au", name:"Gold", category:"transition-metal", stateAtRoom:"Solid", mass:196.967,
+      found:["Found in nature as pure metal"], used:["Jewellery","Electronics"],
+      discovery:"Known and used since ancient times — not credited to a single discoverer." }
+  ];
+
+  var allElements = elementsData.concat(moreElements);
+  var selectedTile = null;
+
+  function neutronsFor(el) { return Math.max(0, Math.round(el.mass) - el.z); }
+
+  function makeTileMarkup(el, small) {
+    var color = CATEGORY_COLORS[el.category];
+    return '<span class="z">' + el.z + '</span>' +
+           '<span class="sym">' + el.sym + '</span>' +
+           (small ? '' : '<span class="nm">' + el.name + '</span>');
+  }
+
+  function initializePeriodicTable() {
+    var grid = document.getElementById("ptableGrid");
+    grid.innerHTML = "";
+    elementsData.forEach(function (el) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "element-tile";
+      btn.style.background = CATEGORY_COLORS[el.category];
+      btn.style.gridColumn = el.group;
+      btn.style.gridRow = el.period;
+      btn.setAttribute("aria-label", el.name + ", atomic number " + el.z + ", " + CATEGORY_LABELS[el.category]);
+      btn.dataset.symbol = el.sym;
+      btn.innerHTML = makeTileMarkup(el, false);
+      btn.addEventListener("click", function () { showElementDetails(el.sym, btn); });
+      grid.appendChild(btn);
+    });
+
+    var moreRow = document.getElementById("moreElementsRow");
+    moreRow.innerHTML = "";
+    moreElements.forEach(function (el) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "element-tile";
+      btn.style.background = CATEGORY_COLORS[el.category];
+      btn.setAttribute("aria-label", el.name + ", atomic number " + el.z + ", " + CATEGORY_LABELS[el.category]);
+      btn.dataset.symbol = el.sym;
+      btn.innerHTML = makeTileMarkup(el, false);
+      btn.addEventListener("click", function () { showElementDetails(el.sym, btn); });
+      moreRow.appendChild(btn);
+    });
+
+    var legend = document.getElementById("ptableLegend");
+    legend.innerHTML = "";
+    Object.keys(CATEGORY_LABELS).forEach(function (key) {
+      var item = document.createElement("span");
+      item.className = "legend-item";
+      item.innerHTML = '<span class="legend-swatch" style="background:' + CATEGORY_COLORS[key] + '"></span>' + CATEGORY_LABELS[key];
+      legend.appendChild(item);
+    });
+  }
+
+  function listToHtml(items) {
+    return "<ul>" + items.map(function (i) { return "<li>" + i + "</li>"; }).join("") + "</ul>";
+  }
+
+  function showElementDetails(symbol, tileEl) {
+    var el = allElements.filter(function (e) { return e.sym === symbol; })[0];
+    if (!el) return;
+
+    if (selectedTile) selectedTile.classList.remove("selected");
+    if (tileEl) { tileEl.classList.add("selected"); selectedTile = tileEl; }
+
+    var neutrons = neutronsFor(el);
+    var panel = document.getElementById("elementPanel");
+    var color = CATEGORY_COLORS[el.category];
+
+    panel.innerHTML =
+      '<div class="element-panel-head">' +
+        '<div class="element-panel-symbol" style="background:' + color + '">' +
+          '<span class="z">' + el.z + '</span><span class="sym">' + el.sym + '</span>' +
+        '</div>' +
+        '<div class="element-panel-title">' +
+          '<h3>' + el.name.toUpperCase() + '</h3>' +
+          '<span class="cat-badge" style="background:' + color + '; color:#1a1006;">' + CATEGORY_LABELS[el.category] + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="element-facts">' +
+        '<div class="element-fact"><div class="lbl">Atomic number</div><div class="val">' + el.z + '</div></div>' +
+        '<div class="element-fact"><div class="lbl">Symbol</div><div class="val">' + el.sym + '</div></div>' +
+        '<div class="element-fact"><div class="lbl">State at room temperature</div><div class="val">' + el.stateAtRoom + '</div></div>' +
+        '<div class="element-fact"><div class="lbl">Atomic mass</div><div class="val">' + el.mass + '</div></div>' +
+      '</div>' +
+      '<div class="element-panel-body">' +
+        '<div>' +
+          '<h6>Where is it found?</h6>' + listToHtml(el.found) +
+          '<h6 class="mt-3">Where is it used?</h6>' + listToHtml(el.used) +
+          '<h6 class="mt-3">Discovery / History</h6><p>' + el.discovery + '</p>' +
+        '</div>' +
+        '<div class="atom-model" id="atomModelHost"></div>' +
+      '</div>';
+
+    panel.classList.add("show");
+    initializeAtomVisualization(el.z, neutrons, el.z, color);
+    panel.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "center" });
+  }
+
+  /* initializeAtomVisualization: draws a simplified Bohr-style model
+     with nucleus + electron shells (shell capacities 2, 8, 8, 18, 18, 32) */
+  function initializeAtomVisualization(protons, neutrons, electrons, color) {
+    var host = document.getElementById("atomModelHost");
+    if (!host) return;
+
+    var shellCapacities = [2, 8, 8, 18, 18, 32];
+    var remaining = electrons;
+    var shells = [];
+    for (var s = 0; s < shellCapacities.length && remaining > 0; s++) {
+      var count = Math.min(shellCapacities[s], remaining);
+      shells.push(count);
+      remaining -= count;
+    }
+
+    var size = 220;
+    var cx = size / 2, cy = size / 2;
+    var svgParts = [];
+    svgParts.push('<svg viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">');
+    svgParts.push('<circle cx="' + cx + '" cy="' + cy + '" r="16" fill="' + color + '"></circle>');
+    svgParts.push('<text x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#1a1006" font-weight="600">' + protons + 'p</text>');
+
+    shells.forEach(function (count, idx) {
+      var radius = 26 + idx * 20;
+      svgParts.push('<circle class="orbit-outline" cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="none" stroke="' + color + '" stroke-opacity="0.35" stroke-width="1.4"></circle>');
+      for (var e = 0; e < count; e++) {
+        var angle = (2 * Math.PI * e) / count;
+        var ex = cx + radius * Math.cos(angle);
+        var ey = cy + radius * Math.sin(angle);
+        svgParts.push('<g class="electron-e" style="animation-duration:' + (5 + idx * 2) + 's;"><circle cx="' + ex + '" cy="' + ey + '" r="4" fill="#0F172A"></circle></g>');
+      }
+    });
+
+    svgParts.push('</svg>');
+    host.innerHTML = svgParts.join("") +
+      '<p class="caption">Simplified atom model — ' + protons + ' protons, ' + neutrons + ' neutrons, ' + electrons + ' electrons.<br>' +
+      'Atoms are much more complex than this simple model. This diagram is only for learning the basic idea.</p>';
+  }
+
+  initializePeriodicTable();
+
+  /* =================================================================
+     MIXTURES
+  ================================================================= */
+  var mixtureData = {
+    salt: { title:"Salt + Water", what:"Salt dissolves in water and forms a solution.",
+            separate:"Yes — by evaporating the water, the salt is left behind.",
+            layers:['<div class="mix-layer" style="height:70%; background:#BAE6FD; opacity:.75;"></div>'] },
+    sand: { title:"Sand + Water", what:"Sand does not dissolve — it sinks and settles at the bottom of the water.",
+            separate:"Yes — by filtering or letting it settle and pouring off the water.",
+            layers:['<div class="mix-layer" style="height:70%; background:#BAE6FD; opacity:.75;"></div>',
+                    '<div class="mix-layer" style="height:22%; background:#D6B589;"></div>'] },
+    oil: { title:"Oil + Water", what:"Oil and water do not mix — the oil floats in a separate layer on top of the water.",
+           separate:"Yes — the two layers can simply be separated, since they never fully combine.",
+           layers:['<div class="mix-layer" style="height:65%; background:#BAE6FD; opacity:.75;"></div>',
+                   '<div class="mix-layer" style="height:22%; background:#FDE68A;"></div>'] }
+  };
+
+  function showMixture(key) {
+    var data = mixtureData[key];
+    document.getElementById("mixTitle").textContent = data.title;
+    document.getElementById("mixWhat").textContent = data.what;
+    document.getElementById("mixSeparate").textContent = data.separate;
+    document.getElementById("mixJar").innerHTML = data.layers.join("");
+    document.querySelectorAll(".mix-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-mix") === key);
+    });
+  }
+
+  document.querySelectorAll(".mix-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () { showMixture(btn.getAttribute("data-mix")); });
+  });
+  showMixture("salt");
+
+  /* =================================================================
+     CHEMISTRY QUIZ
+     Function: initializeChemistryQuiz
+  ================================================================= */
+  function initializeChemistryQuiz() {
+    var questions = [
+      { q:"Which state of matter has particles that move freely and spread out?", options:["Solid","Liquid","Gas"], correct:2,
+        correctMsg:"Excellent! 🎉 Gas particles move freely and spread out.",
+        incorrectMsg:"Not quite. Look at how the particles are arranged in the simulation." },
+      { q:"What happens when a solid gains enough heat to become a liquid?", options:["Freezing","Melting","Evaporation"], correct:1,
+        correctMsg:"That's right! 🎉 Melting turns a solid into a liquid.",
+        incorrectMsg:"Not quite. Try changing the temperature in the simulation above and watch what happens." },
+      { q:"What is chemistry the study of?", options:["Only living things","Matter and how it changes","Only outer space"], correct:1,
+        correctMsg:"Correct! 🎉 Chemistry studies matter and how it can change.",
+        incorrectMsg:"Not quite. Chemistry looks at what things are made of and how they change." },
+      { q:"Which of these is an example of a chemical change?", options:["Water freezing","Iron rusting","Folding paper"], correct:1,
+        correctMsg:"Correct! 🎉 Rusting forms a brand-new substance.",
+        incorrectMsg:"Not quite. A chemical change makes a new substance — think about rust." },
+      { q:"In salt water, what happens to the salt?", options:["It disappears forever","It dissolves but is still there","It turns into water"], correct:1,
+        correctMsg:"Correct! 🎉 The salt dissolves but doesn't disappear — evaporating the water proves it.",
+        incorrectMsg:"Not quite. Nothing truly disappears — think about what's left after the water evaporates." }
+    ];
+
+    var current = 0;
+    var score = 0;
+    var answered = false;
+
+    var progressEl = document.getElementById("quizProgress");
+    var questionEl = document.getElementById("quizQuestion");
+    var optionsEl = document.getElementById("quizOptions");
+    var feedbackEl = document.getElementById("quizFeedback");
+    var nextBtn = document.getElementById("quizNextBtn");
+    var scoreEl = document.getElementById("quizScore");
+
+    function renderQuestion() {
+      answered = false;
+      var qData = questions[current];
+      progressEl.textContent = "Question " + (current + 1) + " of " + questions.length;
+      questionEl.textContent = qData.q;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "quiz-feedback";
+      nextBtn.classList.remove("show");
+      optionsEl.innerHTML = "";
+
+      qData.options.forEach(function (opt, idx) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "quiz-option";
+        b.textContent = opt;
+        b.addEventListener("click", function () { handleAnswer(idx, b); });
+        optionsEl.appendChild(b);
+      });
+
+      scoreEl.textContent = "Score: " + score + " / " + questions.length;
+    }
+
+    function handleAnswer(idx, btnEl) {
+      var qData = questions[current];
+      if (answered && idx !== qData.correct) {
+        /* allow another attempt on a wrong pick, but once correct, lock in */
+        btnEl.classList.add("incorrect");
+        feedbackEl.textContent = qData.incorrectMsg;
+        feedbackEl.className = "quiz-feedback incorrect";
+        return;
+      }
+      if (idx === qData.correct) {
+        btnEl.classList.add("correct");
+        feedbackEl.textContent = qData.correctMsg;
+        feedbackEl.className = "quiz-feedback correct";
+        if (!answered) score++;
+        answered = true;
+        scoreEl.textContent = "Score: " + score + " / " + questions.length;
+        nextBtn.classList.add("show");
+        optionsEl.querySelectorAll(".quiz-option").forEach(function (b) { b.disabled = true; });
+      } else {
+        btnEl.classList.add("incorrect");
+        feedbackEl.textContent = qData.incorrectMsg;
+        feedbackEl.className = "quiz-feedback incorrect";
+      }
+    }
+
+    nextBtn.addEventListener("click", function () {
+      current = (current + 1) % questions.length;
+      renderQuestion();
+    });
+
+    renderQuestion();
+  }
+
+  initializeChemistryQuiz();
+
+  /* =================================================================
+     DID YOU KNOW — Chemistry facts (stored locally, no API)
+  ================================================================= */
+  var chemFacts = [
+    "Water can exist naturally as a solid, liquid and gas.",
+    "The periodic table organises elements according to their atomic properties.",
+    "Your body contains many different chemical elements, including carbon, oxygen and calcium.",
+    "Diamonds and pencil graphite are both made purely of carbon.",
+    "Air is a mixture of gases, mostly nitrogen and oxygen.",
+    "A single water molecule is made of two hydrogen atoms and one oxygen atom.",
+    "Gold is one of the few metals that does not rust or tarnish easily.",
+    "Some gases, like neon, are called 'noble gases' because they rarely react with anything.",
+    "Rust is a completely new substance formed when iron reacts with oxygen and water.",
+    "Bubbles from vinegar and baking soda are made of carbon dioxide gas."
+  ];
+  var chemFactIndex = 0;
+  var chemFactTextEl = document.getElementById("chemFactText");
+  var chemFactBtn = document.getElementById("chemFactBtn");
+
+  function showNextChemFact() {
+    var nextIndex;
+    do { nextIndex = Math.floor(Math.random() * chemFacts.length); }
+    while (nextIndex === chemFactIndex && chemFacts.length > 1);
+    chemFactIndex = nextIndex;
+
+    if (prefersReducedMotion) {
+      chemFactTextEl.textContent = chemFacts[chemFactIndex];
+      return;
+    }
+    chemFactTextEl.classList.add("fading");
+    window.setTimeout(function () {
+      chemFactTextEl.textContent = chemFacts[chemFactIndex];
+      chemFactTextEl.classList.remove("fading");
+    }, 200);
+  }
+
+  if (chemFactBtn) chemFactBtn.addEventListener("click", showNextChemFact);
+
+})();
+</script>
+</body>
+</html>

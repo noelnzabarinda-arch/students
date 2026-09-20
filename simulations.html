@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Science Lab — S1 Science Lab</title>
+<meta name="description" content="Explore Physics, Chemistry and Biology through interactive simulations. Change variables, run experiments and observe what happens.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — SIMULATIONS PAGE — internal styles
+   Reuses the site design system (tokens, navbar, hero, footer) from index.html
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --navy:#0B1226;
+  --navy-2:#101B36;
+  --card-radius:20px;
+  --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+  --sim-primary:#0F766E;
+  --sim-secondary:#14B8A6;
+  --sim-navy:#073B3A;
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+a{ text-decoration:none; }
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+a:focus-visible, button:focus-visible, .btn:focus-visible, input:focus-visible{
+  outline:3px solid var(--sim-secondary); outline-offset:2px; border-radius:8px;
+}
+
+/* NAVBAR (shared) ------------------------------------------------------- */
+.lab-nav{
+  position:sticky; top:0; z-index:1000; padding:.65rem 0;
+  background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  transition:box-shadow .25s ease, background .25s ease;
+}
+.lab-nav.is-scrolled{ box-shadow:0 6px 24px rgba(15,23,42,.08); background:rgba(248,250,252,.92); }
+.lab-brand{ display:flex; align-items:center; gap:.6rem; font-family:var(--display); font-weight:700; font-size:1.15rem; color:var(--ink); }
+.lab-brand .mark{
+  width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--sim-primary),var(--sim-secondary)); color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(15,118,110,.35);
+}
+.lab-brand:hover{ color:var(--ink); }
+.lab-links .nav-link{ color:var(--ink-soft); font-weight:600; font-size:.95rem; padding:.5rem .85rem !important; border-radius:10px; transition:color .15s ease, background .15s ease; }
+.lab-links .nav-link:hover{ color:var(--sim-primary); background:rgba(15,118,110,.07); }
+.lab-links .nav-link.active{ color:var(--sim-primary); background:rgba(15,118,110,.1); }
+.btn-lab-primary{
+  background:linear-gradient(135deg,var(--sim-primary),var(--sim-secondary)); color:#fff; font-weight:600; border:none;
+  padding:.55rem 1.35rem; border-radius:12px; box-shadow:0 8px 20px rgba(15,118,110,.28);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-lab-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(15,118,110,.36); }
+.btn-lab-outline{
+  border:1.5px solid rgba(15,23,42,.15); color:var(--ink); font-weight:600; padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff; transition:border-color .15s ease, transform .15s ease;
+}
+.btn-lab-outline:hover{ color:var(--ink); border-color:var(--sim-primary); transform:translateY(-2px); }
+
+/* HERO (shared look, new content) --------------------------------------- */
+.hero{
+  position:relative; background:radial-gradient(120% 140% at 15% -10%, #115E59 0%, var(--sim-navy) 55%, #021F20 100%);
+  color:#fff; padding:5rem 0 6rem; overflow:hidden; isolation:isolate;
+}
+.hero::before{
+  content:""; position:absolute; inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:44px 44px; mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%); z-index:0;
+}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.78rem; color:#99F6E4;
+  background:rgba(20,184,166,.12); border:1px solid rgba(20,184,166,.35); padding:.35rem .8rem; border-radius:999px;
+}
+.hero h1{ font-size:clamp(2.1rem, 4.4vw, 3.4rem); font-weight:700; line-height:1.1; margin:1.1rem 0 .6rem; }
+.hero h1 .accent{ background:linear-gradient(100deg, #5EEAD4, #67E8F9 60%, #A7F3D0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero .subtitle{ font-family:var(--mono); font-size:1.02rem; color:#99F6E4; margin-bottom:.9rem; }
+.hero p.lead-copy{ color:#C7D2E3; font-size:1.06rem; max-width:34rem; line-height:1.65; }
+.hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+.btn-hero-primary{
+  background:linear-gradient(135deg,var(--sim-secondary), #2DD4BF); color:#042F2E; font-weight:700; border:none;
+  padding:.75rem 1.5rem; border-radius:13px; box-shadow:0 10px 28px rgba(20,184,166,.35);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-hero-primary:hover{ color:#042F2E; transform:translateY(-2px); box-shadow:0 14px 34px rgba(20,184,166,.45); }
+.btn-hero-ghost{
+  border:1.5px solid rgba(255,255,255,.25); color:#fff; font-weight:600; padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.04); transition:border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.btn-hero-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.09); transform:translateY(-2px); }
+.hero-lab{ position:relative; width:100%; max-width:460px; margin-inline:auto; z-index:1; }
+.hero-lab svg{ width:100%; height:auto; overflow:visible; }
+.orbit-ring{ transform-origin:center; animation:spin 22s linear infinite; }
+.orbit-ring.reverse{ animation-direction:reverse; animation-duration:30s; }
+.electron{ transform-origin:center; }
+.float-slow{ animation:float 6s ease-in-out infinite; }
+.float-slower{ animation:float 8s ease-in-out infinite; }
+.float-med{ animation:float 5s ease-in-out infinite; }
+.spin-slow{ animation:spin 18s linear infinite; transform-origin:center; }
+.spin-slower{ animation:spin 40s linear infinite; transform-origin:center; }
+.pulse-dot{ animation:pulse 2.4s ease-in-out infinite; }
+.drift{ animation:drift 9s ease-in-out infinite; }
+@keyframes float{ 0%,100%{ transform:translateY(0px); } 50%{ transform:translateY(-12px); } }
+@keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes pulse{ 0%,100%{ opacity:.4; r:3; } 50%{ opacity:1; r:5; } }
+@keyframes drift{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(6px,-8px); } }
+
+/* SECTION SCAFFOLDING ---------------------------------------------------- */
+.section{ padding:5rem 0; }
+.section-tight{ padding:4rem 0; }
+.section-head{ max-width:660px; }
+.section-head h2{ font-size:clamp(1.6rem,3vw,2.25rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.03rem; line-height:1.6; }
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+/* FILTER PILLS ------------------------------------------------------------ */
+.filter-pills{ display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; margin-top:1.9rem; }
+.filter-pill{
+  border:1.5px solid rgba(15,23,42,.12); background:#fff; color:var(--ink-soft); font-weight:600; font-size:.92rem;
+  padding:.6rem 1.3rem; border-radius:999px; transition:all .2s ease; cursor:pointer;
+}
+.filter-pill i{ margin-right:.35rem; }
+.filter-pill:hover{ border-color:var(--sim-primary); color:var(--sim-primary); }
+.filter-pill.active{ background:linear-gradient(135deg,var(--sim-primary),var(--sim-secondary)); border-color:transparent; color:#fff; box-shadow:0 8px 20px rgba(15,118,110,.28); }
+
+/* SIM CARDS --------------------------------------------------------------- */
+.sim-card{
+  background:#fff; border-radius:var(--card-radius); padding:1.7rem 1.55rem; height:100%;
+  border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease; display:flex; flex-direction:column;
+}
+.sim-card:hover{ transform:translateY(-6px); box-shadow:0 18px 36px rgba(15,23,42,.1); border-color:var(--accent,var(--blue)); }
+.sim-card .icon-tile{
+  width:50px; height:50px; border-radius:14px; display:grid; place-items:center; font-size:1.25rem; color:#fff;
+  background:var(--accent,var(--blue)); margin-bottom:1rem;
+  box-shadow:0 8px 16px color-mix(in srgb, var(--accent,var(--blue)) 45%, transparent);
+}
+.sim-card h3{ font-size:1.1rem; font-weight:700; margin-bottom:.4rem; }
+.sim-card p{ color:var(--ink-soft); font-size:.9rem; line-height:1.55; margin-bottom:1rem; flex-grow:1; }
+.sim-card .meta-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1.1rem; }
+.subject-badge{ font-family:var(--mono); font-size:.68rem; font-weight:700; padding:.3rem .65rem; border-radius:999px; text-transform:uppercase; letter-spacing:.03em; }
+.badge-physics{ background:rgba(37,99,235,.1); color:var(--blue); }
+.badge-chemistry{ background:rgba(245,158,11,.14); color:#B45309; }
+.badge-biology{ background:rgba(22,163,74,.1); color:var(--green); }
+.difficulty{ font-size:.78rem; color:var(--ink-soft); display:flex; align-items:center; gap:.3rem; }
+.difficulty i{ font-size:.68rem; }
+.sim-physics{ --accent:var(--blue); }
+.sim-chemistry{ --accent:var(--orange); }
+.sim-biology{ --accent:var(--green); }
+.sim-card.is-hidden{ display:none; }
+.opened-tick{ color:var(--green); margin-left:.3rem; }
+
+/* WORKSPACE PANEL (dark, holds any opened simulation) --------------------- */
+.workspace-panel{
+  background:linear-gradient(160deg,var(--sim-navy) 0%, #0B5B58 100%); border-radius:24px; color:#fff;
+  padding:2.1rem; position:relative; overflow:hidden; scroll-margin-top:96px;
+}
+.workspace-placeholder{ text-align:center; padding:3rem 1rem; color:#C7D2E3; }
+.workspace-placeholder i{ font-size:2.4rem; color:var(--cyan); margin-bottom:1rem; display:block; }
+.ws-header{ display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:.75rem; margin-bottom:.4rem; }
+.ws-header h3{ font-family:var(--display); font-size:1.45rem; font-weight:700; margin:0; }
+.ws-badge{ font-family:var(--mono); font-size:.72rem; color:#A5F3FC; background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35); padding:.3rem .7rem; border-radius:999px; white-space:nowrap; }
+.ws-desc{ color:#C7D2E3; margin-bottom:1.3rem; font-size:.96rem; }
+.ws-note{ font-size:.82rem; color:#A5F3FC; background:rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.3); padding:.6rem .9rem; border-radius:10px; display:flex; gap:.55rem; align-items:flex-start; margin-top:1.1rem; }
+.ws-note i{ margin-top:.15rem; }
+.control-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.1rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:1.3rem; margin-bottom:1.2rem; }
+.control-item label{ display:flex; justify-content:space-between; font-family:var(--mono); font-size:.8rem; color:#C7D2E3; margin-bottom:.5rem; }
+.control-item label span{ color:#fff; font-weight:700; }
+.control-item input[type=range]{ width:100%; accent-color:var(--cyan); }
+.ws-stage{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:1.4rem; margin-bottom:1.2rem; min-height:120px; position:relative; overflow:hidden; }
+.ws-readout{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.8rem; font-family:var(--mono); font-size:.88rem; margin-bottom:1.1rem; }
+.ws-readout div{ background:rgba(255,255,255,.05); border-radius:10px; padding:.65rem .85rem; display:flex; justify-content:space-between; gap:.5rem; color:#C7D2E3; }
+.ws-readout span{ color:#fff; font-weight:700; }
+.ws-actions{ display:flex; gap:.7rem; flex-wrap:wrap; }
+.btn-ws-primary{ background:linear-gradient(135deg,var(--cyan),#3b82f6); color:#04121F; font-weight:700; border:none; padding:.6rem 1.35rem; border-radius:12px; transition:transform .15s ease; }
+.btn-ws-primary:hover{ color:#04121F; transform:translateY(-2px); }
+.btn-ws-ghost{ border:1.5px solid rgba(255,255,255,.25); color:#fff; font-weight:600; padding:.6rem 1.35rem; border-radius:12px; background:rgba(255,255,255,.04); }
+.btn-ws-ghost:hover{ color:#fff; background:rgba(255,255,255,.09); }
+.ws-toggle-row{ display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+.btn-toggle{ border:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.04); color:#fff; font-weight:600; padding:.55rem 1.15rem; border-radius:12px; }
+.btn-toggle.active{ background:linear-gradient(135deg,var(--cyan),#3b82f6); color:#04121F; border-color:transparent; }
+
+/* Track based animations (force/gravity/speed) */
+.sim-track{ position:relative; height:100px; }
+.sim-ground{ position:absolute; left:0; right:0; bottom:14px; height:2px; background:rgba(255,255,255,.18); }
+.sim-box{
+  position:absolute; bottom:14px; left:4%; width:42px; height:42px; border-radius:8px;
+  background:linear-gradient(135deg,var(--orange), #fbbf24); box-shadow:0 8px 18px rgba(245,158,11,.35);
+  transition:left linear; display:grid; place-items:center; font-size:1.1rem;
+}
+.fall-track{ position:relative; height:220px; }
+.fall-line{ position:absolute; left:16%; top:0; bottom:16px; width:2px; background:repeating-linear-gradient(180deg, rgba(255,255,255,.25) 0 6px, transparent 6px 12px); }
+.fall-ground{ position:absolute; left:0; right:0; bottom:14px; height:2px; background:rgba(255,255,255,.18); }
+.fall-box{
+  position:absolute; left:10%; top:0; width:36px; height:36px; border-radius:8px;
+  background:linear-gradient(135deg,var(--purple), #a78bfa); box-shadow:0 8px 18px rgba(124,58,237,.35);
+  transition:top linear;
+}
+
+/* Pressure lab */
+.press-stage{ display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+.press-object{ background:linear-gradient(135deg,var(--blue),var(--cyan)); border-radius:10px 10px 4px 4px; height:60px; transition:width .3s ease; box-shadow:0 6px 16px rgba(37,99,235,.35); }
+.press-surface{ width:220px; height:16px; background:rgba(255,255,255,.15); border-radius:4px; position:relative; transition:transform .3s ease; }
+.press-surface.pressed{ transform:scaleY(0.6); background:rgba(245,158,11,.5); }
+
+/* States of matter particles */
+.particle-box{ position:relative; height:180px; background:rgba(255,255,255,.03); border-radius:14px; overflow:hidden; }
+.particle{ position:absolute; width:12px; height:12px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px rgba(6,182,212,.6); }
+.particle.solid{ animation:vibrate .5s ease-in-out infinite; }
+.particle.liquid{ animation:roam-liquid 3s ease-in-out infinite; }
+.particle.gas{ animation:roam-gas 2.2s linear infinite; }
+@keyframes vibrate{ 0%,100%{ transform:translate(0,0); } 25%{ transform:translate(1.5px,-1.5px); } 50%{ transform:translate(-1.5px,1.5px);} 75%{ transform:translate(1.5px,1.5px);} }
+@keyframes roam-liquid{ 0%,100%{ transform:translate(0,0);} 33%{ transform:translate(10px,6px);} 66%{ transform:translate(-8px,-6px);} }
+@keyframes roam-gas{ 0%{ transform:translate(0,0);} 25%{ transform:translate(40px,-30px);} 50%{ transform:translate(-30px,20px);} 75%{ transform:translate(35px,30px);} 100%{ transform:translate(0,0);} }
+
+/* Atom explorer */
+.atom-stage{ display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center; justify-content:center; }
+.atom-diagram{ position:relative; width:220px; height:220px; }
+.atom-shell{ position:absolute; border:1.5px dashed rgba(255,255,255,.25); border-radius:50%; top:50%; left:50%; transform:translate(-50%,-50%); }
+.atom-nucleus{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fda4af, #dc2626); display:grid; place-items:center; font-family:var(--mono); font-size:.68rem; font-weight:700; color:#fff; text-align:center; line-height:1.1; }
+.atom-electron{ position:absolute; width:10px; height:10px; border-radius:50%; background:#67E8F9; box-shadow:0 0 8px #67E8F9; }
+.atom-info{ min-width:200px; }
+.atom-info .symbol{ font-family:var(--display); font-size:3rem; font-weight:700; color:var(--cyan); line-height:1; }
+.atom-info .elname{ font-size:1.1rem; font-weight:600; margin:.3rem 0; }
+
+/* Mixture lab */
+.mix-choices{ display:flex; gap:.7rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+.mix-visual{ height:130px; border-radius:14px; position:relative; overflow:hidden; background:rgba(255,255,255,.04); }
+.mix-liquid{ position:absolute; left:0; right:0; bottom:0; height:70%; background:linear-gradient(180deg, rgba(6,182,212,.35), rgba(6,182,212,.55)); }
+.mix-dot{ position:absolute; width:6px; height:6px; border-radius:50%; background:#fff; }
+.mix-layer-oil{ position:absolute; left:0; right:0; top:15%; height:35%; background:rgba(245,158,11,.55); }
+.mix-layer-water{ position:absolute; left:0; right:0; bottom:0; top:50%; background:rgba(6,182,212,.45); }
+.mix-sand{ position:absolute; left:0; right:0; bottom:0; height:22%; background:#c2a374; }
+
+/* Cell explorer */
+.cell-stage{ display:flex; flex-wrap:wrap; gap:1.5rem; }
+.cell-svg-wrap{ flex:1 1 320px; }
+.cell-svg-wrap svg{ width:100%; height:auto; max-width:420px; }
+.organelle{ cursor:pointer; transition:opacity .2s ease, filter .2s ease; }
+.organelle:hover, .organelle.active{ filter:drop-shadow(0 0 8px #67E8F9); }
+.cell-info{ flex:1 1 240px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:1.2rem; min-height:180px; }
+.cell-info h4{ color:var(--cyan); font-weight:700; margin-bottom:.5rem; }
+
+/* Photosynthesis */
+.photo-stage{ display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center; }
+.plant-svg{ flex:0 0 auto; width:160px; }
+.photo-outputs{ flex:1 1 220px; }
+.output-bar-track{ background:rgba(255,255,255,.08); border-radius:999px; height:12px; overflow:hidden; margin:.4rem 0 1rem; }
+.output-bar-fill{ height:100%; border-radius:999px; transition:width .4s ease; }
+
+/* Respiration */
+.resp-stage{ display:flex; align-items:center; justify-content:center; }
+.lung{ transition:transform .5s ease; transform-origin:center; }
+.diaphragm{ transition:transform .5s ease; }
+.air-arrow{ opacity:0; transition:opacity .3s ease; }
+.air-arrow.show{ opacity:1; }
+
+/* Ecosystem */
+.food-chain{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:.4rem; }
+.food-node{ background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.15); border-radius:16px; padding:1rem 1.1rem; text-align:center; cursor:pointer; transition:all .2s ease; min-width:110px; }
+.food-node:hover, .food-node.active{ border-color:var(--cyan); background:rgba(6,182,212,.12); transform:translateY(-3px); }
+.food-node i{ font-size:1.4rem; display:block; margin-bottom:.4rem; }
+.food-arrow{ font-size:1.3rem; color:var(--cyan); }
+
+/* PLAYGROUND (large, matches homepage sim-panel look) --------------------- */
+.playground-panel{ background:linear-gradient(160deg, var(--navy) 0%, #14224a 100%); border-radius:26px; color:#fff; padding:2.6rem; position:relative; overflow:hidden; scroll-margin-top:96px; }
+.playground-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:2rem; }
+@media (max-width:991.98px){ .playground-grid{ grid-template-columns:1fr; } }
+
+/* Formula lab */
+.formula-card{ background:#fff; border-radius:18px; padding:1.6rem; height:100%; border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04); text-align:center; transition:transform .2s ease, box-shadow .2s ease; }
+.formula-card:hover{ transform:translateY(-5px); box-shadow:0 16px 32px rgba(15,23,42,.1); }
+.formula-card .formula{ font-family:var(--mono); font-size:1.5rem; font-weight:700; color:var(--blue); margin-bottom:.6rem; }
+.formula-card h4{ font-weight:700; margin-bottom:.4rem; font-size:1rem; }
+.formula-card p{ color:var(--ink-soft); font-size:.88rem; line-height:1.55; margin-bottom:0; }
+.formula-card .ex{ font-family:var(--mono); font-size:.8rem; color:var(--purple); margin-top:.5rem; display:block; }
+
+/* Prediction challenges */
+.predict-card{ background:#fff; border-radius:18px; padding:1.5rem; border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04); height:100%; }
+.predict-card .qtag{ font-family:var(--mono); font-size:.72rem; font-weight:700; color:var(--purple); text-transform:uppercase; letter-spacing:.03em; }
+.predict-card p.qtext{ font-weight:600; margin:.5rem 0 1rem; }
+.predict-opt{ display:block; width:100%; text-align:left; border:1.5px solid rgba(15,23,42,.12); background:#fff; border-radius:12px; padding:.6rem .9rem; margin-bottom:.55rem; font-size:.92rem; color:var(--ink); transition:all .15s ease; }
+.predict-opt:hover{ border-color:var(--blue); }
+.predict-opt.correct{ border-color:var(--green); background:rgba(22,163,74,.08); color:#166534; font-weight:600; }
+.predict-opt.incorrect{ border-color:#dc2626; background:rgba(220,38,38,.06); color:#991b1b; font-weight:600; }
+.predict-opt[disabled]{ cursor:default; }
+.predict-explain{ font-size:.86rem; color:var(--ink-soft); background:var(--paper); border-radius:10px; padding:.7rem .9rem; margin-top:.6rem; display:none; }
+.predict-explain.show{ display:block; }
+
+/* Facts */
+.fact-panel{ background:linear-gradient(135deg, #EEF4FF, #F5F0FF); border:1px solid rgba(124,58,237,.12); border-radius:24px; padding:2.5rem; text-align:center; max-width:760px; margin-inline:auto; }
+.fact-panel .ico-badge{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center; margin:0 auto 1.1rem; background:linear-gradient(135deg,var(--purple),var(--blue)); color:#fff; font-size:1.35rem; }
+#factText{ font-family:var(--display); font-weight:600; font-size:clamp(1.05rem,2.4vw,1.35rem); color:var(--ink); min-height:3.2em; display:flex; align-items:center; justify-content:center; transition:opacity .25s ease; }
+#factText.fading{ opacity:0; }
+
+/* Progress */
+.progress-card{ background:#fff; border-radius:18px; padding:1.5rem; border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04); }
+.progress-row{ margin-bottom:1.3rem; }
+.progress-row:last-child{ margin-bottom:0; }
+.progress-row .lbl{ display:flex; justify-content:space-between; font-weight:600; margin-bottom:.4rem; font-size:.92rem; }
+.progress-track{ height:12px; border-radius:999px; background:rgba(15,23,42,.07); overflow:hidden; }
+.progress-fill{ height:100%; border-radius:999px; transition:width .5s ease; }
+
+/* Safety */
+.safety-panel{ background:#fff; border:1.5px solid rgba(245,158,11,.35); border-radius:20px; padding:2rem; display:flex; gap:1.2rem; align-items:flex-start; max-width:820px; margin-inline:auto; }
+.safety-panel i{ font-size:1.8rem; color:var(--orange); flex:0 0 auto; }
+.safety-panel p{ color:var(--ink-soft); margin:0; line-height:1.65; }
+
+/* Final CTA */
+.final-cta{ position:relative; background:radial-gradient(120% 160% at 85% 0%, #16264F 0%, var(--navy) 60%, #060A16 100%); border-radius:28px; color:#fff; text-align:center; padding:4rem 2rem; overflow:hidden; isolation:isolate; }
+.final-cta::before{ content:""; position:absolute; inset:0; z-index:0; background-image:radial-gradient(rgba(6,182,212,.5) 1.4px, transparent 1.4px); background-size:34px 34px; mask-image:radial-gradient(70% 90% at 50% 30%, #000 30%, transparent 100%); }
+.final-cta h2{ font-size:clamp(1.7rem,3.6vw,2.4rem); font-weight:700; position:relative; z-index:1; }
+.final-cta p{ color:#C7D2E3; font-size:1.02rem; margin:.8rem 0 1.6rem; position:relative; z-index:1; }
+.final-cta .cta-links{ position:relative; z-index:1; display:flex; gap:.7rem; flex-wrap:wrap; justify-content:center; }
+
+/* FOOTER (shared) --------------------------------------------------------- */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--cyan); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+@media (max-width:575.98px){
+  .hero{ padding:3.5rem 0 4rem; }
+  .section{ padding:3.5rem 0; }
+  .workspace-panel, .playground-panel{ padding:1.4rem; }
+  .atom-diagram{ width:180px; height:180px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .orbit-ring, .electron, .float-slow, .float-slower, .float-med, .spin-slow, .spin-slower,
+  .pulse-dot, .drift, .particle, .sim-box, .fall-box{ animation:none !important; transition:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="start-learning.html" class="btn btn-lab-primary">Start Learning</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+  ==================================================================== -->
+  <header class="hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="hero-eyebrow"><i class="bi bi-flask"></i> S1 Science Lab</span>
+          <h1>Virtual <span class="accent">Science Lab</span></h1>
+          <p class="subtitle">Experiment. Change Variables. Observe. Discover.</p>
+          <p class="lead-copy">Explore scientific ideas through interactive experiments and see how changing variables affects the results.</p>
+          <div class="hero-actions">
+            <a href="#playground" class="btn btn-hero-primary" id="startExperimentBtn">Start Experiment</a>
+            <a href="#experiments" class="btn btn-hero-ghost">Explore Simulations</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-lab" role="img" aria-label="Illustration of a science laboratory scene with an atom, a beaker, a microscope, a planet, a light bulb, molecules and floating particles">
+            <svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Orbiting atom, center -->
+              <g transform="translate(210,205)">
+                <ellipse class="orbit-ring" rx="118" ry="44" stroke="#06B6D4" stroke-width="1.6" opacity="0.55"/>
+                <ellipse class="orbit-ring reverse" rx="118" ry="44" stroke="#7C3AED" stroke-width="1.6" opacity="0.45" transform="rotate(60)"/>
+                <ellipse class="orbit-ring" rx="118" ry="44" stroke="#3B82F6" stroke-width="1.6" opacity="0.45" transform="rotate(120)"/>
+                <circle r="15" fill="url(#nucleusGrad)"/>
+                <circle class="electron spin-slow" r="4.2" cx="118" cy="0" fill="#67E8F9"/>
+                <circle class="electron spin-slow" r="4.2" cx="-102" cy="-38" fill="#C4B5FD" style="animation-direction:reverse;"/>
+                <circle class="electron spin-slow" r="4.2" cx="58" cy="100" fill="#93C5FD" style="animation-duration:14s;"/>
+              </g>
+              <!-- Beaker, bottom left -->
+              <g class="float-slow" transform="translate(30,278)">
+                <path d="M18 0 H34 V28 L54 74 A10 10 0 0 1 45 88 H7 A10 10 0 0 1 -2 74 L18 28 Z" fill="#0F172A" fill-opacity="0.04" stroke="#2563EB" stroke-width="2.5"/>
+                <path d="M-1 66 H53" stroke="#2563EB" stroke-width="2"/>
+                <path d="M4 70 Q26 84 48 70 L45 88 A10 10 0 0 1 45 88 H7 A10 10 0 0 1 4 70 Z" fill="#06B6D4" fill-opacity="0.55"/>
+                <circle class="pulse-dot" cx="26" cy="52" r="3" fill="#F59E0B"/>
+                <circle class="pulse-dot" cx="16" cy="60" r="2.4" fill="#F59E0B" style="animation-delay:.6s"/>
+              </g>
+              <!-- Microscope, bottom right -->
+              <g class="float-med" transform="translate(300,262)">
+                <rect x="-10" y="70" width="70" height="8" rx="3" fill="#0F172A" fill-opacity="0.08"/>
+                <path d="M22 70 V44" stroke="#16A34A" stroke-width="6" stroke-linecap="round"/>
+                <path d="M22 44 L2 20" stroke="#16A34A" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="2" cy="20" r="7" fill="#16A34A"/>
+                <rect x="14" y="30" width="26" height="10" rx="4" fill="#0F172A" fill-opacity="0.85"/>
+                <path d="M22 70 h34" stroke="#16A34A" stroke-width="6" stroke-linecap="round"/>
+              </g>
+              <!-- Molecule, top right -->
+              <g class="drift" transform="translate(330,58)">
+                <line x1="0" y1="0" x2="26" y2="14" stroke="#7C3AED" stroke-width="2"/>
+                <line x1="0" y1="0" x2="-8" y2="26" stroke="#7C3AED" stroke-width="2"/>
+                <circle cx="0" cy="0" r="7" fill="#7C3AED"/>
+                <circle cx="26" cy="14" r="5" fill="#A78BFA"/>
+                <circle cx="-8" cy="26" r="5" fill="#A78BFA"/>
+              </g>
+              <!-- Light bulb, top left -->
+              <g class="float-slower" transform="translate(46,44)">
+                <circle cx="14" cy="14" r="14" fill="none" stroke="#F59E0B" stroke-width="2.5"/>
+                <path d="M8 26 H20 M10 30 H18" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M9 10 Q14 20 19 10" stroke="#F59E0B" stroke-width="2" fill="none"/>
+              </g>
+              <!-- Planet, right side -->
+              <g class="float-slow" transform="translate(360,190)">
+                <circle r="13" fill="#3B82F6"/>
+                <ellipse class="spin-slower" rx="26" ry="7" stroke="#7C3AED" stroke-width="2" fill="none"/>
+              </g>
+              <!-- Formula labels -->
+              <g class="float-slow" transform="translate(140,20)">
+                <rect x="-6" y="-18" width="86" height="30" rx="9" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="37" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#2563EB" font-weight="600">a = F/m</text>
+              </g>
+              <g class="float-med" transform="translate(20,150)">
+                <rect x="-6" y="-16" width="76" height="28" rx="9" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="32" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#7C3AED" font-weight="600">P = F/A</text>
+              </g>
+              <!-- Floating particles -->
+              <circle class="pulse-dot" cx="250" cy="60" r="3" fill="#67E8F9"/>
+              <circle class="pulse-dot" cx="90" cy="220" r="2.6" fill="#F59E0B" style="animation-delay:.4s"/>
+              <circle class="pulse-dot" cx="360" cy="330" r="3" fill="#A78BFA" style="animation-delay:.9s"/>
+              <circle class="pulse-dot" cx="200" cy="350" r="2.4" fill="#67E8F9" style="animation-delay:1.2s"/>
+              <defs>
+                <radialGradient id="nucleusGrad" cx="0.35" cy="0.3" r="0.9">
+                  <stop offset="0%" stop-color="#7DD3FC"/>
+                  <stop offset="100%" stop-color="#2563EB"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       CHOOSE YOUR EXPERIMENT — filters + cards
+  ==================================================================== -->
+  <section class="section" id="experiments">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Choose Your Experiment</h2>
+        <p class="mx-auto">Pick a subject, then open a simulation to change variables and observe what happens.</p>
+      </div>
+
+      <div class="filter-pills reveal" role="group" aria-label="Filter simulations by subject">
+        <button class="filter-pill active" data-filter="all" type="button"><i class="bi bi-grid"></i>All</button>
+        <button class="filter-pill" data-filter="physics" type="button"><i class="bi bi-lightning-charge-fill"></i>Physics</button>
+        <button class="filter-pill" data-filter="chemistry" type="button"><i class="bi bi-droplet-half"></i>Chemistry</button>
+        <button class="filter-pill" data-filter="biology" type="button"><i class="bi bi-flower2"></i>Biology</button>
+      </div>
+
+      <div class="row g-4 mt-2" id="simCardGrid"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SIMULATION WORKSPACE — dynamic area for the 10 non-playground sims
+  ==================================================================== -->
+  <section class="section section-tight" id="workspaceSection">
+    <div class="container container-narrow">
+      <div class="workspace-panel reveal" id="workspace" tabindex="-1">
+        <div class="workspace-placeholder" id="workspacePlaceholder">
+          <i class="bi bi-cursor-fill" aria-hidden="true"></i>
+          <p class="mb-0">Click "Open Simulation" on any card above to start experimenting here.</p>
+        </div>
+        <div id="workspaceContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EXPERIMENT PLAYGROUND (Force & Motion) + What Did You Observe
+  ==================================================================== -->
+  <section class="section" id="playground">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Experiment Playground</h2>
+        <p class="mx-auto">The main laboratory workspace. Change force, mass and time, run the experiment, and watch the object move.</p>
+      </div>
+
+      <div class="playground-panel reveal mt-4">
+        <span class="ws-badge"><i class="bi bi-joystick"></i> Force &amp; Motion</span>
+        <div class="playground-grid mt-3">
+          <div>
+            <h3 class="mb-1" style="font-family:var(--display);font-weight:700;">Force &amp; Motion</h3>
+            <p class="ws-desc">See how force and mass affect the movement of an object. Formula: <strong style="color:#fff;">a = F / m</strong></p>
+            <div class="control-grid">
+              <div class="control-item">
+                <label>Force (N) <span id="pgForceVal">20</span></label>
+                <input type="range" id="pgForce" min="1" max="100" value="20">
+              </div>
+              <div class="control-item">
+                <label>Mass (kg) <span id="pgMassVal">5</span></label>
+                <input type="range" id="pgMass" min="1" max="50" value="5">
+              </div>
+              <div class="control-item">
+                <label>Time (s) <span id="pgTimeVal">5</span></label>
+                <input type="range" id="pgTime" min="1" max="10" value="5">
+              </div>
+            </div>
+            <div class="ws-actions">
+              <button class="btn-ws-primary" id="pgRun" type="button"><i class="bi bi-play-fill"></i> Run Experiment</button>
+              <button class="btn-ws-ghost" id="pgReset" type="button"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+            </div>
+          </div>
+          <div>
+            <div class="ws-stage">
+              <div class="sim-track">
+                <div class="sim-ground" aria-hidden="true"></div>
+                <div class="sim-box" id="pgBox" aria-hidden="true"><i class="bi bi-box-seam"></i></div>
+              </div>
+            </div>
+            <div class="ws-readout">
+              <div>Acceleration <span id="pgAccel">4.00 m/s²</span></div>
+              <div>Velocity <span id="pgVel">20.00 m/s</span></div>
+              <div>Distance <span id="pgDist">50.00 m</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="ws-note"><i class="bi bi-info-circle"></i> This is a simplified educational model of motion on a frictionless track.</p>
+      </div>
+
+      <!-- What Did You Observe -->
+      <div class="row mt-5 g-4">
+        <div class="col-lg-7 reveal">
+          <h2 class="mb-3" style="font-size:clamp(1.5rem,2.6vw,2rem);font-weight:700;">What Did You Observe?</h2>
+          <ul class="mb-4" style="color:var(--ink-soft); line-height:1.9;">
+            <li>What changed when you increased the force?</li>
+            <li>What happened when the mass increased?</li>
+            <li>What happened when temperature increased in the particle lab?</li>
+            <li>What happened to particles in a gas compared to a solid?</li>
+            <li>What happens to the lungs during inhalation?</li>
+          </ul>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-lab-primary" id="thinkBtn" type="button">Think About It</button>
+            <button class="btn btn-lab-outline" id="showExplainBtn" type="button">Show Explanation</button>
+          </div>
+          <div class="predict-explain mt-3" id="observeExplain">
+            Increasing force increases acceleration (a = F/m), so the object speeds up faster. Increasing mass makes it harder to accelerate for the same force. Higher temperature makes particles move faster and spread out — that's why gases expand more than liquids or solids. During inhalation, the diaphragm contracts and moves down, the lungs expand, and air flows in.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       SCIENCE FORMULA LAB
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Science Formula Lab</h2>
+        <p class="mx-auto">The key formulas behind the simulations above, explained simply.</p>
+      </div>
+      <div class="row g-4 mt-2" id="formulaGrid"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       PREDICTION CHALLENGES
+  ==================================================================== -->
+  <section class="section" id="predict">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Can You Predict What Happens?</h2>
+        <p class="mx-auto">Make your prediction, then check if you were right.</p>
+      </div>
+      <div class="row g-4 mt-2" id="predictGrid"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       DID YOU KNOW
+  ==================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="fact-panel reveal">
+        <div class="ico-badge"><i class="bi bi-stars"></i></div>
+        <h2 class="h5 mb-1" style="font-weight:700;">Did You Know?</h2>
+        <p id="factText">Gravity keeps us connected to Earth.</p>
+        <button class="btn btn-lab-outline mt-2" id="factBtn" type="button">
+          <i class="bi bi-arrow-repeat me-1"></i> New Fact
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       PROGRESS
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Your Virtual Lab Progress</h2>
+        <p class="mx-auto">Tracked only on this device — no account and no personal information required.</p>
+      </div>
+      <div class="progress-card reveal mt-4 mx-auto" style="max-width:640px;">
+        <div class="progress-row">
+          <div class="lbl"><span>Physics</span><span id="progPhysicsPct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progPhysicsBar" style="width:0%;background:var(--blue);"></div></div>
+        </div>
+        <div class="progress-row">
+          <div class="lbl"><span>Chemistry</span><span id="progChemistryPct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progChemistryBar" style="width:0%;background:var(--orange);"></div></div>
+        </div>
+        <div class="progress-row">
+          <div class="lbl"><span>Biology</span><span id="progBiologyPct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progBiologyBar" style="width:0%;background:var(--green);"></div></div>
+        </div>
+        <div class="text-center mt-4">
+          <button class="btn btn-lab-outline" id="resetProgressBtn" type="button"><i class="bi bi-trash3 me-1"></i>Reset Progress</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       LEARN SAFELY
+  ==================================================================== -->
+  <section class="section-tight section">
+    <div class="container container-narrow">
+      <div class="safety-panel reveal">
+        <i class="bi bi-shield-check" aria-hidden="true"></i>
+        <p>These simulations are simplified educational models designed to help you understand scientific ideas. Real laboratory experiments should always be performed with a qualified teacher and appropriate safety equipment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FINAL CTA
+  ==================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="final-cta reveal">
+        <h2>Ready to Explore More?</h2>
+        <p>Science becomes easier when you can see it, change it, and observe what happens.</p>
+        <div class="cta-links">
+          <a href="physics.html" class="btn btn-hero-primary">Explore Physics</a>
+          <a href="chemistry.html" class="btn btn-hero-ghost">Explore Chemistry</a>
+          <a href="biology.html" class="btn btn-hero-ghost">Explore Biology</a>
+          <a href="quizzes.html" class="btn btn-hero-ghost">Try a Quiz</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Learn. Explore. Discover.</p>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="text-white mb-3" style="font-weight:700;">Quick Links</h6>
+        <div class="row row-cols-2 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <h6 class="text-white mb-3" style="font-weight:700;">Subjects</h6>
+        <div class="row row-cols-1 g-3">
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<!-- Bootstrap bundle (needed for the navbar collapse toggle) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   S1 SCIENCE LAB — SIMULATIONS PAGE — internal script
+   Shared site behaviour (navbar, reveal, facts, smooth scroll) plus all
+   simulation logic (filtering, physics calculations, animations, quizzes,
+   progress tracking). Vanilla JS only.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------- Shared: navbar scroll state ---------------- */
+  var nav = document.getElementById("labNav");
+  function updateNavState() {
+    if (window.scrollY > 12) nav.classList.add("is-scrolled");
+    else nav.classList.remove("is-scrolled");
+  }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl).hide();
+        }
+      });
+    });
+  }
+
+  /* ---------------- Shared: scroll reveal ---------------- */
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* ---------------- Shared: smooth in-page scroll ---------------- */
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("href");
+      if (targetId.length > 1) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+
+  /* =====================================================================
+     PROGRESS TRACKING (localStorage, anonymous — simulation IDs only)
+  ===================================================================== */
+  var PROGRESS_KEY = "s1lab_sim_progress";
+  var SUBJECT_SIMS = {
+    physics: ["force-motion", "gravity", "speed-distance-time", "pressure"],
+    chemistry: ["states-of-matter", "atom-explorer", "mixture-lab"],
+    biology: ["cell-explorer", "photosynthesis", "respiration", "ecosystem"]
+  };
+
+  function getProgress() {
+    try {
+      var raw = window.localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+  function markOpened(simId) {
+    try {
+      var list = getProgress();
+      if (list.indexOf(simId) === -1) {
+        list.push(simId);
+        window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(list));
+      }
+    } catch (e) { /* localStorage unavailable — progress simply won't persist */ }
+    renderProgress();
+    renderCardTicks();
+  }
+  function renderProgress() {
+    var opened = getProgress();
+    Object.keys(SUBJECT_SIMS).forEach(function (subject) {
+      var total = SUBJECT_SIMS[subject].length;
+      var done = SUBJECT_SIMS[subject].filter(function (id) { return opened.indexOf(id) !== -1; }).length;
+      var pct = total ? Math.round((done / total) * 100) : 0;
+      var bar = document.getElementById("prog" + capitalize(subject) + "Bar");
+      var pctEl = document.getElementById("prog" + capitalize(subject) + "Pct");
+      if (bar) bar.style.width = pct + "%";
+      if (pctEl) pctEl.textContent = pct + "%";
+    });
+  }
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  document.getElementById("resetProgressBtn").addEventListener("click", function () {
+    try { window.localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
+    renderProgress();
+    renderCardTicks();
+  });
+
+  /* =====================================================================
+     SIMULATION CARD DATA + FILTER
+  ===================================================================== */
+  var SIM_CARDS = [
+    { id: "force-motion", subject: "physics", icon: "bi-arrow-right-circle", title: "Force & Motion", desc: "See how force and mass affect the movement of an object.", difficulty: "Easy" },
+    { id: "gravity", subject: "physics", icon: "bi-arrow-down-circle", title: "Gravity Lab", desc: "Drop an object and see how height and gravity affect its fall.", difficulty: "Easy" },
+    { id: "speed-distance-time", subject: "physics", icon: "bi-speedometer2", title: "Speed, Distance & Time", desc: "Change speed and time to see how far an object travels.", difficulty: "Easy" },
+    { id: "pressure", subject: "physics", icon: "bi-arrows-collapse", title: "Pressure Lab", desc: "Explore how force and area combine to create pressure.", difficulty: "Medium" },
+    { id: "states-of-matter", subject: "chemistry", icon: "bi-thermometer-half", title: "States of Matter", desc: "Heat and cool particles to see solids, liquids and gases.", difficulty: "Medium" },
+    { id: "atom-explorer", subject: "chemistry", icon: "bi-bullseye", title: "Atom Explorer", desc: "Build simplified atoms and discover different elements.", difficulty: "Medium" },
+    { id: "mixture-lab", subject: "chemistry", icon: "bi-droplet-half", title: "Mixture Lab", desc: "Mix salt, sand and oil with water and see what happens.", difficulty: "Easy" },
+    { id: "cell-explorer", subject: "biology", icon: "bi-hexagon", title: "Cell Explorer", desc: "Click organelles in an animal or plant cell to learn their jobs.", difficulty: "Medium" },
+    { id: "photosynthesis", subject: "biology", icon: "bi-tree", title: "Photosynthesis", desc: "Change light, water and CO2 to power a virtual plant.", difficulty: "Medium" },
+    { id: "respiration", subject: "biology", icon: "bi-lungs", title: "Respiration", desc: "Inhale and exhale to see how the lungs and diaphragm work.", difficulty: "Easy" },
+    { id: "ecosystem", subject: "biology", icon: "bi-diagram-3", title: "Ecosystem & Food Chain", desc: "Follow energy from the sun through a simple food chain.", difficulty: "Medium" }
+  ];
+
+  var badgeClass = { physics: "badge-physics", chemistry: "badge-chemistry", biology: "badge-biology" };
+  var cardClass = { physics: "sim-physics", chemistry: "sim-chemistry", biology: "sim-biology" };
+  var difficultyIcon = { Easy: "bi-circle-fill text-success", Medium: "bi-circle-fill text-warning", Hard: "bi-circle-fill text-danger" };
+
+  var cardGrid = document.getElementById("simCardGrid");
+  function renderCards() {
+    cardGrid.innerHTML = SIM_CARDS.map(function (sim) {
+      return (
+        '<div class="col-sm-6 col-lg-4 reveal is-visible sim-card-col" data-subject="' + sim.subject + '">' +
+          '<div class="sim-card ' + cardClass[sim.subject] + '">' +
+            '<div class="icon-tile"><i class="bi ' + sim.icon + '"></i></div>' +
+            '<div class="meta-row">' +
+              '<span class="subject-badge ' + badgeClass[sim.subject] + '">' + sim.subject + '</span>' +
+              '<span class="difficulty"><i class="bi ' + difficultyIcon[sim.difficulty] + '"></i>' + sim.difficulty + '</span>' +
+            '</div>' +
+            '<h3>' + sim.title + '<span class="opened-tick" data-tick="' + sim.id + '" style="display:none;"><i class="bi bi-check-circle-fill"></i></span></h3>' +
+            '<p>' + sim.desc + '</p>' +
+            '<button class="btn btn-lab-primary sim-open-btn" data-open="' + sim.id + '" type="button">Open Simulation</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    cardGrid.querySelectorAll("[data-open]").forEach(function (btn) {
+      btn.addEventListener("click", function () { openSimulation(btn.getAttribute("data-open")); });
+    });
+    renderCardTicks();
+  }
+  function renderCardTicks() {
+    var opened = getProgress();
+    cardGrid.querySelectorAll("[data-tick]").forEach(function (tick) {
+      tick.style.display = opened.indexOf(tick.getAttribute("data-tick")) !== -1 ? "inline" : "none";
+    });
+  }
+  renderCards();
+
+  document.querySelectorAll(".filter-pill").forEach(function (pill) {
+    pill.addEventListener("click", function () {
+      document.querySelectorAll(".filter-pill").forEach(function (p) { p.classList.remove("active"); });
+      pill.classList.add("active");
+      var filter = pill.getAttribute("data-filter");
+      cardGrid.querySelectorAll(".sim-card-col").forEach(function (col) {
+        var show = filter === "all" || col.getAttribute("data-subject") === filter;
+        col.classList.toggle("is-hidden", !show);
+      });
+    });
+  });
+
+  /* =====================================================================
+     WORKSPACE — dynamic simulation panel
+  ===================================================================== */
+  var workspace = document.getElementById("workspace");
+  var workspaceContent = document.getElementById("workspaceContent");
+  var workspacePlaceholder = document.getElementById("workspacePlaceholder");
+
+  function openSimulation(id) {
+    markOpened(id);
+    if (id === "force-motion") {
+      var pgSection = document.getElementById("playground");
+      pgSection.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+      return;
+    }
+    var sim = SIMULATIONS[id];
+    if (!sim) return;
+    workspacePlaceholder.style.display = "none";
+    workspaceContent.innerHTML = sim.render();
+    sim.init();
+    document.getElementById("workspaceSection").scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+    workspace.focus({ preventScroll: true });
+  }
+
+  function wsHeader(title, badge, desc) {
+    return '<div class="ws-header"><h3>' + title + '</h3><span class="ws-badge">' + badge + '</span></div><p class="ws-desc">' + desc + '</p>';
+  }
+  function wsNote(text) {
+    return '<p class="ws-note"><i class="bi bi-info-circle"></i>' + text + '</p>';
+  }
+
+  var SIMULATIONS = {};
+
+  /* ---------------- 1. Gravity Lab ---------------- */
+  SIMULATIONS["gravity"] = {
+    render: function () {
+      return (
+        wsHeader("Gravity Lab", "Physics", "See how height and gravity affect a falling object.") +
+        '<div class="control-grid">' +
+          '<div class="control-item"><label>Height (m) <span id="gHeightVal">20</span></label><input type="range" id="gHeight" min="1" max="100" value="20"></div>' +
+          '<div class="control-item"><label>Gravity (m/s²) <span id="gGravVal">9.8</span></label><input type="range" id="gGrav" min="1" max="20" step="0.1" value="9.8"></div>' +
+        '</div>' +
+        '<div class="ws-stage"><div class="fall-track"><div class="fall-line" aria-hidden="true"></div><div class="fall-ground" aria-hidden="true"></div><div class="fall-box" id="gBox" aria-hidden="true"></div></div></div>' +
+        '<div class="ws-readout"><div>Fall Time <span id="gTime">0.00 s</span></div><div>Velocity <span id="gVel">0.00 m/s</span></div><div>Distance <span id="gDist">20.00 m</span></div></div>' +
+        '<div class="ws-actions"><button class="btn-ws-primary" id="gDrop" type="button"><i class="bi bi-arrow-down-circle"></i> Drop Object</button><button class="btn-ws-ghost" id="gReset" type="button"><i class="bi bi-arrow-counterclockwise"></i> Reset</button></div>' +
+        wsNote("Simplified educational model — air resistance is ignored.")
+      );
+    },
+    init: function () {
+      var heightIn = document.getElementById("gHeight"), gravIn = document.getElementById("gGrav");
+      var box = document.getElementById("gBox");
+      var trackHeight = 190;
+      function update() {
+        var h = parseFloat(heightIn.value), g = parseFloat(gravIn.value);
+        document.getElementById("gHeightVal").textContent = h;
+        document.getElementById("gGravVal").textContent = g.toFixed(1);
+        var t = Math.sqrt((2 * h) / g);
+        var v = g * t;
+        document.getElementById("gTime").textContent = t.toFixed(2) + " s";
+        document.getElementById("gVel").textContent = v.toFixed(2) + " m/s";
+        document.getElementById("gDist").textContent = h.toFixed(2) + " m";
+        return t;
+      }
+      heightIn.addEventListener("input", update);
+      gravIn.addEventListener("input", update);
+      update();
+      document.getElementById("gDrop").addEventListener("click", function () {
+        var t = update();
+        var animDuration = prefersReducedMotion ? 0 : Math.min(Math.max(t, 0.6), 3.5);
+        box.style.transition = "top " + animDuration + "s linear";
+        box.style.top = "0px";
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { box.style.top = trackHeight + "px"; });
+        });
+      });
+      document.getElementById("gReset").addEventListener("click", function () {
+        box.style.transition = "none";
+        box.style.top = "0px";
+        heightIn.value = 20; gravIn.value = 9.8;
+        update();
+      });
+    }
+  };
+
+  /* ---------------- 2. Speed, Distance & Time ---------------- */
+  SIMULATIONS["speed-distance-time"] = {
+    render: function () {
+      return (
+        wsHeader("Speed, Distance &amp; Time", "Physics", "Distance = Speed × Time.") +
+        '<div class="control-grid">' +
+          '<div class="control-item"><label>Speed (m/s) <span id="sSpeedVal">10</span></label><input type="range" id="sSpeed" min="1" max="50" value="10"></div>' +
+          '<div class="control-item"><label>Time (s) <span id="sTimeVal">5</span></label><input type="range" id="sTime" min="1" max="20" value="5"></div>' +
+        '</div>' +
+        '<div class="ws-stage"><div class="sim-track"><div class="sim-ground" aria-hidden="true"></div><div class="sim-box" id="sBox" aria-hidden="true"><i class="bi bi-car-front-fill"></i></div></div></div>' +
+        '<div class="ws-readout"><div>Speed <span id="sSpeedOut">10.00 m/s</span></div><div>Time <span id="sTimeOut">5.00 s</span></div><div>Distance <span id="sDist">50.00 m</span></div></div>' +
+        '<div class="ws-actions"><button class="btn-ws-primary" id="sRun" type="button"><i class="bi bi-play-fill"></i> Run</button><button class="btn-ws-ghost" id="sReset" type="button"><i class="bi bi-arrow-counterclockwise"></i> Reset</button></div>'
+      );
+    },
+    init: function () {
+      var speedIn = document.getElementById("sSpeed"), timeIn = document.getElementById("sTime");
+      var box = document.getElementById("sBox");
+      function update() {
+        var sp = parseFloat(speedIn.value), t = parseFloat(timeIn.value);
+        document.getElementById("sSpeedVal").textContent = sp;
+        document.getElementById("sTimeVal").textContent = t;
+        document.getElementById("sSpeedOut").textContent = sp.toFixed(2) + " m/s";
+        document.getElementById("sTimeOut").textContent = t.toFixed(2) + " s";
+        document.getElementById("sDist").textContent = (sp * t).toFixed(2) + " m";
+        return t;
+      }
+      speedIn.addEventListener("input", update);
+      timeIn.addEventListener("input", update);
+      update();
+      document.getElementById("sRun").addEventListener("click", function () {
+        var t = update();
+        var dur = prefersReducedMotion ? 0 : Math.min(Math.max(t / 2, 0.6), 4);
+        box.style.transition = "none";
+        box.style.left = "4%";
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            box.style.transition = "left " + dur + "s linear";
+            box.style.left = "82%";
+          });
+        });
+      });
+      document.getElementById("sReset").addEventListener("click", function () {
+        box.style.transition = "none";
+        box.style.left = "4%";
+        speedIn.value = 10; timeIn.value = 5;
+        update();
+      });
+    }
+  };
+
+  /* ---------------- 3. Pressure Lab ---------------- */
+  SIMULATIONS["pressure"] = {
+    render: function () {
+      return (
+        wsHeader("Pressure Lab", "Physics", "Pressure = Force ÷ Area.") +
+        '<div class="control-grid">' +
+          '<div class="control-item"><label>Force (N) <span id="prForceVal">200</span></label><input type="range" id="prForce" min="10" max="500" value="200"></div>' +
+          '<div class="control-item"><label>Area (cm²) <span id="prAreaVal">50</span></label><input type="range" id="prArea" min="5" max="200" value="50"></div>' +
+        '</div>' +
+        '<div class="ws-stage"><div class="press-stage">' +
+          '<div class="press-object" id="prObject" style="width:80px;"></div>' +
+          '<div class="press-surface" id="prSurface"></div>' +
+        '</div></div>' +
+        '<div class="ws-readout"><div>Pressure <span id="prOut">4.00 N/cm²</span></div></div>' +
+        wsNote("Pressure increases when the same force acts over a smaller area — try lowering the area.")
+      );
+    },
+    init: function () {
+      var forceIn = document.getElementById("prForce"), areaIn = document.getElementById("prArea");
+      var obj = document.getElementById("prObject"), surf = document.getElementById("prSurface");
+      function update() {
+        var f = parseFloat(forceIn.value), a = parseFloat(areaIn.value);
+        document.getElementById("prForceVal").textContent = f;
+        document.getElementById("prAreaVal").textContent = a;
+        var p = f / a;
+        document.getElementById("prOut").textContent = p.toFixed(2) + " N/cm²";
+        obj.style.width = Math.max(30, Math.min(200, a)) + "px";
+        surf.classList.toggle("pressed", p > 3);
+      }
+      forceIn.addEventListener("input", update);
+      areaIn.addEventListener("input", update);
+      update();
+    }
+  };
+
+  /* ---------------- 4. States of Matter ---------------- */
+  SIMULATIONS["states-of-matter"] = {
+    render: function () {
+      var dots = "";
+      for (var i = 0; i < 18; i++) {
+        dots += '<span class="particle solid" style="left:' + (10 + Math.random() * 80) + '%; top:' + (10 + Math.random() * 80) + '%; animation-delay:' + (Math.random() * 1).toFixed(2) + 's;"></span>';
+      }
+      return (
+        wsHeader("States of Matter", "Chemistry", "Choose a state and adjust temperature to see how particles behave.") +
+        '<div class="ws-toggle-row">' +
+          '<button class="btn-toggle active" data-state="solid" type="button"><i class="bi bi-snow2"></i> Solid</button>' +
+          '<button class="btn-toggle" data-state="liquid" type="button"><i class="bi bi-droplet"></i> Liquid</button>' +
+          '<button class="btn-toggle" data-state="gas" type="button"><i class="bi bi-cloud"></i> Gas</button>' +
+        '</div>' +
+        '<div class="control-grid"><div class="control-item"><label>Temperature (°C) <span id="somTempVal">0</span></label><input type="range" id="somTemp" min="-50" max="150" value="0"></div></div>' +
+        '<div class="ws-stage particle-box" id="somBox">' + dots + '</div>' +
+        '<div class="ws-readout"><div>Current State <span id="somState">Solid</span></div></div>' +
+        '<p class="ws-note" id="somTransition"><i class="bi bi-arrow-repeat"></i> Try changing state to see melting, freezing, evaporation, condensation, sublimation and deposition.</p>' +
+        wsNote("Simplified educational particle model.")
+      );
+    },
+    init: function () {
+      var box = document.getElementById("somBox");
+      var stateEl = document.getElementById("somState");
+      var transEl = document.getElementById("somTransition");
+      var current = "solid";
+      var transitions = {
+        "solid-liquid": "Melting: the solid is gaining energy and turning into a liquid.",
+        "liquid-solid": "Freezing: the liquid is losing energy and turning into a solid.",
+        "liquid-gas": "Evaporation: the liquid is gaining energy and turning into a gas.",
+        "gas-liquid": "Condensation: the gas is losing energy and turning into a liquid.",
+        "solid-gas": "Sublimation: the solid is turning directly into a gas.",
+        "gas-solid": "Deposition: the gas is turning directly into a solid."
+      };
+      function setState(next) {
+        var key = current + "-" + next;
+        if (transitions[key]) {
+          transEl.innerHTML = '<i class="bi bi-arrow-repeat"></i> ' + transitions[key];
+        }
+        current = next;
+        stateEl.textContent = capitalize(next);
+        box.querySelectorAll(".particle").forEach(function (p) {
+          p.classList.remove("solid", "liquid", "gas");
+          p.classList.add(next);
+        });
+        document.querySelectorAll(".btn-toggle").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-state") === next);
+        });
+      }
+      document.querySelectorAll(".btn-toggle").forEach(function (b) {
+        b.addEventListener("click", function () { setState(b.getAttribute("data-state")); });
+      });
+      document.getElementById("somTemp").addEventListener("input", function () {
+        var t = parseFloat(this.value);
+        document.getElementById("somTempVal").textContent = t;
+        if (t <= 0 && current !== "solid") setState("solid");
+        else if (t > 0 && t < 100 && current !== "liquid") setState("liquid");
+        else if (t >= 100 && current !== "gas") setState("gas");
+      });
+    }
+  };
+
+  /* ---------------- 5. Atom Explorer ---------------- */
+  SIMULATIONS["atom-explorer"] = {
+    render: function () {
+      return (
+        wsHeader("Atom Explorer", "Chemistry", "Change the number of protons to explore different elements.") +
+        '<div class="control-grid"><div class="control-item"><label>Protons <span id="atProtonsVal">1</span></label><input type="range" id="atProtons" min="0" max="7" step="1" value="0"></div></div>' +
+        '<div class="ws-stage atom-stage">' +
+          '<div class="atom-diagram" id="atDiagram"></div>' +
+          '<div class="atom-info">' +
+            '<div class="symbol" id="atSymbol">H</div>' +
+            '<div class="elname" id="atName">Hydrogen</div>' +
+            '<div class="ws-readout" style="grid-template-columns:1fr;"><div>Atomic Number <span id="atNumber">1</span></div></div>' +
+          '</div>' +
+        '</div>' +
+        wsNote("Model simplified for learning and not drawn to scale.")
+      );
+    },
+    init: function () {
+      var elements = [
+        { z: 1, name: "Hydrogen", sym: "H", shells: [1] },
+        { z: 2, name: "Helium", sym: "He", shells: [2] },
+        { z: 6, name: "Carbon", sym: "C", shells: [2, 4] },
+        { z: 7, name: "Nitrogen", sym: "N", shells: [2, 5] },
+        { z: 8, name: "Oxygen", sym: "O", shells: [2, 6] },
+        { z: 11, name: "Sodium", sym: "Na", shells: [2, 8, 1] },
+        { z: 12, name: "Magnesium", sym: "Mg", shells: [2, 8, 2] },
+        { z: 17, name: "Chlorine", sym: "Cl", shells: [2, 8, 7] }
+      ];
+      var slider = document.getElementById("atProtons");
+      var diagram = document.getElementById("atDiagram");
+      function draw(el) {
+        document.getElementById("atSymbol").textContent = el.sym;
+        document.getElementById("atName").textContent = el.name;
+        document.getElementById("atNumber").textContent = el.z;
+        var html = '<div class="atom-nucleus">' + el.z + 'p<br>' + el.z + 'n</div>';
+        var maxR = 100;
+        el.shells.forEach(function (count, shellIndex) {
+          var r = 34 + shellIndex * 34;
+          html += '<div class="atom-shell" style="width:' + (r * 2) + 'px;height:' + (r * 2) + 'px;"></div>';
+          for (var i = 0; i < count; i++) {
+            var angle = (2 * Math.PI * i) / count;
+            var x = 110 + r * Math.cos(angle) - 5;
+            var y = 110 + r * Math.sin(angle) - 5;
+            html += '<div class="atom-electron" style="left:' + x + 'px; top:' + y + 'px;"></div>';
+          }
+        });
+        diagram.innerHTML = html;
+      }
+      slider.addEventListener("input", function () {
+        var idx = parseInt(this.value, 10);
+        document.getElementById("atProtonsVal").textContent = elements[idx].z;
+        draw(elements[idx]);
+      });
+      draw(elements[0]);
+    }
+  };
+
+  /* ---------------- 6. Mixture Lab ---------------- */
+  SIMULATIONS["mixture-lab"] = {
+    render: function () {
+      return (
+        wsHeader("Mixture Lab", "Chemistry", "Choose a mixture to see what happens when it meets water.") +
+        '<div class="mix-choices">' +
+          '<button class="btn-toggle active" data-mix="salt" type="button">Salt + Water</button>' +
+          '<button class="btn-toggle" data-mix="sand" type="button">Sand + Water</button>' +
+          '<button class="btn-toggle" data-mix="oil" type="button">Oil + Water</button>' +
+        '</div>' +
+        '<div class="ws-stage"><div class="mix-visual" id="mixVisual"></div></div>' +
+        '<div class="ws-readout" style="grid-template-columns:1fr;">' +
+          '<div>Mixture Type <span id="mixType">Solution</span></div>' +
+        '</div>' +
+        '<p class="ws-note" id="mixHappens"><i class="bi bi-info-circle"></i> Salt dissolves completely and spreads evenly through the water.</p>' +
+        '<p class="ws-note" id="mixSeparate"><i class="bi bi-arrow-repeat"></i> Can be separated by evaporation — the water evaporates and leaves the salt behind.</p>'
+      );
+    },
+    init: function () {
+      var data = {
+        salt: { type: "Solution (homogeneous mixture)", happens: "Salt dissolves completely and spreads evenly through the water — you can't see it anymore.", separate: "Can be separated by evaporation: the water evaporates and leaves the salt behind." },
+        sand: { type: "Suspension (heterogeneous mixture)", happens: "Sand does not dissolve. It sinks and settles at the bottom of the water.", separate: "Can be separated by filtration or by simply letting it settle and pouring off the water." },
+        oil: { type: "Immiscible mixture (does not mix)", happens: "Oil and water do not mix. Oil floats in a separate layer on top of the water.", separate: "Can be separated by decanting — carefully pouring off the top layer of oil." }
+      };
+      var visual = document.getElementById("mixVisual");
+      function setMix(key) {
+        var d = data[key];
+        document.getElementById("mixType").textContent = d.type;
+        document.getElementById("mixHappens").innerHTML = '<i class="bi bi-info-circle"></i> ' + d.happens;
+        document.getElementById("mixSeparate").innerHTML = '<i class="bi bi-arrow-repeat"></i> ' + d.separate;
+        document.querySelectorAll("[data-mix]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-mix") === key); });
+        if (key === "salt") {
+          var dots = "";
+          for (var i = 0; i < 14; i++) dots += '<span class="mix-dot" style="left:' + (Math.random() * 90) + '%; top:' + (35 + Math.random() * 55) + '%;"></span>';
+          visual.innerHTML = '<div class="mix-liquid"></div>' + dots;
+        } else if (key === "sand") {
+          visual.innerHTML = '<div class="mix-liquid"></div><div class="mix-sand"></div>';
+        } else {
+          visual.innerHTML = '<div class="mix-layer-oil"></div><div class="mix-layer-water"></div>';
+        }
+      }
+      document.querySelectorAll("[data-mix]").forEach(function (b) {
+        b.addEventListener("click", function () { setMix(b.getAttribute("data-mix")); });
+      });
+      setMix("salt");
+    }
+  };
+
+  /* ---------------- 7. Cell Explorer ---------------- */
+  var CELL_INFO = {
+    animal: {
+      nucleus: "The nucleus contains genetic material and controls many activities of the cell.",
+      membrane: "The cell membrane controls what enters and leaves the cell.",
+      cytoplasm: "The cytoplasm is a jelly-like substance where many cell activities happen.",
+      mitochondria: "Mitochondria release energy from food for the cell to use.",
+      vacuole: "Small vacuoles store water, food and waste.",
+      ribosomes: "Ribosomes make proteins for the cell."
+    },
+    plant: {
+      nucleus: "The nucleus contains genetic material and controls many activities of the cell.",
+      membrane: "The cell membrane controls what enters and leaves the cell, just inside the cell wall.",
+      cytoplasm: "The cytoplasm is a jelly-like substance where many cell activities happen.",
+      mitochondria: "Mitochondria release energy from food for the cell to use.",
+      vacuole: "A large central vacuole stores water and keeps the cell firm.",
+      ribosomes: "Ribosomes make proteins for the cell.",
+      wall: "The rigid cell wall supports and protects the plant cell.",
+      chloroplast: "Chloroplasts capture light energy for photosynthesis."
+    }
+  };
+  function animalCellSvg() {
+    return (
+      '<svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">' +
+        '<ellipse cx="150" cy="130" rx="130" ry="105" fill="#164e63" stroke="#67E8F9" stroke-width="3" class="organelle" data-part="membrane"/>' +
+        '<circle cx="150" cy="130" r="42" fill="#7C3AED" opacity="0.85" class="organelle" data-part="nucleus"/>' +
+        '<ellipse cx="90" cy="90" rx="22" ry="10" fill="#F59E0B" class="organelle" data-part="mitochondria"/>' +
+        '<ellipse cx="215" cy="170" rx="22" ry="10" fill="#F59E0B" class="organelle" data-part="mitochondria"/>' +
+        '<circle cx="90" cy="185" r="16" fill="#06B6D4" opacity="0.85" class="organelle" data-part="vacuole"/>' +
+        '<circle cx="205" cy="75" r="5" fill="#fff" class="organelle" data-part="ribosomes"/>' +
+        '<circle cx="220" cy="90" r="5" fill="#fff" class="organelle" data-part="ribosomes"/>' +
+        '<circle cx="60" cy="130" r="5" fill="#fff" class="organelle" data-part="ribosomes"/>' +
+        '<circle cx="150" cy="200" r="6" fill="#16A34A" class="organelle" data-part="cytoplasm"/>' +
+      '</svg>'
+    );
+  }
+  function plantCellSvg() {
+    return (
+      '<svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">' +
+        '<rect x="20" y="25" width="260" height="210" rx="18" fill="#052e16" stroke="#16A34A" stroke-width="4" class="organelle" data-part="wall"/>' +
+        '<rect x="34" y="39" width="232" height="182" rx="12" fill="#164e63" stroke="#67E8F9" stroke-width="2" class="organelle" data-part="membrane"/>' +
+        '<ellipse cx="150" cy="140" rx="95" ry="70" fill="#0891b2" opacity="0.6" class="organelle" data-part="vacuole"/>' +
+        '<circle cx="90" cy="90" r="30" fill="#7C3AED" opacity="0.9" class="organelle" data-part="nucleus"/>' +
+        '<ellipse cx="210" cy="80" rx="18" ry="9" fill="#16A34A" class="organelle" data-part="chloroplast"/>' +
+        '<ellipse cx="225" cy="150" rx="18" ry="9" fill="#16A34A" class="organelle" data-part="chloroplast"/>' +
+        '<ellipse cx="200" cy="190" rx="18" ry="9" fill="#F59E0B" class="organelle" data-part="mitochondria"/>' +
+        '<circle cx="70" cy="180" r="5" fill="#fff" class="organelle" data-part="ribosomes"/>' +
+        '<circle cx="60" cy="150" r="5" fill="#fff" class="organelle" data-part="ribosomes"/>' +
+      '</svg>'
+    );
+  }
+  var partNames = { nucleus: "Nucleus", membrane: "Cell Membrane", cytoplasm: "Cytoplasm", mitochondria: "Mitochondria", vacuole: "Vacuole", ribosomes: "Ribosomes", wall: "Cell Wall", chloroplast: "Chloroplast" };
+  SIMULATIONS["cell-explorer"] = {
+    render: function () {
+      return (
+        wsHeader("Cell Explorer", "Biology", "Click any organelle to learn what it does.") +
+        '<div class="ws-toggle-row">' +
+          '<button class="btn-toggle active" data-cell="animal" type="button"><i class="bi bi-circle"></i> Animal Cell</button>' +
+          '<button class="btn-toggle" data-cell="plant" type="button"><i class="bi bi-hexagon"></i> Plant Cell</button>' +
+        '</div>' +
+        '<div class="ws-stage cell-stage">' +
+          '<div class="cell-svg-wrap" id="cellSvgWrap"></div>' +
+          '<div class="cell-info" id="cellInfo"><h4>Tap a part</h4><p class="mb-0">Click any highlighted shape in the diagram to see its name and function.</p></div>' +
+        '</div>'
+      );
+    },
+    init: function () {
+      var wrap = document.getElementById("cellSvgWrap");
+      var infoBox = document.getElementById("cellInfo");
+      var currentType = "animal";
+      function drawCell(type) {
+        currentType = type;
+        wrap.innerHTML = type === "animal" ? animalCellSvg() : plantCellSvg();
+        infoBox.innerHTML = "<h4>Tap a part</h4><p class=\"mb-0\">Click any highlighted shape in the diagram to see its name and function.</p>";
+        wrap.querySelectorAll(".organelle").forEach(function (el) {
+          el.addEventListener("click", function () {
+            wrap.querySelectorAll(".organelle").forEach(function (o) { o.classList.remove("active"); });
+            el.classList.add("active");
+            var part = el.getAttribute("data-part");
+            var desc = CELL_INFO[currentType][part] || "";
+            infoBox.innerHTML = "<h4>" + partNames[part] + "</h4><p class=\"mb-0\">" + desc + "</p>";
+          });
+        });
+      }
+      document.querySelectorAll("[data-cell]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          document.querySelectorAll("[data-cell]").forEach(function (x) { x.classList.remove("active"); });
+          b.classList.add("active");
+          drawCell(b.getAttribute("data-cell"));
+        });
+      });
+      drawCell("animal");
+    }
+  };
+
+  /* ---------------- 8. Photosynthesis ---------------- */
+  SIMULATIONS["photosynthesis"] = {
+    render: function () {
+      return (
+        wsHeader("Photosynthesis", "Biology", "Carbon dioxide + Water + Light energy → Glucose + Oxygen") +
+        '<div class="control-grid">' +
+          '<div class="control-item"><label>Light <span id="phLightVal">50%</span></label><input type="range" id="phLight" min="0" max="100" value="50"></div>' +
+          '<div class="control-item"><label>Water <span id="phWaterVal">50%</span></label><input type="range" id="phWater" min="0" max="100" value="50"></div>' +
+          '<div class="control-item"><label>Carbon Dioxide <span id="phCo2Val">50%</span></label><input type="range" id="phCo2" min="0" max="100" value="50"></div>' +
+        '</div>' +
+        '<div class="ws-stage photo-stage">' +
+          '<svg class="plant-svg" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">' +
+            '<rect x="46" y="70" width="8" height="60" fill="#7c5a3a"/>' +
+            '<ellipse id="phLeaf1" cx="30" cy="70" rx="26" ry="14" fill="#16A34A" transform="rotate(-20 30 70)"/>' +
+            '<ellipse id="phLeaf2" cx="70" cy="80" rx="26" ry="14" fill="#22c55e" transform="rotate(20 70 80)"/>' +
+            '<ellipse id="phLeaf3" cx="50" cy="50" rx="24" ry="13" fill="#4ade80"/>' +
+          '</svg>' +
+          '<div class="photo-outputs">' +
+            '<div style="font-family:var(--mono); font-size:.85rem; color:#C7D2E3;">Oxygen (O₂)</div>' +
+            '<div class="output-bar-track"><div class="output-bar-fill" id="phO2Bar" style="width:50%; background:linear-gradient(90deg,#06B6D4,#67E8F9);"></div></div>' +
+            '<div style="font-family:var(--mono); font-size:.85rem; color:#C7D2E3;">Glucose</div>' +
+            '<div class="output-bar-track"><div class="output-bar-fill" id="phGlucoseBar" style="width:50%; background:linear-gradient(90deg,#F59E0B,#fbbf24);"></div></div>' +
+          '</div>' +
+        '</div>' +
+        wsNote("This is a simplified educational model of photosynthesis, not an exact scientific measurement.")
+      );
+    },
+    init: function () {
+      var light = document.getElementById("phLight"), water = document.getElementById("phWater"), co2 = document.getElementById("phCo2");
+      var leaves = [document.getElementById("phLeaf1"), document.getElementById("phLeaf2"), document.getElementById("phLeaf3")];
+      function update() {
+        var l = parseFloat(light.value), w = parseFloat(water.value), c = parseFloat(co2.value);
+        document.getElementById("phLightVal").textContent = l + "%";
+        document.getElementById("phWaterVal").textContent = w + "%";
+        document.getElementById("phCo2Val").textContent = c + "%";
+        var rate = (l + w + c) / 3;
+        document.getElementById("phO2Bar").style.width = rate + "%";
+        document.getElementById("phGlucoseBar").style.width = rate + "%";
+        var scale = 0.75 + (rate / 100) * 0.5;
+        leaves.forEach(function (leaf) { leaf.style.transform = leaf.getAttribute("transform") ? leaf.getAttribute("transform") + " " : ""; leaf.setAttribute("opacity", 0.5 + rate / 200); });
+        var wrap = document.querySelector(".plant-svg");
+        if (wrap) wrap.style.transform = "scale(" + scale + ")";
+      }
+      [light, water, co2].forEach(function (input) { input.addEventListener("input", update); });
+      update();
+    }
+  };
+
+  /* ---------------- 9. Respiration ---------------- */
+  SIMULATIONS["respiration"] = {
+    render: function () {
+      return (
+        wsHeader("Respiration", "Biology", "Inhale and exhale to see how the lungs and diaphragm work.") +
+        '<div class="ws-stage resp-stage">' +
+          '<svg viewBox="0 0 200 220" width="200" xmlns="http://www.w3.org/2000/svg">' +
+            '<path d="M100 10 V60" stroke="#C7D2E3" stroke-width="6" stroke-linecap="round"/>' +
+            '<ellipse id="respLungL" class="lung" cx="72" cy="100" rx="30" ry="45" fill="#f472b6" opacity="0.85"/>' +
+            '<ellipse id="respLungR" class="lung" cx="128" cy="100" rx="30" ry="45" fill="#f472b6" opacity="0.85"/>' +
+            '<rect id="respDiaphragm" class="diaphragm" x="45" y="150" width="110" height="8" rx="4" fill="#67E8F9"/>' +
+            '<path id="arrowIn" class="air-arrow" d="M100 0 L92 18 H108 Z" fill="#22c55e"/>' +
+            '<path id="arrowOut" class="air-arrow" d="M100 24 L92 6 H108 Z" fill="#F59E0B"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="ws-readout" style="grid-template-columns:1fr;"><div>Status <span id="respStatus">Resting</span></div></div>' +
+        '<div class="ws-actions"><button class="btn-ws-primary" id="respInhale" type="button"><i class="bi bi-arrow-down"></i> Inhale</button><button class="btn-ws-ghost" id="respExhale" type="button"><i class="bi bi-arrow-up"></i> Exhale</button></div>' +
+        '<p class="ws-note" id="respExplain"><i class="bi bi-info-circle"></i> Click Inhale or Exhale to see how air moves in and out of the lungs.</p>'
+      );
+    },
+    init: function () {
+      var lungL = document.getElementById("respLungL"), lungR = document.getElementById("respLungR");
+      var diaphragm = document.getElementById("respDiaphragm");
+      var arrowIn = document.getElementById("arrowIn"), arrowOut = document.getElementById("arrowOut");
+      var status = document.getElementById("respStatus"), explain = document.getElementById("respExplain");
+      document.getElementById("respInhale").addEventListener("click", function () {
+        lungL.style.transform = "scale(1.25)"; lungR.style.transform = "scale(1.25)";
+        diaphragm.style.transform = "translateY(15px)";
+        arrowOut.classList.remove("show"); arrowIn.classList.add("show");
+        status.textContent = "Inhaling";
+        explain.innerHTML = '<i class="bi bi-info-circle"></i> The diaphragm contracts and moves down, the lungs expand, and air flows in through the nose and trachea.';
+      });
+      document.getElementById("respExhale").addEventListener("click", function () {
+        lungL.style.transform = "scale(0.85)"; lungR.style.transform = "scale(0.85)";
+        diaphragm.style.transform = "translateY(-6px)";
+        arrowIn.classList.remove("show"); arrowOut.classList.add("show");
+        status.textContent = "Exhaling";
+        explain.innerHTML = '<i class="bi bi-info-circle"></i> The diaphragm relaxes and moves up, the lungs contract, and air is pushed out.';
+      });
+    }
+  };
+
+  /* ---------------- 10. Ecosystem & Food Chain ---------------- */
+  var FOOD_DATA = {
+    sun: { name: "Sun", role: "Energy source", energy: "Nuclear fusion", position: "Start of every food chain", icon: "bi-sun" },
+    plants: { name: "Plants", role: "Producer", energy: "Sunlight (via photosynthesis)", position: "1st level", icon: "bi-tree" },
+    herbivore: { name: "Herbivore", role: "Primary consumer", energy: "Eats plants", position: "2nd level", icon: "bi-egg" },
+    carnivore: { name: "Carnivore", role: "Secondary consumer", energy: "Eats herbivores", position: "3rd level", icon: "bi-bug" },
+    decomposer: { name: "Decomposer", role: "Decomposer", energy: "Breaks down dead organisms", position: "Recycles nutrients back to soil", icon: "bi-recycle" }
+  };
+  SIMULATIONS["ecosystem"] = {
+    render: function () {
+      var order = ["sun", "plants", "herbivore", "carnivore", "decomposer"];
+      var html = wsHeader("Ecosystem & Food Chain", "Biology", "Click each organism to see its role in the food chain.") +
+        '<div class="ws-stage"><div class="food-chain">';
+      order.forEach(function (key, i) {
+        var d = FOOD_DATA[key];
+        html += '<div class="food-node" data-node="' + key + '"><i class="bi ' + d.icon + '"></i>' + d.name + '</div>';
+        if (i < order.length - 1) html += '<i class="bi bi-arrow-right food-arrow"></i>';
+      });
+      html += '</div></div>' +
+        '<div class="cell-info" id="ecoInfo"><h4>Tap an organism</h4><p class="mb-0">Click any organism above to see its role, energy source and position in the food chain.</p></div>';
+      return html;
+    },
+    init: function () {
+      var infoBox = document.getElementById("ecoInfo");
+      document.querySelectorAll(".food-node").forEach(function (node) {
+        node.addEventListener("click", function () {
+          document.querySelectorAll(".food-node").forEach(function (n) { n.classList.remove("active"); });
+          node.classList.add("active");
+          var d = FOOD_DATA[node.getAttribute("data-node")];
+          infoBox.innerHTML = "<h4>" + d.name + "</h4><p class=\"mb-1\"><strong>Role:</strong> " + d.role + "</p><p class=\"mb-1\"><strong>Energy Source:</strong> " + d.energy + "</p><p class=\"mb-0\"><strong>Position:</strong> " + d.position + "</p>";
+        });
+      });
+    }
+  };
+
+  /* =====================================================================
+     PLAYGROUND — Force & Motion (main workspace, section 17)
+  ===================================================================== */
+  (function () {
+    var forceIn = document.getElementById("pgForce"), massIn = document.getElementById("pgMass"), timeIn = document.getElementById("pgTime");
+    var box = document.getElementById("pgBox");
+    function update() {
+      var f = parseFloat(forceIn.value), m = parseFloat(massIn.value), t = parseFloat(timeIn.value);
+      document.getElementById("pgForceVal").textContent = f;
+      document.getElementById("pgMassVal").textContent = m;
+      document.getElementById("pgTimeVal").textContent = t;
+      var a = f / m;
+      var v = a * t;
+      var d = 0.5 * a * t * t;
+      document.getElementById("pgAccel").textContent = a.toFixed(2) + " m/s²";
+      document.getElementById("pgVel").textContent = v.toFixed(2) + " m/s";
+      document.getElementById("pgDist").textContent = d.toFixed(2) + " m";
+      return t;
+    }
+    [forceIn, massIn, timeIn].forEach(function (input) { input.addEventListener("input", update); });
+    update();
+    document.getElementById("pgRun").addEventListener("click", function () {
+      markOpened("force-motion");
+      var t = update();
+      var dur = prefersReducedMotion ? 0 : Math.min(Math.max(t / 2, 0.6), 4);
+      box.style.transition = "none";
+      box.style.left = "4%";
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          box.style.transition = "left " + dur + "s linear";
+          box.style.left = "84%";
+        });
+      });
+    });
+    document.getElementById("pgReset").addEventListener("click", function () {
+      box.style.transition = "none";
+      box.style.left = "4%";
+      forceIn.value = 20; massIn.value = 5; timeIn.value = 5;
+      update();
+    });
+  })();
+
+  /* What Did You Observe interactions */
+  document.getElementById("thinkBtn").addEventListener("click", function () {
+    document.getElementById("playground").scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  });
+  document.getElementById("showExplainBtn").addEventListener("click", function () {
+    document.getElementById("observeExplain").classList.toggle("show");
+  });
+
+  /* =====================================================================
+     SCIENCE FORMULA LAB
+  ===================================================================== */
+  var FORMULAS = [
+    { title: "Force", formula: "F = m × a", meaning: "Force equals mass times acceleration.", example: "A 2 kg object accelerating at 3 m/s² needs 6 N of force." },
+    { title: "Speed", formula: "v = d / t", meaning: "Speed equals distance divided by time.", example: "Travelling 100 m in 20 s gives a speed of 5 m/s." },
+    { title: "Distance", formula: "d = v × t", meaning: "Distance equals speed multiplied by time.", example: "At 10 m/s for 5 s, you travel 50 m." },
+    { title: "Pressure", formula: "P = F / A", meaning: "Pressure equals force divided by area.", example: "20 N over 4 cm² gives a pressure of 5 N/cm²." },
+    { title: "Weight", formula: "W = m × g", meaning: "Weight equals mass multiplied by gravity.", example: "A 5 kg object on Earth weighs about 49 N (5 × 9.8)." }
+  ];
+  document.getElementById("formulaGrid").innerHTML = FORMULAS.map(function (f) {
+    return '<div class="col-sm-6 col-lg-4 reveal is-visible"><div class="formula-card"><div class="formula">' + f.formula + '</div><h4>' + f.title + '</h4><p>' + f.meaning + '</p><span class="ex">' + f.example + '</span></div></div>';
+  }).join("");
+
+  /* =====================================================================
+     PREDICTION CHALLENGES
+  ===================================================================== */
+  var CHALLENGES = [
+    { tag: "Physics", q: "If force increases while mass stays constant, what happens to acceleration?", opts: ["Acceleration increases", "Acceleration decreases", "Acceleration stays the same"], correct: 0, why: "Since a = F/m, increasing force while mass is constant makes acceleration larger." },
+    { tag: "Physics", q: "If the same force acts on a bigger mass, what happens to acceleration?", opts: ["It increases", "It decreases", "It stays the same"], correct: 1, why: "Since a = F/m, a bigger mass with the same force gives a smaller acceleration." },
+    { tag: "Physics", q: "If you press the same force over a smaller area, what happens to pressure?", opts: ["Pressure decreases", "Pressure increases", "Pressure stays the same"], correct: 1, why: "Since P = F/A, a smaller area with the same force gives a bigger pressure." },
+    { tag: "Chemistry", q: "What happens to particles in a gas when you heat them further?", opts: ["They move slower and get closer", "They move faster and spread out more", "Nothing changes"], correct: 1, why: "Heating gives particles more energy, so they move faster and spread further apart." },
+    { tag: "Chemistry", q: "What happens when you cool a gas until it becomes a liquid?", opts: ["Melting", "Evaporation", "Condensation"], correct: 2, why: "A gas turning into a liquid as it loses energy is called condensation." },
+    { tag: "Biology", q: "If light increases during photosynthesis (with enough water and CO2), what happens?", opts: ["Glucose and oxygen production increases", "Glucose and oxygen production decreases", "Nothing changes"], correct: 0, why: "More light energy allows the plant to carry out photosynthesis faster, producing more glucose and oxygen." },
+    { tag: "Biology", q: "What happens to the diaphragm when you inhale?", opts: ["It relaxes and moves up", "It contracts and moves down", "It stays still"], correct: 1, why: "During inhalation the diaphragm contracts and moves down, helping the lungs expand." }
+  ];
+  document.getElementById("predictGrid").innerHTML = CHALLENGES.map(function (c, qi) {
+    var opts = c.opts.map(function (opt, oi) {
+      return '<button class="predict-opt" data-q="' + qi + '" data-o="' + oi + '" type="button">' + opt + '</button>';
+    }).join("");
+    return (
+      '<div class="col-md-6 col-lg-4 reveal is-visible"><div class="predict-card">' +
+        '<span class="qtag">' + c.tag + '</span>' +
+        '<p class="qtext">' + c.q + '</p>' +
+        opts +
+        '<div class="predict-explain" id="predictExplain' + qi + '">' + c.why + '</div>' +
+      '</div></div>'
+    );
+  }).join("");
+  document.querySelectorAll(".predict-opt").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var qi = btn.getAttribute("data-q"), oi = parseInt(btn.getAttribute("data-o"), 10);
+      var correct = CHALLENGES[qi].correct;
+      document.querySelectorAll('.predict-opt[data-q="' + qi + '"]').forEach(function (opt) {
+        opt.disabled = true;
+        var oIndex = parseInt(opt.getAttribute("data-o"), 10);
+        if (oIndex === correct) opt.classList.add("correct");
+        else if (opt === btn) opt.classList.add("incorrect");
+      });
+      document.getElementById("predictExplain" + qi).classList.add("show");
+    });
+  });
+
+  /* =====================================================================
+     SCIENCE FACTS
+  ===================================================================== */
+  var scienceFacts = [
+    "Earth has gravity that pulls objects toward its centre.",
+    "Water can exist as a solid, liquid and gas.",
+    "Cells are the basic units of life.",
+    "Plants use light energy during photosynthesis.",
+    "Sound needs a medium, like air or water, to travel through.",
+    "The human body has more bacterial cells than human cells.",
+    "A rainbow forms when light is refracted and reflected inside water droplets.",
+    "Metals are usually good conductors of heat and electricity.",
+    "The heart pumps blood around the body roughly 100,000 times a day.",
+    "Most of an atom is empty space."
+  ];
+  var factIndex = 0;
+  var factTextEl = document.getElementById("factText");
+  document.getElementById("factBtn").addEventListener("click", function () {
+    var nextIndex;
+    do { nextIndex = Math.floor(Math.random() * scienceFacts.length); } while (nextIndex === factIndex && scienceFacts.length > 1);
+    factIndex = nextIndex;
+    if (prefersReducedMotion) { factTextEl.textContent = scienceFacts[factIndex]; return; }
+    factTextEl.classList.add("fading");
+    window.setTimeout(function () {
+      factTextEl.textContent = scienceFacts[factIndex];
+      factTextEl.classList.remove("fading");
+    }, 200);
+  });
+
+  /* Initial progress render */
+  renderProgress();
+})();
+</script>
+</body>
+</html>

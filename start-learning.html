@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start Learning | S1 Science Lab</title>
+<meta name="description" content="Begin your Science journey at S1 Science Lab. Choose a subject, study interactive lessons, explore simulations, take quizzes and track your progress.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — BASE DESIGN SYSTEM
+   (Carried over from index.html / about.html so every page looks like
+   one site. Tokens are unchanged.)
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --emerald:#10B981;
+  --orange:#F59E0B;
+  --yellow:#FBBF24;
+  --red:#DC2626;
+  --navy:#0B1226;
+  --navy-2:#101B36;
+  --card-radius:20px;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Science-themed page backdrop — no plain white anywhere */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(48rem 34rem at 82% -6%, rgba(6,182,212,.16), transparent 62%),
+    radial-gradient(42rem 30rem at 6% 22%, rgba(124,58,237,.13), transparent 60%),
+    radial-gradient(46rem 32rem at 95% 72%, rgba(22,163,74,.11), transparent 62%),
+    radial-gradient(40rem 28rem at 18% 96%, rgba(245,158,11,.12), transparent 60%),
+    linear-gradient(180deg,#F8FAFC 0%,#EEF3FA 45%,#F5F7FD 100%);
+}
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:
+    linear-gradient(rgba(15,23,42,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,23,42,.035) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(90% 70% at 50% 20%, #000 20%, transparent 85%);
+}
+
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+a{ text-decoration:none; }
+
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+
+a:focus-visible, button:focus-visible, .btn:focus-visible, input:focus-visible,
+[tabindex]:focus-visible{
+  outline:3px solid var(--cyan);
+  outline-offset:2px;
+  border-radius:8px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* NAVBAR */
+/* ---------------------------------------------------------------------- */
+.lab-nav{
+  position:sticky; top:0; z-index:1000; padding:.65rem 0;
+  background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  transition:box-shadow .25s ease, background .25s ease;
+}
+.lab-nav.is-scrolled{ box-shadow:0 6px 24px rgba(15,23,42,.08); background:rgba(248,250,252,.94); }
+.lab-brand{
+  display:flex; align-items:center; gap:.6rem;
+  font-family:var(--display); font-weight:700; font-size:1.12rem; color:var(--ink);
+}
+.lab-brand .mark{
+  width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; font-size:1.15rem; box-shadow:0 6px 16px rgba(37,99,235,.35);
+}
+.lab-brand:hover{ color:var(--ink); }
+.lab-links .nav-link{
+  color:var(--ink-soft); font-weight:600; font-size:.92rem;
+  padding:.5rem .7rem !important; border-radius:10px;
+  transition:color .15s ease, background .15s ease;
+}
+.lab-links .nav-link:hover{ color:var(--blue); background:rgba(37,99,235,.07); }
+.lab-links .nav-link.active{ color:var(--blue); background:rgba(37,99,235,.1); }
+
+.btn-lab-primary{
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; font-weight:600; border:none;
+  padding:.55rem 1.2rem; border-radius:12px;
+  box-shadow:0 8px 20px rgba(37,99,235,.28);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-lab-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(37,99,235,.36); }
+
+.btn-lab-outline{
+  border:1.5px solid rgba(15,23,42,.15); color:var(--ink); font-weight:600;
+  padding:.55rem 1.3rem; border-radius:12px; background:rgba(255,255,255,.8);
+  transition:border-color .15s ease, transform .15s ease;
+}
+.btn-lab-outline:hover{ color:var(--ink); border-color:var(--blue); transform:translateY(-2px); }
+
+/* ---------------------------------------------------------------------- */
+/* HERO */
+/* ---------------------------------------------------------------------- */
+.hero{
+  position:relative; color:#fff; padding:5rem 0 5.5rem; overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 140% at 15% -10%, #16264F 0%, var(--navy) 55%, #060A16 100%);
+}
+.hero::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%);
+}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.78rem; color:#A5F3FC;
+  background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35);
+  padding:.35rem .8rem; border-radius:999px;
+}
+.hero h1{ font-size:clamp(2.1rem,4.4vw,3.4rem); font-weight:700; line-height:1.1; margin:1.1rem 0 .6rem; }
+.hero h1 .accent{
+  background:linear-gradient(100deg,var(--cyan),#7dd3fc 60%,var(--purple));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero .tagline{
+  font-family:var(--mono); font-size:.92rem; color:#7DD3FC; letter-spacing:.02em; margin-bottom:1rem;
+}
+.hero p.lead-copy{ color:#C7D2E3; font-size:1.06rem; max-width:36rem; line-height:1.65; }
+.hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+
+.btn-hero-primary{
+  background:linear-gradient(135deg,var(--cyan),#3b82f6);
+  color:#04121F; font-weight:700; border:none;
+  padding:.75rem 1.5rem; border-radius:13px;
+  box-shadow:0 10px 28px rgba(6,182,212,.35);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-hero-primary:hover{ color:#04121F; transform:translateY(-2px); box-shadow:0 14px 34px rgba(6,182,212,.45); }
+.btn-hero-ghost{
+  border:1.5px solid rgba(255,255,255,.25); color:#fff; font-weight:600;
+  padding:.75rem 1.5rem; border-radius:13px; background:rgba(255,255,255,.04);
+  transition:border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.btn-hero-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.09); transform:translateY(-2px); }
+
+.hero-lab{ position:relative; width:100%; max-width:450px; margin-inline:auto; z-index:1; }
+.hero-lab svg{ width:100%; height:auto; overflow:visible; }
+
+.orbit-ring{ transform-origin:center; animation:spin 22s linear infinite; }
+.orbit-ring.reverse{ animation-direction:reverse; animation-duration:30s; }
+.electron{ transform-origin:center; }
+.float-slow{ animation:float 6s ease-in-out infinite; }
+.float-slower{ animation:float 8s ease-in-out infinite; }
+.float-med{ animation:float 5s ease-in-out infinite; }
+.spin-slow{ animation:spin 18s linear infinite; transform-origin:center; }
+.pulse-dot{ animation:pulse 2.4s ease-in-out infinite; }
+.drift{ animation:drift 9s ease-in-out infinite; }
+
+@keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
+@keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes pulse{ 0%,100%{ opacity:.4; r:3; } 50%{ opacity:1; r:5; } }
+@keyframes drift{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(6px,-8px); } }
+
+/* ---------------------------------------------------------------------- */
+/* SECTION SCAFFOLDING */
+/* ---------------------------------------------------------------------- */
+.section{ padding:5rem 0; position:relative; }
+.section-tight{ padding:4rem 0; }
+.section-glass{
+  background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.45));
+  border-block:1px solid rgba(15,23,42,.05);
+  backdrop-filter:blur(6px);
+}
+.section-head{ max-width:640px; }
+.section-head h2{ font-size:clamp(1.7rem,3vw,2.35rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.04rem; line-height:1.6; }
+
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+/* Shared surface for cards (glassy, never flat white) */
+.surface{
+  background:linear-gradient(160deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
+  border:1px solid rgba(15,23,42,.07);
+  border-radius:var(--card-radius);
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+
+/* ---------------------------------------------------------------------- */
+/* 5. WELCOME — learning stages */
+/* ---------------------------------------------------------------------- */
+.stage-card{
+  position:relative; padding:1.7rem 1.5rem; height:100%; overflow:hidden;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.stage-card:hover{ transform:translateY(-6px); box-shadow:0 18px 38px rgba(15,23,42,.1); border-color:var(--accent,var(--blue)); }
+.stage-card .stage-no{
+  font-family:var(--mono); font-size:.78rem; font-weight:600; color:var(--accent,var(--blue));
+  display:block; margin-bottom:.9rem;
+}
+.stage-card .s-ico{
+  width:52px; height:52px; border-radius:15px; display:grid; place-items:center;
+  font-size:1.25rem; color:#fff; background:var(--accent,var(--blue)); margin-bottom:1rem;
+  box-shadow:0 8px 18px color-mix(in srgb, var(--accent,var(--blue)) 40%, transparent);
+  transition:transform .25s ease;
+}
+.stage-card:hover .s-ico{ transform:rotate(-6deg) scale(1.06); }
+.stage-card h3{ font-size:1.12rem; font-weight:700; margin-bottom:.3rem; }
+.stage-card p{ color:var(--ink-soft); font-size:.93rem; line-height:1.55; margin:0; }
+
+/* ---------------------------------------------------------------------- */
+/* 6. SUBJECT CARDS */
+/* ---------------------------------------------------------------------- */
+.subject-card{
+  position:relative; padding:2.1rem 1.9rem 1.9rem; height:100%; overflow:hidden;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.subject-card::after{
+  content:""; position:absolute; inset:auto -30% -40% auto; width:230px; height:230px;
+  border-radius:50%; background:var(--accent,var(--blue)); opacity:.07; transition:opacity .25s ease;
+}
+.subject-card:hover{ transform:translateY(-8px); box-shadow:0 22px 44px rgba(15,23,42,.13); border-color:var(--accent,var(--blue)); }
+.subject-card:hover::after{ opacity:.14; }
+.subject-card .icon-tile{
+  width:60px; height:60px; border-radius:17px; display:grid; place-items:center;
+  font-size:1.6rem; margin-bottom:1.1rem; position:relative; z-index:1;
+  background:linear-gradient(135deg, var(--accent,var(--blue)), var(--accent-2,var(--cyan)));
+  box-shadow:0 10px 22px color-mix(in srgb, var(--accent,var(--blue)) 42%, transparent);
+  transition:transform .25s ease;
+}
+.subject-card:hover .icon-tile{ transform:rotate(-6deg) scale(1.06); }
+.subject-card h3{ font-size:1.35rem; font-weight:700; margin-bottom:.45rem; position:relative; z-index:1; }
+.subject-card > p{ color:var(--ink-soft); font-size:.96rem; line-height:1.6; margin-bottom:1.1rem; position:relative; z-index:1; }
+.topic-pills{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.4rem; position:relative; z-index:1; }
+.topic-pills span{
+  font-size:.79rem; font-weight:600; color:var(--ink-soft);
+  background:color-mix(in srgb, var(--accent,var(--blue)) 9%, #fff);
+  border:1px solid color-mix(in srgb, var(--accent,var(--blue)) 22%, transparent);
+  padding:.28rem .68rem; border-radius:999px;
+}
+.btn-subject{
+  position:relative; z-index:1; display:inline-flex; align-items:center; gap:.45rem;
+  font-weight:700; color:#fff; border:none; border-radius:12px; padding:.6rem 1.25rem;
+  background:linear-gradient(135deg, var(--accent,var(--blue)), var(--accent-2,var(--cyan)));
+  box-shadow:0 8px 20px color-mix(in srgb, var(--accent,var(--blue)) 35%, transparent);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-subject:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px color-mix(in srgb, var(--accent,var(--blue)) 45%, transparent); }
+.btn-subject i{ transition:transform .2s ease; }
+.btn-subject:hover i{ transform:translateX(3px); }
+
+.subj-physics{ --accent:var(--blue);  --accent-2:var(--cyan); }
+.subj-chemistry{ --accent:var(--orange); --accent-2:var(--yellow); }
+.subj-biology{ --accent:var(--green);  --accent-2:var(--emerald); }
+
+/* ---------------------------------------------------------------------- */
+/* 7. LEARNING PATH — journey map */
+/* ---------------------------------------------------------------------- */
+.path-map{ position:relative; max-width:900px; margin:3rem auto 0; padding-block:.5rem; }
+.path-map::before{
+  content:""; position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%);
+  background:linear-gradient(180deg,var(--cyan),var(--blue) 40%,var(--purple) 75%,var(--green));
+  opacity:.35; border-radius:3px;
+}
+.path-marker{
+  position:relative; text-align:center; font-family:var(--mono); font-size:.76rem;
+  color:var(--ink-soft); margin-bottom:1.4rem;
+}
+.path-marker span{
+  background:linear-gradient(135deg,var(--navy),#1e2f57); color:#A5F3FC;
+  padding:.35rem 1rem; border-radius:999px; display:inline-block;
+  border:1px solid rgba(6,182,212,.3);
+}
+.path-step{ position:relative; display:flex; align-items:center; gap:1.4rem; margin-bottom:1.5rem; width:calc(50% - 2.2rem); }
+.path-step:nth-child(odd){ margin-left:0; flex-direction:row-reverse; text-align:right; }
+.path-step:nth-child(even){ margin-left:calc(50% + 2.2rem); }
+.path-step .node{
+  position:absolute; top:50%; width:48px; height:48px; border-radius:50%; transform:translateY(-50%);
+  display:grid; place-items:center; color:#fff; font-size:1.1rem; z-index:2;
+  background:linear-gradient(135deg,var(--accent,var(--blue)),var(--accent-2,var(--cyan)));
+  box-shadow:0 0 0 6px rgba(248,250,252,.9), 0 10px 22px color-mix(in srgb,var(--accent,var(--blue)) 40%, transparent);
+}
+.path-step:nth-child(odd) .node{ right:-4.4rem; }
+.path-step:nth-child(even) .node{ left:-4.4rem; }
+.path-step .card-body-x{ flex:1; padding:1.1rem 1.3rem; border-radius:16px; }
+.path-step .step-label{ font-family:var(--mono); font-size:.72rem; color:var(--accent,var(--blue)); }
+.path-step h4{ font-size:1.02rem; font-weight:700; margin:.15rem 0 .2rem; }
+.path-step p{ font-size:.89rem; color:var(--ink-soft); margin:0; line-height:1.5; }
+.path-finish{ text-align:center; margin-top:.5rem; position:relative; }
+.path-finish span{
+  display:inline-flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.78rem;
+  color:#065F46; background:rgba(16,185,129,.14); border:1px solid rgba(16,185,129,.35);
+  padding:.45rem 1.1rem; border-radius:999px;
+}
+@media (max-width:767.98px){
+  .path-map::before{ left:24px; }
+  .path-step, .path-step:nth-child(odd), .path-step:nth-child(even){
+    width:100%; margin-left:0; flex-direction:row; text-align:left; padding-left:4rem;
+  }
+  .path-step:nth-child(odd) .node, .path-step:nth-child(even) .node{ left:0; right:auto; }
+  .path-marker, .path-finish{ text-align:left; padding-left:0; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* 8. FEATURED TOPICS */
+/* ---------------------------------------------------------------------- */
+.filter-row{ display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin:2rem 0 2.4rem; }
+.filter-chip{
+  border:1.5px solid rgba(15,23,42,.12); background:rgba(255,255,255,.85); color:var(--ink-soft);
+  font-weight:600; font-size:.88rem; padding:.42rem 1.05rem; border-radius:999px; cursor:pointer;
+  transition:border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease;
+}
+.filter-chip:hover{ border-color:var(--blue); color:var(--blue); transform:translateY(-1px); }
+.filter-chip[aria-pressed="true"]{ background:rgba(37,99,235,.1); border-color:var(--blue); color:var(--blue); }
+
+.topic-card{
+  padding:1.5rem; height:100%; display:flex; flex-direction:column;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.topic-card:hover{ transform:translateY(-6px); box-shadow:0 18px 38px rgba(15,23,42,.1); border-color:var(--accent,var(--blue)); }
+.topic-card .t-top{ display:flex; align-items:center; gap:.8rem; margin-bottom:1rem; }
+.topic-card .t-ico{
+  width:46px; height:46px; border-radius:13px; display:grid; place-items:center; font-size:1.2rem;
+  color:#fff; background:linear-gradient(135deg,var(--accent,var(--blue)),var(--accent-2,var(--cyan)));
+  flex:0 0 auto;
+}
+.topic-card .t-subject{ font-family:var(--mono); font-size:.72rem; color:var(--accent,var(--blue)); }
+.topic-card h4{ font-size:1.05rem; font-weight:700; margin:.1rem 0 0; }
+.topic-card p{ font-size:.9rem; color:var(--ink-soft); line-height:1.55; margin:0 0 1rem; }
+.difficulty{ display:flex; align-items:center; gap:.45rem; font-size:.78rem; color:var(--ink-soft); margin-bottom:1.1rem; }
+.difficulty .bars{ display:flex; gap:3px; }
+.difficulty .bars i{
+  width:16px; height:5px; border-radius:3px; background:rgba(15,23,42,.13); display:block;
+}
+.difficulty .bars i.on{ background:var(--accent,var(--blue)); }
+.btn-topic{
+  margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; gap:.4rem;
+  font-weight:700; font-size:.9rem; color:var(--accent,var(--blue)); background:none; border:none;
+  padding:.35rem 0; cursor:pointer;
+}
+.btn-topic i{ transition:transform .2s ease; }
+.btn-topic:hover i{ transform:translateX(4px); }
+.topic-card.done{ border-color:var(--green); }
+.topic-card.done .btn-topic{ color:var(--green); }
+
+/* ---------------------------------------------------------------------- */
+/* 9. LESSON PREVIEW */
+/* ---------------------------------------------------------------------- */
+.lesson-shell{ overflow:hidden; }
+.lesson-head{
+  padding:1.6rem 1.8rem; color:#fff;
+  background:linear-gradient(135deg,var(--navy) 0%,#16264F 60%,#1d3a7a 100%);
+  position:relative; overflow:hidden;
+}
+.lesson-head::after{
+  content:""; position:absolute; inset:0;
+  background-image:radial-gradient(rgba(6,182,212,.45) 1.2px, transparent 1.2px);
+  background-size:26px 26px;
+  mask-image:radial-gradient(60% 100% at 80% 20%, #000, transparent 75%);
+}
+.lesson-head .l-eyebrow{ font-family:var(--mono); font-size:.74rem; color:#7DD3FC; position:relative; z-index:1; }
+.lesson-head h3{ font-size:1.5rem; font-weight:700; margin:.25rem 0 0; position:relative; z-index:1; }
+.lesson-tabs{ display:flex; gap:.4rem; flex-wrap:wrap; padding:1rem 1.8rem 0; }
+.lesson-tab{
+  border:1.5px solid rgba(15,23,42,.1); background:rgba(255,255,255,.8); color:var(--ink-soft);
+  font-weight:600; font-size:.88rem; padding:.42rem 1rem; border-radius:999px; cursor:pointer;
+  transition:all .15s ease;
+}
+.lesson-tab:hover{ border-color:var(--blue); color:var(--blue); }
+.lesson-tab[aria-selected="true"]{ background:rgba(37,99,235,.1); border-color:var(--blue); color:var(--blue); }
+.lesson-body{ padding:1.4rem 1.8rem 1.8rem; }
+.lesson-body h4{ font-size:1.05rem; font-weight:700; margin-bottom:.7rem; }
+.learn-list{ list-style:none; padding:0; margin:0 0 1.2rem; display:grid; gap:.55rem; }
+.learn-list li{ display:flex; gap:.6rem; align-items:flex-start; color:var(--ink-soft); font-size:.95rem; line-height:1.55; }
+.learn-list i{ color:var(--green); margin-top:.2rem; flex:0 0 auto; }
+.lesson-note{
+  background:rgba(6,182,212,.08); border:1px solid rgba(6,182,212,.25); border-radius:14px;
+  padding:1rem 1.2rem; font-size:.93rem; color:var(--ink); line-height:1.6;
+}
+.lesson-note .mono{ font-family:var(--mono); color:var(--blue); }
+.lesson-foot{ padding:0 1.8rem 1.8rem; display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; }
+
+/* ---------------------------------------------------------------------- */
+/* 10. ACTIVITY HUB */
+/* ---------------------------------------------------------------------- */
+.activity-card{
+  padding:1.6rem; height:100%; display:flex; flex-direction:column; text-align:center;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.activity-card:hover{ transform:translateY(-6px); box-shadow:0 18px 38px rgba(15,23,42,.1); border-color:var(--accent,var(--blue)); }
+.activity-card .a-ico{
+  width:58px; height:58px; border-radius:17px; margin:0 auto 1rem; display:grid; place-items:center;
+  font-size:1.5rem; background:color-mix(in srgb, var(--accent,var(--blue)) 14%, #fff);
+  border:1px solid color-mix(in srgb, var(--accent,var(--blue)) 25%, transparent);
+}
+.activity-card h4{ font-size:1.05rem; font-weight:700; margin-bottom:.35rem; }
+.activity-card p{ font-size:.9rem; color:var(--ink-soft); line-height:1.55; margin-bottom:1.2rem; }
+.activity-card .btn{ margin-top:auto; }
+
+/* ---------------------------------------------------------------------- */
+/* 11. DAILY CHALLENGE */
+/* ---------------------------------------------------------------------- */
+.challenge-panel{
+  position:relative; border-radius:26px; color:#fff; padding:2.6rem 2.2rem; overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 150% at 12% 0%, #1B2E5F 0%, var(--navy) 58%, #060A16 100%);
+  max-width:860px; margin-inline:auto;
+}
+.challenge-panel::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(6,182,212,.5) 1.4px, transparent 1.4px);
+  background-size:32px 32px;
+  mask-image:radial-gradient(75% 90% at 50% 25%, #000 30%, transparent 100%);
+}
+.challenge-panel > *{ position:relative; z-index:1; }
+.challenge-badge{
+  display:inline-flex; align-items:center; gap:.45rem; font-family:var(--mono); font-size:.74rem;
+  color:#FDE68A; background:rgba(245,158,11,.14); border:1px solid rgba(245,158,11,.38);
+  padding:.32rem .8rem; border-radius:999px;
+}
+.challenge-q{
+  font-family:var(--display); font-weight:700; font-size:clamp(1.3rem,3vw,1.85rem); line-height:1.35;
+  margin:1.1rem 0 .4rem; min-height:2.6em; transition:opacity .25s ease;
+}
+.challenge-q.fading{ opacity:0; }
+.challenge-subject{ font-family:var(--mono); font-size:.76rem; color:#7DD3FC; }
+.challenge-answer{
+  margin-top:1.4rem; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+  border-radius:16px; padding:1.1rem 1.3rem; color:#DCE7F7; font-size:.97rem; line-height:1.65;
+}
+.challenge-answer strong{ color:#A5F3FC; display:block; margin-bottom:.25rem; font-family:var(--display); }
+.challenge-actions{ display:flex; gap:.7rem; flex-wrap:wrap; margin-top:1.5rem; }
+
+/* ---------------------------------------------------------------------- */
+/* 12. FORMULAS */
+/* ---------------------------------------------------------------------- */
+.formula-card{
+  padding:1.4rem; height:100%; cursor:pointer; text-align:left;
+  display:flex; flex-direction:column; width:100%;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.formula-card:hover{ transform:translateY(-5px); box-shadow:0 16px 34px rgba(15,23,42,.1); border-color:var(--accent,var(--blue)); }
+.formula-card .f-name{ font-family:var(--mono); font-size:.74rem; color:var(--accent,var(--blue)); margin-bottom:.5rem; }
+.formula-card .f-eq{
+  font-family:var(--mono); font-size:1.32rem; font-weight:600; color:var(--ink);
+  background:color-mix(in srgb, var(--accent,var(--blue)) 8%, #fff);
+  border:1px solid color-mix(in srgb, var(--accent,var(--blue)) 20%, transparent);
+  border-radius:12px; padding:.6rem .8rem; text-align:center; margin-bottom:.8rem;
+}
+.formula-card .f-mean{ font-size:.89rem; color:var(--ink-soft); line-height:1.55; margin-bottom:.6rem; }
+.formula-card .f-ex{
+  font-size:.85rem; color:var(--ink); background:rgba(15,23,42,.04); border-radius:10px;
+  padding:.6rem .75rem; line-height:1.5;
+}
+.formula-card .f-hint{ margin-top:auto; padding-top:.8rem; font-size:.8rem; font-weight:600; color:var(--accent,var(--blue)); }
+
+.practice-box{
+  max-width:640px; margin:2rem auto 0; padding:1.7rem;
+}
+.practice-box .p-q{ font-family:var(--display); font-weight:600; font-size:1.1rem; line-height:1.5; margin-bottom:1rem; }
+.practice-row{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
+.practice-row input{
+  flex:1 1 150px; border:1.5px solid rgba(15,23,42,.14); border-radius:12px;
+  padding:.6rem .9rem; font-family:var(--mono); font-size:1rem; background:rgba(255,255,255,.9);
+}
+.practice-row input:focus{ border-color:var(--blue); outline:none; box-shadow:0 0 0 3px rgba(6,182,212,.3); }
+.practice-result{ margin-top:1rem; font-size:.94rem; line-height:1.6; border-radius:12px; padding:.85rem 1rem; }
+.practice-result.ok{ background:rgba(22,163,74,.09); border:1px solid rgba(22,163,74,.25); }
+.practice-result.no{ background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); }
+
+/* ---------------------------------------------------------------------- */
+/* 13. PROGRESS */
+/* ---------------------------------------------------------------------- */
+.progress-panel{ padding:2rem; max-width:820px; margin-inline:auto; }
+.prog-row{ margin-bottom:1.3rem; }
+.prog-row:last-of-type{ margin-bottom:0; }
+.prog-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.45rem; }
+.prog-top .name{ font-weight:600; font-size:.97rem; display:flex; align-items:center; gap:.5rem; }
+.prog-top .name i{ color:var(--accent,var(--blue)); }
+.prog-top .val{ font-family:var(--mono); font-size:.85rem; color:var(--ink-soft); }
+.prog-track{ height:11px; background:rgba(15,23,42,.08); border-radius:999px; overflow:hidden; }
+.prog-fill{
+  height:100%; width:0%; border-radius:999px;
+  background:linear-gradient(90deg, var(--accent,var(--blue)), var(--accent-2,var(--cyan)));
+  transition:width 1.1s cubic-bezier(.22,1,.36,1);
+}
+.prog-overall{ border-top:1px dashed rgba(15,23,42,.12); margin-top:1.6rem; padding-top:1.5rem; }
+.progress-foot{ display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; margin-top:1.6rem; }
+.progress-foot .note{ font-size:.82rem; color:var(--ink-soft); }
+
+/* ---------------------------------------------------------------------- */
+/* 14. QUICK ACCESS */
+/* ---------------------------------------------------------------------- */
+.quick-card{
+  display:flex; gap:1rem; align-items:flex-start; padding:1.3rem; height:100%;
+  border-radius:16px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.quick-card:hover{ transform:translateY(-4px); box-shadow:0 14px 30px rgba(15,23,42,.09); border-color:var(--accent,var(--blue)); }
+.quick-card .q-ico{
+  flex:0 0 auto; width:46px; height:46px; border-radius:13px; display:grid; place-items:center;
+  font-size:1.15rem; color:#fff; background:linear-gradient(135deg,var(--accent,var(--blue)),var(--accent-2,var(--cyan)));
+}
+.quick-card h4{ font-size:1rem; font-weight:700; margin-bottom:.2rem; }
+.quick-card p{ font-size:.87rem; color:var(--ink-soft); line-height:1.5; margin:0 0 .8rem; }
+.quick-card .btn{ font-size:.85rem; padding:.4rem 1rem; }
+
+/* ---------------------------------------------------------------------- */
+/* 15. STUDY TIPS */
+/* ---------------------------------------------------------------------- */
+.tip-card{
+  padding:1.4rem; height:100%; position:relative; overflow:hidden;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.tip-card:hover{ transform:translateY(-5px); box-shadow:0 16px 32px rgba(15,23,42,.09); }
+.tip-card .tip-no{
+  font-family:var(--display); font-weight:700; font-size:2.6rem; line-height:1;
+  color:color-mix(in srgb, var(--accent,var(--blue)) 22%, transparent); margin-bottom:.3rem;
+}
+.tip-card h4{ font-size:.98rem; font-weight:700; margin-bottom:.25rem; }
+.tip-card p{ font-size:.87rem; color:var(--ink-soft); line-height:1.5; margin:0; }
+
+/* ---------------------------------------------------------------------- */
+/* 16. MOTIVATION BANNER */
+/* ---------------------------------------------------------------------- */
+.motivate{
+  position:relative; border-radius:28px; color:#fff; text-align:center; padding:4rem 2rem;
+  overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 160% at 85% 0%, #16264F 0%, var(--navy) 60%, #060A16 100%);
+}
+.motivate::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(6,182,212,.5) 1.4px, transparent 1.4px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(70% 90% at 50% 30%, #000 30%, transparent 100%);
+}
+.motivate h2{ font-size:clamp(1.7rem,3.6vw,2.5rem); font-weight:700; position:relative; z-index:1; line-height:1.2; }
+.motivate p{ color:#C7D2E3; font-size:1.04rem; margin:.9rem auto 1.8rem; position:relative; z-index:1; max-width:38rem; }
+.motivate .cta-actions{ position:relative; z-index:1; display:flex; gap:.85rem; flex-wrap:wrap; justify-content:center; }
+.spark{ position:absolute; border-radius:50%; background:#67E8F9; opacity:.5; z-index:0; }
+
+/* ---------------------------------------------------------------------- */
+/* FOOTER */
+/* ---------------------------------------------------------------------- */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--cyan); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+/* Skip link + toast */
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+.toast-note{
+  position:fixed; left:50%; bottom:1.4rem; transform:translate(-50%,140%);
+  background:var(--navy); color:#E0F2FE; font-size:.9rem; font-weight:600;
+  padding:.75rem 1.2rem; border-radius:999px; z-index:3000;
+  box-shadow:0 14px 34px rgba(15,23,42,.3); border:1px solid rgba(6,182,212,.35);
+  display:flex; align-items:center; gap:.5rem; max-width:92vw;
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+}
+.toast-note.show{ transform:translate(-50%,0); }
+.toast-note i{ color:#67E8F9; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .orbit-ring,.electron,.float-slow,.float-slower,.float-med,.spin-slow,.pulse-dot,.drift{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     3. NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-xl lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 SCIENCE LAB
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-xl-auto my-3 my-xl-0">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="#subjects" class="btn btn-lab-primary">Start Learning <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ==================================================================
+       4. HERO
+  ================================================================== -->
+  <header class="hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="hero-eyebrow"><i class="bi bi-rocket-takeoff"></i> Start Learning</span>
+          <h1>Start Learning <span class="accent">Science</span></h1>
+          <p class="tagline">Learn. Explore. Practice. Discover.</p>
+          <p class="lead-copy">Build your Science knowledge step by step with interactive lessons, experiments, simulations, quizzes and revision activities.</p>
+          <div class="hero-actions">
+            <a href="#welcome" class="btn btn-hero-primary">Begin Learning</a>
+            <a href="#topics" class="btn btn-hero-ghost">Explore Topics</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-lab" role="img" aria-label="Science illustration showing an orbiting atom, a microscope, a planet, a DNA strand and a formula label">
+            <svg viewBox="0 0 420 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Atom -->
+              <g transform="translate(212,180)">
+                <ellipse class="orbit-ring" rx="118" ry="45" stroke="#06B6D4" stroke-width="1.6" opacity="0.55"/>
+                <ellipse class="orbit-ring reverse" rx="118" ry="45" stroke="#7C3AED" stroke-width="1.6" opacity="0.45" transform="rotate(60)"/>
+                <ellipse class="orbit-ring" rx="118" ry="45" stroke="#3B82F6" stroke-width="1.6" opacity="0.45" transform="rotate(120)"/>
+                <circle r="16" fill="url(#nucleusGradSL)"/>
+                <circle class="electron spin-slow" r="4.5" cx="118" cy="0" fill="#67E8F9"/>
+                <circle class="electron spin-slow" r="4.5" cx="-102" cy="-39" fill="#C4B5FD" style="animation-direction:reverse;"/>
+                <circle class="electron spin-slow" r="4.5" cx="59" cy="102" fill="#93C5FD" style="animation-duration:14s;"/>
+              </g>
+
+              <!-- Microscope -->
+              <g class="float-slow" transform="translate(36,236)">
+                <rect x="-4" y="86" width="86" height="9" rx="4" fill="#0F172A" fill-opacity="0.35"/>
+                <path d="M40 86 V60" stroke="#06B6D4" stroke-width="7" stroke-linecap="round"/>
+                <path d="M40 60 C 40 36, 26 30, 18 26" stroke="#06B6D4" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <rect x="6" y="6" width="16" height="30" rx="7" fill="#2563EB" transform="rotate(-18 14 20)"/>
+                <rect x="10" y="40" width="46" height="7" rx="3" fill="#7DD3FC"/>
+                <circle cx="24" cy="52" r="5" fill="#F59E0B" class="pulse-dot"/>
+                <path d="M40 86 h30" stroke="#06B6D4" stroke-width="7" stroke-linecap="round"/>
+              </g>
+
+              <!-- Planet -->
+              <g class="float-med" transform="translate(320,290)">
+                <circle r="24" fill="#16A34A"/>
+                <ellipse rx="40" ry="10" fill="none" stroke="#A7F3D0" stroke-width="2.4" transform="rotate(-18)"/>
+                <circle cx="-8" cy="-7" r="4.5" fill="#86EFAC"/>
+                <circle cx="9" cy="9" r="3" fill="#065F46"/>
+              </g>
+
+              <!-- DNA -->
+              <g class="drift" transform="translate(322,52)">
+                <path d="M0 0 C 14 12, 26 -12, 40 0" stroke="#7C3AED" stroke-width="2.4" fill="none"/>
+                <path d="M0 22 C 14 34, 26 10, 40 22" stroke="#A78BFA" stroke-width="2.4" fill="none"/>
+                <line x1="6" y1="4" x2="6" y2="18" stroke="#C4B5FD" stroke-width="2"/>
+                <line x1="20" y1="0" x2="20" y2="16" stroke="#C4B5FD" stroke-width="2"/>
+                <line x1="34" y1="4" x2="34" y2="18" stroke="#C4B5FD" stroke-width="2"/>
+              </g>
+
+              <!-- Molecule -->
+              <g class="float-slower" transform="translate(56,86)">
+                <line x1="0" y1="0" x2="26" y2="14" stroke="#F59E0B" stroke-width="2.2"/>
+                <line x1="0" y1="0" x2="-8" y2="24" stroke="#F59E0B" stroke-width="2.2"/>
+                <circle cx="0" cy="0" r="8" fill="#F59E0B"/>
+                <circle cx="26" cy="14" r="5" fill="#FDE68A"/>
+                <circle cx="-8" cy="24" r="5" fill="#FDE68A"/>
+              </g>
+
+              <!-- Formula labels -->
+              <g class="float-slow" transform="translate(146,16)">
+                <rect x="-6" y="-18" width="96" height="30" rx="9" fill="#FFFFFF" fill-opacity="0.95" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="42" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#2563EB" font-weight="600">F = m × a</text>
+              </g>
+              <g class="float-med" transform="translate(268,356)">
+                <rect x="-6" y="-18" width="90" height="28" rx="9" fill="#FFFFFF" fill-opacity="0.95" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="39" y="1" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#16A34A" font-weight="600">v = d / t</text>
+              </g>
+
+              <!-- Floating particles -->
+              <circle class="pulse-dot" cx="118" cy="300" r="4" fill="#67E8F9"/>
+              <circle class="pulse-dot" cx="380" cy="168" r="3.4" fill="#C4B5FD" style="animation-delay:.7s"/>
+              <circle class="pulse-dot" cx="190" cy="372" r="3" fill="#FDE68A" style="animation-delay:1.2s"/>
+              <circle class="pulse-dot" cx="28" cy="164" r="3.2" fill="#86EFAC" style="animation-delay:1.6s"/>
+
+              <defs>
+                <radialGradient id="nucleusGradSL" cx="0.35" cy="0.3" r="0.9">
+                  <stop offset="0%" stop-color="#7DD3FC"/>
+                  <stop offset="100%" stop-color="#2563EB"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================================================================
+       5. WELCOME
+  ================================================================== -->
+  <section class="section section-glass" id="welcome">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Welcome to Your Science Learning Journey</h2>
+        <p class="mx-auto">Science becomes easier when you learn it step by step. Choose a subject, study the lesson, explore interactive activities, test your knowledge and review what you have learned.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface stage-card" style="--accent:var(--blue);">
+            <span class="stage-no">01</span>
+            <div class="s-ico" aria-hidden="true"><i class="bi bi-book"></i></div>
+            <h3>Learn</h3>
+            <p>Understand the main Science concepts.</p>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface stage-card" style="--accent:var(--cyan);">
+            <span class="stage-no">02</span>
+            <div class="s-ico" aria-hidden="true"><i class="bi bi-binoculars"></i></div>
+            <h3>Explore</h3>
+            <p>Use visual activities and simulations.</p>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface stage-card" style="--accent:var(--orange);">
+            <span class="stage-no">03</span>
+            <div class="s-ico" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+            <h3>Practice</h3>
+            <p>Answer questions and complete challenges.</p>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface stage-card" style="--accent:var(--green);">
+            <span class="stage-no">04</span>
+            <div class="s-ico" aria-hidden="true"><i class="bi bi-mortarboard"></i></div>
+            <h3>Master</h3>
+            <p>Review your knowledge and improve your understanding.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       6. CHOOSE YOUR SUBJECT
+  ================================================================== -->
+  <section class="section" id="subjects">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Choose Your Subject</h2>
+        <p class="mx-auto">Select a Science subject and start learning.</p>
+      </div>
+      <div class="row g-4 mt-2">
+        <div class="col-lg-4 reveal">
+          <article class="surface subject-card subj-physics">
+            <div class="icon-tile" aria-hidden="true">⚡</div>
+            <h3>Physics</h3>
+            <p>Explore forces, motion, energy, pressure, measurements and other physical phenomena.</p>
+            <div class="topic-pills">
+              <span>Force &amp; Motion</span><span>Speed, Distance &amp; Time</span><span>Gravity</span>
+              <span>Pressure</span><span>Energy</span><span>Measurements</span>
+            </div>
+            <a href="physics.html" class="btn btn-subject">Learn Physics <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-lg-4 reveal">
+          <article class="surface subject-card subj-chemistry">
+            <div class="icon-tile" aria-hidden="true">🧪</div>
+            <h3>Chemistry</h3>
+            <p>Discover matter, atoms, mixtures, particles and changes in materials.</p>
+            <div class="topic-pills">
+              <span>States of Matter</span><span>Atoms</span><span>Elements</span>
+              <span>Mixtures</span><span>Separation</span><span>Changes of Matter</span>
+            </div>
+            <a href="chemistry.html" class="btn btn-subject">Learn Chemistry <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-lg-4 reveal">
+          <article class="surface subject-card subj-biology">
+            <div class="icon-tile" aria-hidden="true">🧬</div>
+            <h3>Biology</h3>
+            <p>Explore living organisms, cells, plants, ecosystems and life processes.</p>
+            <div class="topic-pills">
+              <span>Cells</span><span>Plants</span><span>Photosynthesis</span>
+              <span>Respiration</span><span>Ecosystems</span><span>Food Chains</span>
+            </div>
+            <a href="biology.html" class="btn btn-subject">Learn Biology <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       7. LEARNING PATH
+  ================================================================== -->
+  <section class="section section-glass">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Your Learning Path</h2>
+        <p class="mx-auto">Follow the map from your first topic all the way to mastering it.</p>
+      </div>
+
+      <div class="path-map reveal">
+        <div class="path-marker"><span><i class="bi bi-flag"></i> START</span></div>
+
+        <div class="path-step" style="--accent:var(--blue); --accent-2:var(--cyan);">
+          <span class="node float-slow" aria-hidden="true"><i class="bi bi-compass"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 1</span>
+            <h4>Choose a Topic</h4>
+            <p>Pick something you want to understand better.</p>
+          </div>
+        </div>
+
+        <div class="path-step" style="--accent:var(--cyan); --accent-2:#3B82F6;">
+          <span class="node float-med" aria-hidden="true"><i class="bi bi-book"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 2</span>
+            <h4>Study the Lesson</h4>
+            <p>Read the simple explanation and look at the diagrams.</p>
+          </div>
+        </div>
+
+        <div class="path-step" style="--accent:var(--purple); --accent-2:#A78BFA;">
+          <span class="node float-slower" aria-hidden="true"><i class="bi bi-joystick"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 3</span>
+            <h4>Explore an Activity</h4>
+            <p>Change the values in a simulation and watch what happens.</p>
+          </div>
+        </div>
+
+        <div class="path-step" style="--accent:var(--orange); --accent-2:var(--yellow);">
+          <span class="node float-slow" aria-hidden="true"><i class="bi bi-patch-question"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 4</span>
+            <h4>Take a Quiz</h4>
+            <p>Answer questions to check what you understood.</p>
+          </div>
+        </div>
+
+        <div class="path-step" style="--accent:#0EA5E9; --accent-2:var(--cyan);">
+          <span class="node float-med" aria-hidden="true"><i class="bi bi-clipboard-data"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 5</span>
+            <h4>Review Your Results</h4>
+            <p>Look at the questions you missed and read the explanations.</p>
+          </div>
+        </div>
+
+        <div class="path-step" style="--accent:var(--green); --accent-2:var(--emerald);">
+          <span class="node float-slower" aria-hidden="true"><i class="bi bi-trophy"></i></span>
+          <div class="surface card-body-x">
+            <span class="step-label">STEP 6</span>
+            <h4>Master the Topic</h4>
+            <p>Try it again until you can explain it in your own words.</p>
+          </div>
+        </div>
+
+        <div class="path-finish"><span><i class="bi bi-stars"></i> TOPIC MASTERED</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       8. FEATURED TOPICS
+  ================================================================== -->
+  <section class="section" id="topics">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Featured Science Topics</h2>
+        <p class="mx-auto">Nine good places to begin. Filter by subject, then start a topic.</p>
+      </div>
+
+      <div class="filter-row reveal" role="group" aria-label="Filter topics by subject">
+        <button class="filter-chip" type="button" data-filter="all" aria-pressed="true">All subjects</button>
+        <button class="filter-chip" type="button" data-filter="physics" aria-pressed="false">Physics</button>
+        <button class="filter-chip" type="button" data-filter="chemistry" aria-pressed="false">Chemistry</button>
+        <button class="filter-chip" type="button" data-filter="biology" aria-pressed="false">Biology</button>
+      </div>
+
+      <div class="row g-3" id="topicGrid"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       9. LESSON PREVIEW
+  ================================================================== -->
+  <section class="section section-glass" id="lesson">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>How a Lesson Works</h2>
+        <p class="mx-auto">Every topic follows the same four parts. Here is one of them from start to finish.</p>
+      </div>
+
+      <div class="surface lesson-shell reveal" style="max-width:820px; margin-inline:auto;">
+        <div class="lesson-head">
+          <span class="l-eyebrow">SAMPLE LESSON · PHYSICS</span>
+          <h3>Force &amp; Motion</h3>
+        </div>
+
+        <div class="lesson-tabs" role="tablist" aria-label="Lesson parts">
+          <button class="lesson-tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="panel-lesson" data-part="learn">Learn</button>
+          <button class="lesson-tab" role="tab" id="tab-explore" aria-selected="false" aria-controls="panel-lesson" data-part="explore">Explore</button>
+          <button class="lesson-tab" role="tab" id="tab-practice" aria-selected="false" aria-controls="panel-lesson" data-part="practice">Practice</button>
+          <button class="lesson-tab" role="tab" id="tab-quiz" aria-selected="false" aria-controls="panel-lesson" data-part="quiz">Quiz</button>
+        </div>
+
+        <div class="lesson-body" id="panel-lesson" role="tabpanel" aria-labelledby="tab-learn">
+          <h4 id="lessonHeading">What You Will Learn</h4>
+          <ul class="learn-list" id="lessonList"></ul>
+          <div class="lesson-note" id="lessonNote"></div>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn btn-hero-primary" id="startLessonBtn" type="button">Start Lesson <i class="bi bi-arrow-right ms-1"></i></button>
+          <span class="text-secondary" style="font-size:.85rem;">Learn → Explore → Practice → Quiz</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       10. ACTIVITY HUB
+  ================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Explore Science Activities</h2>
+        <p class="mx-auto">Four ways to work on the same idea until it makes sense.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface activity-card" style="--accent:var(--blue);">
+            <div class="a-ico" aria-hidden="true">🔬</div>
+            <h4>Interactive Lessons</h4>
+            <p>Learn concepts through clear explanations and visuals.</p>
+            <a href="#lesson" class="btn btn-lab-outline">Open Lessons</a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface activity-card" style="--accent:var(--cyan);">
+            <div class="a-ico" aria-hidden="true">🧪</div>
+            <h4>Virtual Experiments</h4>
+            <p>Explore scientific ideas through safe simulations.</p>
+            <a href="simulations.html" class="btn btn-lab-outline">Enter the Lab</a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface activity-card" style="--accent:var(--orange);">
+            <div class="a-ico" aria-hidden="true">🎯</div>
+            <h4>Practice Questions</h4>
+            <p>Test your understanding with questions.</p>
+            <a href="quizzes.html" class="btn btn-lab-outline">Start Practising</a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-3 reveal">
+          <article class="surface activity-card" style="--accent:var(--purple);">
+            <div class="a-ico" aria-hidden="true">🧠</div>
+            <h4>Science Games</h4>
+            <p>Learn while solving fun educational challenges.</p>
+            <a href="games.html" class="btn btn-lab-outline">Play Games</a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       11. DAILY CHALLENGE
+  ================================================================== -->
+  <section class="section section-glass" id="challenge">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Today's Science Challenge</h2>
+        <p class="mx-auto">Think about it first, then reveal the explanation.</p>
+      </div>
+
+      <div class="challenge-panel reveal">
+        <span class="challenge-badge"><i class="bi bi-lightning-charge-fill"></i> DAILY CHALLENGE</span>
+        <p class="challenge-q" id="challengeQ">Can you explain why objects fall toward Earth?</p>
+        <span class="challenge-subject" id="challengeSubject">PHYSICS · GRAVITY</span>
+
+        <div class="challenge-answer" id="challengeAnswer" hidden>
+          <strong>Explanation</strong>
+          <span id="challengeText"></span>
+        </div>
+
+        <div class="challenge-actions">
+          <button class="btn btn-hero-primary" id="tryChallengeBtn" type="button">Try Challenge</button>
+          <button class="btn btn-hero-ghost" id="showExplainBtn" type="button">Show Explanation</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       12. FORMULA QUICK REVIEW
+  ================================================================== -->
+  <section class="section" id="formulas">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Science Formula Quick Review</h2>
+        <p class="mx-auto">Tap a card to practise that formula with a fresh question.</p>
+      </div>
+      <div class="row g-3 mt-4" id="formulaGrid"><!-- filled by JS --></div>
+
+      <div class="surface practice-box reveal" id="practiceBox" hidden>
+        <p class="p-q" id="practiceQ">—</p>
+        <div class="practice-row">
+          <input type="number" step="any" id="practiceInput" inputmode="decimal" aria-label="Your answer" placeholder="Your answer">
+          <button class="btn btn-lab-primary" id="checkAnswerBtn" type="button">Check answer</button>
+          <button class="btn btn-lab-outline" id="newQuestionBtn" type="button">New question</button>
+        </div>
+        <div class="practice-result" id="practiceResult" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       13. PROGRESS
+  ================================================================== -->
+  <section class="section section-glass" id="progress">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Your Learning Progress</h2>
+        <p class="mx-auto">Saved in this browser only. No name, email or personal information is ever collected.</p>
+      </div>
+
+      <div class="surface progress-panel reveal">
+        <div class="prog-row" style="--accent:var(--blue); --accent-2:var(--cyan);">
+          <div class="prog-top">
+            <span class="name"><i class="bi bi-lightning-charge-fill"></i> Physics</span>
+            <span class="val" data-val="physics">0%</span>
+          </div>
+          <div class="prog-track" role="progressbar" aria-label="Physics progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-bar="physics">
+            <div class="prog-fill" data-fill="physics"></div>
+          </div>
+        </div>
+
+        <div class="prog-row" style="--accent:var(--orange); --accent-2:var(--yellow);">
+          <div class="prog-top">
+            <span class="name"><i class="bi bi-droplet-half"></i> Chemistry</span>
+            <span class="val" data-val="chemistry">0%</span>
+          </div>
+          <div class="prog-track" role="progressbar" aria-label="Chemistry progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-bar="chemistry">
+            <div class="prog-fill" data-fill="chemistry"></div>
+          </div>
+        </div>
+
+        <div class="prog-row" style="--accent:var(--green); --accent-2:var(--emerald);">
+          <div class="prog-top">
+            <span class="name"><i class="bi bi-flower2"></i> Biology</span>
+            <span class="val" data-val="biology">0%</span>
+          </div>
+          <div class="prog-track" role="progressbar" aria-label="Biology progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-bar="biology">
+            <div class="prog-fill" data-fill="biology"></div>
+          </div>
+        </div>
+
+        <div class="prog-row prog-overall" style="--accent:var(--purple); --accent-2:#60A5FA;">
+          <div class="prog-top">
+            <span class="name"><i class="bi bi-graph-up-arrow"></i> Overall Science</span>
+            <span class="val" data-val="overall">0%</span>
+          </div>
+          <div class="prog-track" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-bar="overall">
+            <div class="prog-fill" data-fill="overall"></div>
+          </div>
+        </div>
+
+        <div class="progress-foot">
+          <button class="btn btn-lab-outline" id="resetProgressBtn" type="button"><i class="bi bi-arrow-counterclockwise me-1"></i> Reset Progress</button>
+          <span class="note" id="progressNote">Starting a topic above adds to your progress.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       14. QUICK ACCESS
+  ================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Quick Access</h2>
+        <p class="mx-auto">Jump straight back to whatever you were doing.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:var(--blue); --accent-2:var(--cyan);">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-play-circle"></i></span>
+            <div>
+              <h4>Continue Learning</h4>
+              <p id="continueText">Continue your latest topic.</p>
+              <button class="btn btn-lab-primary" id="continueBtn" type="button">Continue</button>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:var(--orange); --accent-2:var(--yellow);">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-patch-question"></i></span>
+            <div>
+              <h4>Take a Quiz</h4>
+              <p>Test what you know.</p>
+              <a class="btn btn-lab-outline" href="quizzes.html">Open Quizzes</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:var(--cyan); --accent-2:#3B82F6;">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-sliders"></i></span>
+            <div>
+              <h4>Explore Simulations</h4>
+              <p>Experiment with Science.</p>
+              <a class="btn btn-lab-outline" href="simulations.html">Open Simulations</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:var(--purple); --accent-2:#A78BFA;">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-controller"></i></span>
+            <div>
+              <h4>Play Science Games</h4>
+              <p>Practice through challenges.</p>
+              <a class="btn btn-lab-outline" href="games.html">Open Games</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:var(--green); --accent-2:var(--emerald);">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-calculator"></i></span>
+            <div>
+              <h4>Review Formulas</h4>
+              <p>Refresh important equations.</p>
+              <a class="btn btn-lab-outline" href="#formulas">Open Formulas</a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <article class="surface quick-card" style="--accent:#0EA5E9; --accent-2:var(--cyan);">
+            <span class="q-ico" aria-hidden="true"><i class="bi bi-lightning-charge"></i></span>
+            <div>
+              <h4>Daily Challenge</h4>
+              <p>One question to think about today.</p>
+              <a class="btn btn-lab-outline" href="#challenge">Open Challenge</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       15. STUDY TIPS
+  ================================================================== -->
+  <section class="section section-glass">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Smart Science Study Tips</h2>
+        <p class="mx-auto">Five habits that make every topic easier to understand.</p>
+      </div>
+      <div class="row g-3 mt-4">
+        <div class="col-6 col-lg reveal">
+          <article class="surface tip-card" style="--accent:var(--blue);">
+            <div class="tip-no">1</div>
+            <h4>Read carefully</h4>
+            <p>Read the concept slowly before doing anything else.</p>
+          </article>
+        </div>
+        <div class="col-6 col-lg reveal">
+          <article class="surface tip-card" style="--accent:var(--cyan);">
+            <div class="tip-no">2</div>
+            <h4>Study the diagrams</h4>
+            <p>Look at the pictures and examples that go with it.</p>
+          </article>
+        </div>
+        <div class="col-6 col-lg reveal">
+          <article class="surface tip-card" style="--accent:var(--purple);">
+            <div class="tip-no">3</div>
+            <h4>Try the activity</h4>
+            <p>Use the interactive activity to see the idea in action.</p>
+          </article>
+        </div>
+        <div class="col-6 col-lg reveal">
+          <article class="surface tip-card" style="--accent:var(--orange);">
+            <div class="tip-no">4</div>
+            <h4>Test yourself</h4>
+            <p>Answer questions without looking at your notes.</p>
+          </article>
+        </div>
+        <div class="col-6 col-lg reveal">
+          <article class="surface tip-card" style="--accent:var(--green);">
+            <div class="tip-no">5</div>
+            <h4>Review again</h4>
+            <p>Go back to the difficult topics a second time.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       16. MOTIVATION
+  ================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="motivate reveal" id="motivate">
+        <h2>Keep Exploring. Keep Learning. Keep Discovering.</h2>
+        <p>Every question you ask is another step toward understanding the world around you.</p>
+        <div class="cta-actions">
+          <a href="#subjects" class="btn btn-hero-primary">Continue Learning <i class="bi bi-arrow-right ms-1"></i></a>
+          <a href="simulations.html" class="btn btn-hero-ghost">Enter Virtual Lab</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     17. FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 SCIENCE LAB
+        </div>
+        <p class="mb-0" style="max-width:26rem;">An interactive Science learning platform for S1 students.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-3 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="games.html">Games</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+          <div class="col"><a class="footer-link" href="start-learning.html">Start Learning</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 SCIENCE LAB. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<div class="toast-note" id="toast" role="status" aria-live="polite"><i class="bi bi-check-circle-fill"></i><span id="toastText"></span></div>
+
+<!-- Bootstrap bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   js/main.js  (shared site behaviour — kept inline)
+   Navbar scroll state, mobile menu auto-close, scroll reveal, smooth scroll.
+   ========================================================================== */
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var nav = document.getElementById("labNav");
+  function navState(){ nav.classList.toggle("is-scrolled", window.scrollY > 12); }
+  navState();
+  window.addEventListener("scroll", navState, { passive:true });
+
+  var coll = document.getElementById("labNavCollapse");
+  if (coll) {
+    coll.querySelectorAll(".nav-link, .btn").forEach(function (l) {
+      l.addEventListener("click", function () {
+        if (coll.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(coll).hide();
+        }
+      });
+    });
+  }
+
+  var revealEls = document.querySelectorAll(".reveal");
+  if (reduced || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-visible"); obs.unobserve(e.target); }
+      });
+    }, { threshold:0.12, rootMargin:"0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { obs.observe(el); });
+  }
+
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute("href");
+    if (id.length < 2) return;
+    var t = document.querySelector(id);
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block:"start" }); }
+  });
+})();
+</script>
+
+<script>
+/* ==========================================================================
+   js/start-learning.js  (page behaviour — kept inline)
+   Topics + filtering, lesson tabs, daily challenge, formulas + practice,
+   progress with localStorage, quick access, toast messages.
+   ========================================================================== */
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var STORE_KEY = "s1lab.startlearning.v1";
+
+  /* ---------------- storage (safe) ---------------- */
+  var state = { physics:40, chemistry:30, biology:25, done:[], last:null };
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && typeof p === "object") {
+          state.physics   = clamp(p.physics);
+          state.chemistry = clamp(p.chemistry);
+          state.biology   = clamp(p.biology);
+          state.done      = Array.isArray(p.done) ? p.done : [];
+          state.last      = p.last || null;
+        }
+      }
+    } catch (err) { /* storage blocked — carry on with defaults */ }
+  }
+  function save() {
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) {}
+  }
+  function clamp(n){ n = Number(n); return isNaN(n) ? 0 : Math.max(0, Math.min(100, Math.round(n))); }
+
+  /* ---------------- toast ---------------- */
+  var toast = document.getElementById("toast");
+  var toastText = document.getElementById("toastText");
+  var toastTimer = null;
+  function say(msg) {
+    toastText.textContent = msg;
+    toast.classList.add("show");
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function(){ toast.classList.remove("show"); }, 2600);
+  }
+
+  /* ---------------- 8. FEATURED TOPICS ---------------- */
+  var SUBJECTS = {
+    physics:   { name:"Physics",   a:"var(--blue)",   b:"var(--cyan)",    page:"physics.html"   },
+    chemistry: { name:"Chemistry", a:"var(--orange)", b:"var(--yellow)",  page:"chemistry.html" },
+    biology:   { name:"Biology",   a:"var(--green)",  b:"var(--emerald)", page:"biology.html"   }
+  };
+
+  var TOPICS = [
+    { id:"force-motion", s:"physics",   icon:"bi-lightning-charge-fill", title:"Force & Motion",
+      desc:"What a force does to an object, and why things speed up, slow down or change direction.", level:1 },
+    { id:"gravity", s:"physics", icon:"bi-globe2", title:"Gravity",
+      desc:"Why everything falls toward Earth, and the difference between mass and weight.", level:1 },
+    { id:"speed-distance", s:"physics", icon:"bi-speedometer2", title:"Speed & Distance",
+      desc:"Work out how fast something moves using distance and time.", level:2 },
+
+    { id:"states", s:"chemistry", icon:"bi-thermometer-half", title:"States of Matter",
+      desc:"How particles behave in solids, liquids and gases, and what happens when you heat them.", level:1 },
+    { id:"atoms", s:"chemistry", icon:"bi-diagram-3-fill", title:"Atoms",
+      desc:"The tiny building blocks of everything, and the particles inside them.", level:2 },
+    { id:"mixtures", s:"chemistry", icon:"bi-droplet-half", title:"Mixtures",
+      desc:"What a mixture is and the methods used to separate one again.", level:2 },
+
+    { id:"cells", s:"biology", icon:"bi-bullseye", title:"Cells",
+      desc:"The parts of plant and animal cells and the job each part does.", level:1 },
+    { id:"photosynthesis", s:"biology", icon:"bi-flower2", title:"Photosynthesis",
+      desc:"How green plants use light, water and carbon dioxide to make their own food.", level:2 },
+    { id:"ecosystems", s:"biology", icon:"bi-tree-fill", title:"Ecosystems",
+      desc:"How living things depend on each other and on their surroundings.", level:3 }
+  ];
+
+  var grid = document.getElementById("topicGrid");
+
+  function levelLabel(n){ return n === 1 ? "Starter" : (n === 2 ? "Building" : "Challenge"); }
+
+  function renderTopics(filter) {
+    grid.innerHTML = "";
+    TOPICS.forEach(function (t) {
+      if (filter !== "all" && t.s !== filter) return;
+      var sub = SUBJECTS[t.s];
+      var done = state.done.indexOf(t.id) !== -1;
+
+      var col = document.createElement("div");
+      col.className = "col-sm-6 col-lg-4 reveal is-visible";
+
+      var bars = "";
+      for (var i = 1; i <= 3; i++) bars += '<i class="' + (i <= t.level ? "on" : "") + '"></i>';
+
+      col.innerHTML =
+        '<article class="surface topic-card' + (done ? " done" : "") + '" data-topic="' + t.id + '" style="--accent:' + sub.a + '; --accent-2:' + sub.b + ';">' +
+          '<div class="t-top">' +
+            '<span class="t-ico" aria-hidden="true"><i class="bi ' + t.icon + '"></i></span>' +
+            '<div><span class="t-subject">' + sub.name.toUpperCase() + '</span><h4>' + t.title + '</h4></div>' +
+          '</div>' +
+          '<p>' + t.desc + '</p>' +
+          '<div class="difficulty"><span>Level</span><span class="bars" aria-hidden="true">' + bars + '</span>' +
+            '<span>' + levelLabel(t.level) + '</span></div>' +
+          '<button class="btn-topic" type="button">' +
+            (done ? '<i class="bi bi-check-circle-fill"></i> Started — open again' : 'Start Topic <i class="bi bi-arrow-right"></i>') +
+          '</button>' +
+        '</article>';
+
+      col.querySelector(".btn-topic").addEventListener("click", function () { startTopic(t); });
+      grid.appendChild(col);
+    });
+  }
+
+  function startTopic(t) {
+    if (state.done.indexOf(t.id) === -1) {
+      state.done.push(t.id);
+      state[t.s] = clamp(state[t.s] + 10);
+      say("Nice — " + t.title + " added to your progress.");
+    } else {
+      say("Opening " + t.title + " again.");
+    }
+    state.last = { id:t.id, title:t.title, s:t.s };
+    save();
+    renderTopics(currentFilter);
+    updateProgress(true);
+    updateContinue();
+  }
+
+  var currentFilter = "all";
+  document.querySelectorAll(".filter-chip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      document.querySelectorAll(".filter-chip").forEach(function (c) {
+        c.setAttribute("aria-pressed", c === chip ? "true" : "false");
+      });
+      currentFilter = chip.dataset.filter;
+      renderTopics(currentFilter);
+    });
+  });
+
+  /* ---------------- 9. LESSON PREVIEW ---------------- */
+  var LESSON = {
+    learn: {
+      heading:"What You Will Learn",
+      items:[
+        "What force means",
+        "How force affects motion",
+        "The relationship between force and mass",
+        "Simple examples from everyday life"
+      ],
+      note:'A force is a push or a pull. It can start movement, stop it, or change its direction. The bigger the force on an object, the bigger the change in its motion: <span class="mono">F = m × a</span>.'
+    },
+    explore: {
+      heading:"Explore the Idea",
+      items:[
+        "Open the force simulation and set the mass of the trolley",
+        "Add a small force and watch how quickly it speeds up",
+        "Double the force and compare what happens",
+        "Now double the mass instead and look at the difference"
+      ],
+      note:'Changing one thing at a time is how scientists work. Keep the mass fixed while you change the force, then swap it around.'
+    },
+    practice: {
+      heading:"Practise What You Learned",
+      items:[
+        "A 2 kg box is pushed with a force of 10 N. What is its acceleration?",
+        "A trolley accelerates at 4 m/s² when a 12 N force acts on it. What is its mass?",
+        "Why is it harder to push a loaded wheelbarrow than an empty one?",
+        "Name two forces acting on a ball rolling across the floor"
+      ],
+      note:'Answer 1: a = F ÷ m = 10 ÷ 2 = <span class="mono">5 m/s²</span>. Answer 2: m = F ÷ a = 12 ÷ 4 = <span class="mono">3 kg</span>.'
+    },
+    quiz: {
+      heading:"Check Your Understanding",
+      items:[
+        "Six questions on force, mass and motion",
+        "One question at a time with instant feedback",
+        "An explanation after every answer",
+        "A full review of anything you missed"
+      ],
+      note:'Score 5 out of 6 or better and the topic is ready to be marked as mastered. Below that, go back to the simulation and try again.'
+    }
+  };
+
+  var lessonHeading = document.getElementById("lessonHeading");
+  var lessonList = document.getElementById("lessonList");
+  var lessonNote = document.getElementById("lessonNote");
+
+  function showLessonPart(part) {
+    var data = LESSON[part];
+    lessonHeading.textContent = data.heading;
+    lessonList.innerHTML = "";
+    data.items.forEach(function (text) {
+      var li = document.createElement("li");
+      li.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>' + text + '</span>';
+      lessonList.appendChild(li);
+    });
+    lessonNote.innerHTML = data.note;
+    document.querySelectorAll(".lesson-tab").forEach(function (tab) {
+      tab.setAttribute("aria-selected", tab.dataset.part === part ? "true" : "false");
+    });
+    document.getElementById("panel-lesson").setAttribute("aria-labelledby", "tab-" + part);
+  }
+
+  document.querySelectorAll(".lesson-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () { showLessonPart(tab.dataset.part); });
+  });
+  showLessonPart("learn");
+
+  document.getElementById("startLessonBtn").addEventListener("click", function () {
+    showLessonPart("learn");
+    var t = TOPICS[0];
+    startTopic(t);
+    document.getElementById("lesson").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block:"start" });
+  });
+
+  /* ---------------- 11. DAILY CHALLENGE ---------------- */
+  var CHALLENGES = [
+    { q:"Can you explain why objects fall toward Earth?", s:"PHYSICS · GRAVITY",
+      a:"Earth pulls every object toward its centre with a force called gravity. The pull acts on the object's mass, so a dropped ball accelerates downward until something stops it. Gravity is also why we stay on the ground instead of floating away." },
+    { q:"Why does ice float on water when most solids sink in their own liquid?", s:"CHEMISTRY · MATTER",
+      a:"When water freezes, its particles lock into a pattern that holds them slightly further apart than in liquid water. The same mass now takes up more space, so ice is less dense than water and floats." },
+    { q:"Why do plants need sunlight to stay alive?", s:"BIOLOGY · PHOTOSYNTHESIS",
+      a:"Plants use light energy to join carbon dioxide and water together and make glucose, their food. This is photosynthesis. Without light the plant cannot make food, so it slowly runs out of energy." },
+    { q:"Why is it harder to push a full shopping trolley than an empty one?", s:"PHYSICS · FORCE & MOTION",
+      a:"A full trolley has more mass. Since F = m × a, you need a bigger force to give the heavier trolley the same acceleration. More mass also means more friction between the wheels and the floor." },
+    { q:"Why can you smell food cooking from another room?", s:"CHEMISTRY · PARTICLES",
+      a:"Particles of gas from the food move quickly in all directions and spread out through the air until they reach your nose. This spreading out is called diffusion." },
+    { q:"Why does your heart beat faster when you run?", s:"BIOLOGY · RESPIRATION",
+      a:"Running muscles need more oxygen and glucose for respiration, and they produce more carbon dioxide. A faster heartbeat pumps blood more quickly so oxygen arrives and waste is carried away in time." },
+    { q:"Why do heavy lorries have many wide tyres?", s:"PHYSICS · PRESSURE",
+      a:"Pressure is force divided by area. Spreading the lorry's weight over more tyre area lowers the pressure on the road, so the tyres do not sink in or damage the surface." },
+    { q:"Why does a wet floor dry even without heating it?", s:"CHEMISTRY · CHANGES OF STATE",
+      a:"Some water particles at the surface always have enough energy to escape as gas. This is evaporation, and it happens below boiling point. Warmth and moving air just make it happen faster." },
+    { q:"Why does a food chain always start with a plant?", s:"BIOLOGY · ECOSYSTEMS",
+      a:"Plants are producers: they make their own food from sunlight. Every other organism in the chain gets its energy by eating, so the energy has to enter the chain through a producer first." }
+  ];
+
+  var chIndex = 0;
+  var chQ = document.getElementById("challengeQ");
+  var chSubject = document.getElementById("challengeSubject");
+  var chAnswer = document.getElementById("challengeAnswer");
+  var chText = document.getElementById("challengeText");
+
+  function setChallenge(i) {
+    chIndex = i;
+    var c = CHALLENGES[i];
+    chAnswer.hidden = true;
+    if (reduced) {
+      chQ.textContent = c.q; chSubject.textContent = c.s; chText.textContent = c.a;
+      return;
+    }
+    chQ.classList.add("fading");
+    window.setTimeout(function () {
+      chQ.textContent = c.q;
+      chSubject.textContent = c.s;
+      chText.textContent = c.a;
+      chQ.classList.remove("fading");
+    }, 220);
+  }
+  chText.textContent = CHALLENGES[0].a;
+
+  document.getElementById("tryChallengeBtn").addEventListener("click", function () {
+    var n;
+    do { n = Math.floor(Math.random() * CHALLENGES.length); }
+    while (n === chIndex && CHALLENGES.length > 1);
+    setChallenge(n);
+    say("New challenge — think it through first.");
+  });
+
+  document.getElementById("showExplainBtn").addEventListener("click", function () {
+    chAnswer.hidden = !chAnswer.hidden;
+    this.textContent = chAnswer.hidden ? "Show Explanation" : "Hide Explanation";
+  });
+
+  /* ---------------- 12. FORMULAS ---------------- */
+  function r(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  var FORMULAS = [
+    { id:"force", name:"FORCE", eq:"F = m × a", accent:"var(--blue)", accent2:"var(--cyan)",
+      mean:"Force equals mass multiplied by acceleration. A bigger mass needs a bigger force to speed up the same way.",
+      ex:"A 3 kg ball accelerating at 2 m/s² needs a force of 6 N.",
+      gen:function(){ var m=r(2,12), a=r(2,9);
+        return { q:"A trolley of mass "+m+" kg accelerates at "+a+" m/s². What force is acting on it, in newtons?", ans:m*a, unit:"N", work:"F = m × a = "+m+" × "+a+" = "+(m*a)+" N" }; } },
+
+    { id:"speed", name:"SPEED", eq:"v = d / t", accent:"var(--cyan)", accent2:"#3B82F6",
+      mean:"Speed equals distance divided by time. It tells you how much ground is covered each second.",
+      ex:"A runner covering 100 m in 20 s moves at 5 m/s.",
+      gen:function(){ var v=r(2,15), t=r(3,12), d=v*t;
+        return { q:"A cyclist travels "+d+" metres in "+t+" seconds. What is the speed, in m/s?", ans:v, unit:"m/s", work:"v = d ÷ t = "+d+" ÷ "+t+" = "+v+" m/s" }; } },
+
+    { id:"distance", name:"DISTANCE", eq:"d = v × t", accent:"var(--purple)", accent2:"#A78BFA",
+      mean:"Distance equals speed multiplied by time. Travel faster or for longer and you cover more ground.",
+      ex:"Moving at 4 m/s for 10 s covers 40 metres.",
+      gen:function(){ var v=r(2,14), t=r(4,15);
+        return { q:"A car moves at "+v+" m/s for "+t+" seconds. What distance does it travel, in metres?", ans:v*t, unit:"m", work:"d = v × t = "+v+" × "+t+" = "+(v*t)+" m" }; } },
+
+    { id:"pressure", name:"PRESSURE", eq:"P = F / A", accent:"var(--orange)", accent2:"var(--yellow)",
+      mean:"Pressure equals force divided by area. The same force spread over a larger area gives less pressure.",
+      ex:"A 40 N force on 2 m² gives a pressure of 20 N/m².",
+      gen:function(){ var p=r(3,20), a=r(2,8), f=p*a;
+        return { q:"A force of "+f+" N presses on an area of "+a+" m². What is the pressure, in N/m²?", ans:p, unit:"N/m²", work:"P = F ÷ A = "+f+" ÷ "+a+" = "+p+" N/m²" }; } },
+
+    { id:"weight", name:"WEIGHT", eq:"W = m × g", accent:"var(--green)", accent2:"var(--emerald)",
+      mean:"Weight equals mass multiplied by gravitational field strength. On Earth g is about 10 N/kg.",
+      ex:"A 5 kg bag has a weight of about 50 N on Earth.",
+      gen:function(){ var m=r(2,25);
+        return { q:"An object has a mass of "+m+" kg. What is its weight on Earth, in newtons? (Use g = 10 N/kg)", ans:m*10, unit:"N", work:"W = m × g = "+m+" × 10 = "+(m*10)+" N" }; } }
+  ];
+
+  var fGrid = document.getElementById("formulaGrid");
+  FORMULAS.forEach(function (f) {
+    var col = document.createElement("div");
+    col.className = "col-sm-6 col-lg-4 reveal";
+    col.innerHTML =
+      '<button class="surface formula-card" type="button" style="--accent:' + f.accent + '; --accent-2:' + f.accent2 + ';">' +
+        '<span class="f-name">' + f.name + '</span>' +
+        '<div class="f-eq">' + f.eq + '</div>' +
+        '<p class="f-mean">' + f.mean + '</p>' +
+        '<div class="f-ex"><b>Example:</b> ' + f.ex + '</div>' +
+        '<span class="f-hint">Practice Formula <i class="bi bi-arrow-right"></i></span>' +
+      '</button>';
+    col.querySelector(".formula-card").addEventListener("click", function () { openPractice(f); });
+    fGrid.appendChild(col);
+  });
+
+  var practiceBox = document.getElementById("practiceBox");
+  var practiceQ = document.getElementById("practiceQ");
+  var practiceInput = document.getElementById("practiceInput");
+  var practiceResult = document.getElementById("practiceResult");
+  var activeFormula = null;
+  var activeProblem = null;
+
+  function openPractice(f) {
+    activeFormula = f;
+    practiceBox.hidden = false;
+    practiceBox.classList.add("is-visible");
+    newProblem();
+    practiceBox.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block:"center" });
+    practiceInput.focus({ preventScroll:true });
+  }
+
+  function newProblem() {
+    if (!activeFormula) return;
+    activeProblem = activeFormula.gen();
+    practiceQ.textContent = activeProblem.q;
+    practiceInput.value = "";
+    practiceResult.hidden = true;
+  }
+
+  function checkAnswer() {
+    if (!activeProblem) return;
+    var val = parseFloat(practiceInput.value);
+    if (isNaN(val)) {
+      practiceResult.hidden = false;
+      practiceResult.className = "practice-result no";
+      practiceResult.textContent = "Type a number first, then check your answer.";
+      return;
+    }
+    var ok = Math.abs(val - activeProblem.ans) < 0.01;
+    practiceResult.hidden = false;
+    practiceResult.className = "practice-result " + (ok ? "ok" : "no");
+    practiceResult.innerHTML = ok
+      ? "<b>Correct.</b> " + activeProblem.work
+      : "<b>Not quite.</b> The answer is " + activeProblem.ans + " " + activeProblem.unit + ". Working: " + activeProblem.work;
+    if (ok) say("Correct — try another one.");
+  }
+
+  document.getElementById("checkAnswerBtn").addEventListener("click", checkAnswer);
+  document.getElementById("newQuestionBtn").addEventListener("click", newProblem);
+  practiceInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
+  });
+
+  /* ---------------- 13. PROGRESS ---------------- */
+  var progressShown = false;
+
+  function overall() {
+    return Math.round((state.physics + state.chemistry + state.biology) / 3);
+  }
+
+  function setBar(key, value) {
+    var fill = document.querySelector('[data-fill="' + key + '"]');
+    var val  = document.querySelector('[data-val="' + key + '"]');
+    var bar  = document.querySelector('[data-bar="' + key + '"]');
+    if (!fill) return;
+    fill.style.width = value + "%";
+    val.textContent = value + "%";
+    bar.setAttribute("aria-valuenow", String(value));
+  }
+
+  function updateProgress(animate) {
+    var vals = { physics:state.physics, chemistry:state.chemistry, biology:state.biology, overall:overall() };
+    Object.keys(vals).forEach(function (k) { setBar(k, vals[k]); });
+    if (animate) progressShown = true;
+  }
+
+  /* Animate bars the first time the section scrolls into view */
+  (function () {
+    var section = document.getElementById("progress");
+    if (!("IntersectionObserver" in window) || reduced) { updateProgress(true); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !progressShown) { updateProgress(true); io.disconnect(); }
+      });
+    }, { threshold:0.3 });
+    io.observe(section);
+  })();
+
+  document.getElementById("resetProgressBtn").addEventListener("click", function () {
+    state = { physics:0, chemistry:0, biology:0, done:[], last:null };
+    save();
+    updateProgress(true);
+    renderTopics(currentFilter);
+    updateContinue();
+    document.getElementById("progressNote").textContent = "Progress cleared. Start a topic to begin again.";
+    say("Progress reset.");
+  });
+
+  /* ---------------- 14. QUICK ACCESS ---------------- */
+  var continueText = document.getElementById("continueText");
+  var continueBtn = document.getElementById("continueBtn");
+
+  function updateContinue() {
+    if (state.last && state.last.title) {
+      continueText.textContent = "Last topic: " + state.last.title + ".";
+      continueBtn.textContent = "Continue " + state.last.title;
+    } else {
+      continueText.textContent = "Continue your latest topic.";
+      continueBtn.textContent = "Choose a topic";
+    }
+  }
+
+  continueBtn.addEventListener("click", function () {
+    if (state.last && state.last.s && SUBJECTS[state.last.s]) {
+      window.location.href = SUBJECTS[state.last.s].page;
+    } else {
+      document.getElementById("topics").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block:"start" });
+      say("Pick a topic to get started.");
+    }
+  });
+
+  /* ---------------- 16. MOTIVATION PARTICLES ---------------- */
+  (function () {
+    if (reduced) return;
+    var banner = document.getElementById("motivate");
+    for (var i = 0; i < 14; i++) {
+      var s = document.createElement("span");
+      s.className = "spark " + (i % 3 === 0 ? "float-slow" : (i % 3 === 1 ? "float-med" : "float-slower"));
+      var size = (Math.random() * 4 + 2).toFixed(1);
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.left = (Math.random() * 96 + 2) + "%";
+      s.style.top = (Math.random() * 84 + 8) + "%";
+      s.style.animationDelay = (Math.random() * 5).toFixed(1) + "s";
+      s.style.opacity = (Math.random() * 0.4 + 0.25).toFixed(2);
+      banner.appendChild(s);
+    }
+  })();
+
+  /* ---------------- INIT ---------------- */
+  load();
+  renderTopics("all");
+  updateProgress(false);
+  updateContinue();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physics — S1 Science Lab</title>
+<meta name="description" content="Explore force, gravity, pressure and motion through interactive simulations on S1 Science Lab.">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — shared design tokens (same system as index.html / chemistry.html)
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --navy:#0B1226;
+  --card-radius:20px;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+
+  /* Physics-specific accents */
+  --phys-primary:#2563EB;
+  --phys-secondary:#06B6D4;
+  --phys-support:#7C3AED;
+  --phys-navy:#0B1F4B;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{ font-family:var(--body); color:var(--ink); background:var(--paper); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+a{ text-decoration:none; }
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+a:focus-visible, button:focus-visible, .btn:focus-visible, input:focus-visible{
+  outline:3px solid var(--phys-secondary); outline-offset:2px; border-radius:8px;
+}
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+/* NAVBAR (shared) */
+.lab-nav{ position:sticky; top:0; z-index:1000; padding:.65rem 0; background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06); transition:box-shadow .25s ease, background .25s ease; }
+.lab-nav.is-scrolled{ box-shadow:0 6px 24px rgba(15,23,42,.08); background:rgba(248,250,252,.92); }
+.lab-brand{ display:flex; align-items:center; gap:.6rem; font-family:var(--display); font-weight:700; font-size:1.15rem; color:var(--ink); }
+.lab-brand .mark{ width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--phys-primary),var(--phys-secondary)); color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(37,99,235,.35); }
+.lab-brand:hover{ color:var(--ink); }
+.lab-links .nav-link{ color:var(--ink-soft); font-weight:600; font-size:.95rem; padding:.5rem .85rem !important; border-radius:10px;
+  transition:color .15s ease, background .15s ease; }
+.lab-links .nav-link:hover{ color:var(--phys-primary); background:rgba(37,99,235,.07); }
+.lab-links .nav-link.active{ color:var(--phys-primary); background:rgba(37,99,235,.1); }
+.btn-phys-primary{ background:linear-gradient(135deg,var(--phys-primary),var(--phys-secondary)); color:#fff; font-weight:600; border:none;
+  padding:.55rem 1.35rem; border-radius:12px; box-shadow:0 8px 20px rgba(37,99,235,.28);
+  transition:transform .15s ease, box-shadow .15s ease; }
+.btn-phys-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(37,99,235,.36); }
+.btn-phys-outline{ border:1.5px solid rgba(15,23,42,.15); color:var(--ink); font-weight:600; padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff; transition:border-color .15s ease, transform .15s ease; }
+.btn-phys-outline:hover{ color:var(--ink); border-color:var(--phys-primary); transform:translateY(-2px); }
+.btn-phys-ghost{ border:1.5px solid rgba(255,255,255,.28); color:#fff; font-weight:600; padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.05); transition:border-color .15s ease, background .15s ease, transform .15s ease; }
+.btn-phys-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.1); transform:translateY(-2px); }
+
+/* HERO */
+.phys-hero{ position:relative; color:#fff; padding:5.5rem 0 6.5rem; overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 140% at 15% -10%, #1D4ED8 0%, var(--phys-navy) 55%, #061126 100%); }
+.phys-hero::before{ content:""; position:absolute; inset:0; z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:44px 44px; mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%); }
+.phys-eyebrow{ display:inline-flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.78rem; color:#A5F3FC;
+  background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35); padding:.35rem .8rem; border-radius:999px; }
+.phys-hero h1{ font-size:clamp(2.15rem,4.4vw,3.4rem); font-weight:700; line-height:1.1; margin:1.1rem 0; }
+.phys-hero h1 .accent{ background:linear-gradient(100deg,var(--phys-secondary),#7dd3fc 60%,var(--phys-support));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.phys-hero p.lead-copy{ color:#C7D2E3; font-size:1.06rem; max-width:33rem; line-height:1.65; }
+.phys-hero-actions{ margin-top:1.6rem; }
+.phys-lab-art{ position:relative; width:100%; max-width:440px; margin-inline:auto; z-index:1; }
+.phys-lab-art svg{ width:100%; height:auto; overflow:visible; }
+.float-a{ animation:floatA 6s ease-in-out infinite; }
+.float-b{ animation:floatA 7.5s ease-in-out infinite; animation-delay:.4s; }
+.float-c{ animation:floatA 5.2s ease-in-out infinite; animation-delay:.8s; }
+@keyframes floatA{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+
+/* SECTION SCAFFOLDING */
+.section{ padding:5.5rem 0; }
+.section-tight{ padding:4.5rem 0; }
+.section-head{ max-width:660px; }
+.section-head h2{ font-size:clamp(1.7rem,3vw,2.3rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.03rem; line-height:1.6; }
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+.step-flow{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; font-family:var(--mono); font-size:.78rem;
+  color:var(--ink-soft); margin-bottom:1rem; }
+.step-flow span{ padding:.25rem .6rem; border-radius:999px; background:#fff; border:1px solid rgba(15,23,42,.08); }
+.step-flow i{ font-size:.7rem; }
+
+/* WHAT IS PHYSICS — concept cards */
+.concept-card{ background:#fff; border-radius:var(--card-radius); padding:1.9rem; height:100%;
+  border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04); transition:transform .2s ease, box-shadow .2s ease; }
+.concept-card:hover{ transform:translateY(-6px); box-shadow:0 16px 32px rgba(15,23,42,.1); }
+.concept-card .icon-tile{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:1.3rem; color:#fff; margin-bottom:1rem; }
+.concept-card h3{ font-size:1.15rem; font-weight:700; margin-bottom:.5rem; }
+.concept-card p{ color:var(--ink-soft); font-size:.95rem; line-height:1.6; margin:0; }
+
+/* TOPIC CARDS */
+.topic-card{ background:#fff; border-radius:16px; padding:1.5rem; height:100%; border:1px solid rgba(15,23,42,.06);
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; }
+.topic-card:hover{ transform:translateY(-5px); box-shadow:0 14px 28px rgba(15,23,42,.09); border-color:var(--phys-primary); }
+.topic-card .ico{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:1.15rem; color:#fff;
+  background:linear-gradient(135deg,var(--phys-primary),var(--phys-secondary)); margin-bottom:.9rem; }
+.topic-card h4{ font-size:1.02rem; font-weight:700; margin-bottom:.4rem; }
+.topic-card p{ color:var(--ink-soft); font-size:.88rem; line-height:1.5; margin-bottom:.9rem; flex:1; }
+.topic-card button{ align-self:flex-start; font-weight:700; font-size:.87rem; color:var(--phys-primary); background:none; border:none; padding:0;
+  display:inline-flex; align-items:center; gap:.35rem; }
+.topic-card button:hover{ text-decoration:underline; }
+
+/* SHARED LAB PANEL (simulations) */
+.lab-panel{ background:linear-gradient(160deg,#0C1730 0%, #14224a 100%); border-radius:26px; color:#fff; padding:2.2rem; overflow:hidden; }
+.lab-panel-badge{ display:inline-flex; align-items:center; gap:.45rem; font-family:var(--mono); font-size:.75rem; color:#A5F3FC;
+  background:rgba(6,182,212,.12); border:1px solid rgba(6,182,212,.35); padding:.3rem .7rem; border-radius:999px; }
+.lab-stage-wrap{ display:grid; grid-template-columns:1.2fr .8fr; gap:1.6rem; margin-top:1.3rem; }
+@media (max-width:991.98px){ .lab-stage-wrap{ grid-template-columns:1fr; } }
+.lab-stage{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1.1rem; }
+.lab-controls{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1.3rem; }
+.lab-controls label{ font-weight:700; font-size:.83rem; color:#DCE6FF; display:flex; justify-content:space-between; margin-bottom:.4rem; }
+.lab-controls .slider-row{ margin-bottom:1.1rem; }
+.lab-controls .slider-row:last-of-type{ margin-bottom:0; }
+.lab-btn-row{ display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap; }
+.lab-btn-row .btn{ flex:1; min-width:120px; }
+.btn-run{ background:linear-gradient(135deg,var(--phys-secondary),#3b82f6); color:#04121F; font-weight:700; border:none;
+  padding:.6rem 1.1rem; border-radius:11px; }
+.btn-run:hover{ color:#04121F; }
+.btn-reset{ background:rgba(255,255,255,.08); color:#fff; font-weight:600; border:1px solid rgba(255,255,255,.2); border-radius:11px; padding:.6rem 1.1rem; }
+.btn-reset:hover{ color:#fff; background:rgba(255,255,255,.14); }
+
+.readout-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:.7rem; margin-top:1.1rem; }
+@media (min-width:576px){ .readout-grid.readout-5{ grid-template-columns:repeat(5,1fr); } }
+.readout{ background:rgba(255,255,255,.06); border-radius:10px; padding:.6rem .7rem; text-align:center; }
+.readout .lbl{ font-size:.68rem; color:#9FB1D6; margin-bottom:.15rem; }
+.readout .val{ font-family:var(--mono); font-weight:700; font-size:1.02rem; color:#fff; transition:color .2s ease; }
+.lab-formula-row{ margin-top:1rem; padding-top:1rem; border-top:1px dashed rgba(255,255,255,.15); font-family:var(--mono);
+  font-size:.95rem; color:#A5F3FC; display:flex; flex-wrap:wrap; gap:1.3rem; }
+.calc-flow{ margin-top:1.1rem; font-family:var(--mono); font-size:.86rem; color:#CBD8F5; display:flex; align-items:center;
+  gap:.6rem; flex-wrap:wrap; }
+.calc-flow i{ color:#5B79C9; }
+.lab-explain{ margin-top:1rem; font-size:.9rem; color:#D6E0F7; line-height:1.55; }
+
+/* FORCE STAGE */
+.force-track{ position:relative; height:140px; border-radius:12px; background:rgba(0,0,0,.22); overflow:hidden; }
+.force-ground{ position:absolute; left:0; right:0; bottom:22px; height:2px; background:rgba(255,255,255,.18); }
+.force-person{ position:absolute; bottom:22px; left:4%; font-size:2rem; transition:left .1s linear; }
+.force-arrow{ position:absolute; bottom:52px; left:9%; height:4px; background:var(--phys-secondary); border-radius:2px;
+  transform-origin:left center; transition:width .2s ease, left .1s linear; }
+.force-arrow::after{ content:""; position:absolute; right:-8px; top:-6px; border:8px solid transparent; border-left-color:var(--phys-secondary); }
+.force-box{ position:absolute; bottom:22px; left:14%; width:44px; height:44px; border-radius:8px;
+  background:linear-gradient(135deg,var(--orange),#fbbf24); box-shadow:0 8px 18px rgba(245,158,11,.35); transition:left .1s linear; }
+#forceGraph{ width:100%; height:140px; display:block; border-radius:12px; background:rgba(0,0,0,.22); margin-top:.8rem; }
+
+/* GRAVITY STAGE */
+.gravity-track{ position:relative; height:280px; border-radius:12px; background:rgba(0,0,0,.22); overflow:hidden; }
+.gravity-object{ position:absolute; left:50%; top:16px; transform:translateX(-50%); font-size:2rem; transition:top .05s linear; }
+.gravity-ground-label{ position:absolute; left:0; right:0; bottom:8px; text-align:center; font-size:1.6rem; }
+.gravity-height-line{ position:absolute; left:20%; top:16px; bottom:32px; width:1px; background:repeating-linear-gradient(to bottom, rgba(255,255,255,.3) 0 6px, transparent 6px 12px); }
+
+/* PRESSURE STAGE */
+.pressure-visual{ display:flex; align-items:flex-end; justify-content:center; gap:2.5rem; padding:1.4rem 0; flex-wrap:wrap; }
+.pressure-block{ text-align:center; }
+.pressure-surface{ width:140px; height:16px; background:rgba(255,255,255,.15); border-radius:4px; margin:0 auto; }
+.pressure-contact{ background:linear-gradient(135deg,var(--phys-secondary),var(--phys-primary)); border-radius:8px 8px 0 0; margin:0 auto;
+  transition:width .25s ease, height .25s ease, background .25s ease; }
+.pressure-value-tag{ font-family:var(--mono); font-size:.8rem; color:#DCE6FF; margin-top:.5rem; }
+
+/* MOTION STAGE */
+.motion-track-wrap{ padding:1.6rem 0 .6rem; }
+.motion-track{ position:relative; height:4px; background:rgba(255,255,255,.15); border-radius:2px; margin:2.4rem 0 .6rem; }
+.motion-progress{ position:absolute; left:0; top:0; height:100%; background:linear-gradient(90deg,var(--phys-secondary),#3b82f6); border-radius:2px; width:0%; transition:width .1s linear; }
+.motion-icon{ position:absolute; top:-16px; left:0%; font-size:1.6rem; transform:translateX(-50%); transition:left .1s linear; }
+.motion-marks{ display:flex; justify-content:space-between; font-family:var(--mono); font-size:.78rem; color:#9FB1D6; }
+
+/* FORMULA CHEAT SHEET */
+.formula-card{ background:#fff; border:1px solid rgba(15,23,42,.07); border-radius:16px; padding:1.4rem; height:100%; }
+.formula-card .eq{ font-family:var(--mono); font-size:1.3rem; font-weight:700; color:var(--phys-primary); margin-bottom:.6rem; }
+.formula-card ul{ list-style:none; padding:0; margin:0; font-size:.85rem; color:var(--ink-soft); }
+.formula-card li{ display:flex; justify-content:space-between; padding:.2rem 0; border-bottom:1px dashed rgba(15,23,42,.08); }
+.formula-card li:last-child{ border-bottom:none; }
+
+/* CHALLENGE */
+.quiz-card{ background:#fff; border-radius:24px; border:1px solid rgba(15,23,42,.07); box-shadow:0 16px 36px rgba(15,23,42,.08);
+  padding:2.2rem; max-width:680px; margin-inline:auto; }
+.quiz-question{ font-size:1.1rem; font-weight:700; margin-bottom:1.3rem; line-height:1.5; }
+.quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+@media (max-width:479.98px){ .quiz-options{ grid-template-columns:1fr; } }
+.quiz-option{ text-align:center; background:var(--paper); border:1.5px solid rgba(15,23,42,.08); border-radius:12px; padding:.85rem 1rem;
+  font-weight:700; font-family:var(--mono); font-size:1rem; color:var(--ink); transition:border-color .15s ease, background .15s ease; }
+.quiz-option:hover{ border-color:var(--phys-primary); }
+.quiz-option.correct{ border-color:var(--green); background:rgba(22,163,74,.08); }
+.quiz-option.incorrect{ border-color:#EF4444; background:rgba(239,68,68,.07); }
+.quiz-feedback{ margin-top:1.1rem; font-weight:600; font-size:.95rem; min-height:1.4em; }
+.quiz-feedback.correct{ color:var(--green); }
+.quiz-feedback.incorrect{ color:#DC2626; }
+.quiz-steps{ font-family:var(--mono); font-size:.86rem; color:var(--ink-soft); margin-top:.6rem; display:none; }
+.quiz-steps.show{ display:block; }
+.quiz-retry{ margin-top:1rem; display:none; }
+.quiz-retry.show{ display:inline-flex; }
+
+/* DID YOU KNOW */
+.fact-panel{ background:linear-gradient(135deg,#EEF4FF,#F0FBFF); border:1px solid rgba(37,99,235,.13); border-radius:24px;
+  padding:2.5rem; text-align:center; max-width:760px; margin-inline:auto; }
+.fact-panel .ico-badge{ width:54px; height:54px; border-radius:50%; display:grid; place-items:center; margin:0 auto 1rem;
+  background:linear-gradient(135deg,var(--phys-primary),var(--phys-support)); color:#fff; font-size:1.3rem; }
+#physFactText{ font-family:var(--display); font-weight:600; font-size:clamp(1.05rem,2.3vw,1.35rem); color:var(--ink);
+  min-height:3.2em; display:flex; align-items:center; justify-content:center; transition:opacity .25s ease; }
+#physFactText.fading{ opacity:0; }
+
+/* FOOTER (shared) */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--phys-secondary); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .float-a,.float-b,.float-c{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="#force-sim" class="btn btn-phys-primary">Start Learning</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+  ==================================================================== -->
+  <header class="phys-hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="phys-eyebrow"><i class="bi bi-lightning-charge"></i> Physics Lab</span>
+          <h1>Explore the World of <span class="accent">Physics</span></h1>
+          <p class="lead-copy">Don't just read about Physics. Change the numbers, run experiments and see what happens.</p>
+          <div class="phys-hero-actions">
+            <a href="#force-sim" class="btn btn-phys-ghost" id="startExperimentingBtn">Start Experimenting</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="phys-lab-art" role="img" aria-label="Illustration representing force, gravity, pressure and motion with an arrow, a falling object, a pressing weight and a moving track">
+            <svg viewBox="0 0 420 400" xmlns="http://www.w3.org/2000/svg">
+              <!-- Force arrow -->
+              <g class="float-a" transform="translate(60,110)">
+                <line x1="0" y1="0" x2="90" y2="0" stroke="#06B6D4" stroke-width="6" stroke-linecap="round"/>
+                <path d="M90 -12 L112 0 L90 12 Z" fill="#06B6D4"/>
+                <text x="30" y="-16" font-family="JetBrains Mono, monospace" font-size="13" fill="#7dd3fc" font-weight="600">Force</text>
+              </g>
+
+              <!-- Falling object with dashed path -->
+              <g transform="translate(300,60)">
+                <line x1="0" y1="0" x2="0" y2="90" stroke="#94A3B8" stroke-width="1.4" stroke-dasharray="3 6"/>
+                <circle class="float-b" cx="0" cy="0" r="12" fill="#F59E0B"/>
+                <text x="18" y="70" font-family="JetBrains Mono, monospace" font-size="12" fill="#A5F3FC">Gravity</text>
+              </g>
+
+              <!-- Pressure block on surface -->
+              <g class="float-c" transform="translate(60,240)">
+                <rect x="-8" y="0" width="70" height="26" rx="4" fill="#3B82F6"/>
+                <rect x="-18" y="30" width="90" height="6" rx="3" fill="#94A3B8"/>
+                <text x="27" y="52" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#A5F3FC">Pressure</text>
+              </g>
+
+              <!-- Motion track -->
+              <g transform="translate(210,300)">
+                <line x1="-90" y1="0" x2="90" y2="0" stroke="#94A3B8" stroke-width="2"/>
+                <g class="float-a" transform="translate(-40,0)">
+                  <circle r="8" fill="#7C3AED"/>
+                </g>
+                <text x="0" y="26" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#A5F3FC">Motion</text>
+              </g>
+
+              <!-- Formula tag -->
+              <g class="float-b" transform="translate(150,20)">
+                <rect x="-6" y="-18" width="90" height="30" rx="9" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="39" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#2563EB" font-weight="600">F = m × a</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       WHAT IS PHYSICS
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>What is Physics?</h2>
+        <p class="mx-auto">Physics helps us understand how objects move, how forces act, how gravity pulls things toward Earth, how pressure works and how energy changes from one form to another.</p>
+      </div>
+      <div class="row g-4 mt-2">
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:var(--phys-primary);"><i class="bi bi-hand-index-thumb"></i></div>
+            <h3>Force</h3>
+            <p>Makes an object push, pull or change its motion.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:var(--phys-secondary);"><i class="bi bi-arrow-right-circle"></i></div>
+            <h3>Motion</h3>
+            <p>Describes how an object changes position with time.</p>
+          </div>
+        </div>
+        <div class="col-md-4 reveal">
+          <div class="concept-card">
+            <div class="icon-tile" style="background:var(--phys-support);"><i class="bi bi-lightning-charge"></i></div>
+            <h3>Energy</h3>
+            <p>Allows things to move or cause changes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       PHYSICS TOPICS
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="topics">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>What Would You Like to Explore?</h2>
+        <p class="mx-auto">Pick a topic to jump straight to its experiment.</p>
+      </div>
+      <div class="row g-3 mt-3">
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-hand-index-thumb"></i></div>
+            <h4>Force</h4>
+            <p>Push and pull an object across the lab.</p>
+            <button type="button" data-scroll-to="#force-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-globe-americas"></i></div>
+            <h4>Gravity</h4>
+            <p>Drop an object and watch it fall.</p>
+            <button type="button" data-scroll-to="#gravity-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-arrows-collapse"></i></div>
+            <h4>Pressure</h4>
+            <p>See how area changes pressure.</p>
+            <button type="button" data-scroll-to="#pressure-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-speedometer2"></i></div>
+            <h4>Motion</h4>
+            <p>Move an object along a track.</p>
+            <button type="button" data-scroll-to="#motion-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-rulers"></i></div>
+            <h4>Distance &amp; Time</h4>
+            <p>Connect speed, time and distance.</p>
+            <button type="button" data-scroll-to="#motion-sim">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2 reveal">
+          <div class="topic-card">
+            <div class="ico"><i class="bi bi-lightning-charge"></i></div>
+            <h4>Energy</h4>
+            <p>See where energy shows up in every experiment.</p>
+            <button type="button" data-scroll-to="#formulas">Explore <i class="bi bi-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EXPERIMENT 1 — FORCE
+  ==================================================================== -->
+  <section class="section" id="force-sim">
+    <div class="container container-narrow">
+      <div class="step-flow reveal">
+        <span>SEE</span><i class="bi bi-chevron-right"></i><span>INTERACT</span><i class="bi bi-chevron-right"></i>
+        <span>OBSERVE</span><i class="bi bi-chevron-right"></i><span>CALCULATE</span><i class="bi bi-chevron-right"></i><span>UNDERSTAND</span>
+      </div>
+      <div class="section-head reveal">
+        <h2>Experiment 1: Force</h2>
+        <p>A force is a push or pull that can change the motion of an object. Change the sliders and press Start.</p>
+      </div>
+
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-hand-index-thumb"></i> Force simulation</span>
+
+        <div class="lab-stage-wrap">
+          <div class="lab-stage">
+            <div class="force-track" aria-label="Person pushing a box across the lab" role="img">
+              <div class="force-arrow" id="forceArrow"></div>
+              <div class="force-person" id="forcePerson">🧑</div>
+              <div class="force-box" id="forceBox"></div>
+              <div class="force-ground"></div>
+            </div>
+            <canvas id="forceGraph" width="600" height="140" role="img" aria-label="Graph of distance against time for this experiment"></canvas>
+            <p class="lab-explain" id="forceExplain">The stronger the force, the greater the acceleration when the mass stays the same.</p>
+          </div>
+
+          <div class="lab-controls">
+            <div class="slider-row">
+              <label for="forceSlider"><span>Force (N)</span><span id="forceVal">20</span></label>
+              <input type="range" class="form-range" id="forceSlider" min="5" max="100" value="20" step="1">
+            </div>
+            <div class="slider-row">
+              <label for="massSlider"><span>Mass (kg)</span><span id="massVal">5</span></label>
+              <input type="range" class="form-range" id="massSlider" min="1" max="20" value="5" step="1">
+            </div>
+            <div class="slider-row">
+              <label for="timeSlider"><span>Time (s)</span><span id="timeVal">2</span></label>
+              <input type="range" class="form-range" id="timeSlider" min="1" max="10" value="2" step="1">
+            </div>
+            <div class="lab-btn-row">
+              <button type="button" class="btn btn-run" id="startForceBtn">Start Experiment</button>
+              <button type="button" class="btn btn-reset" id="resetForceBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-flow">
+          <span>Force = <b id="calcF">20</b> N</span><i class="bi bi-arrow-right"></i>
+          <span>Mass = <b id="calcM">5</b> kg</span><i class="bi bi-arrow-right"></i>
+          <span>a = F ÷ m</span><i class="bi bi-arrow-right"></i>
+          <span>a = <b id="calcA">4</b> m/s²</span>
+        </div>
+
+        <div class="readout-grid readout-5">
+          <div class="readout"><div class="lbl">Force</div><div class="val" id="roForce">20 N</div></div>
+          <div class="readout"><div class="lbl">Mass</div><div class="val" id="roMass">5 kg</div></div>
+          <div class="readout"><div class="lbl">Acceleration</div><div class="val" id="roAccel">4 m/s²</div></div>
+          <div class="readout"><div class="lbl">Time</div><div class="val" id="roTime">2 s</div></div>
+          <div class="readout"><div class="lbl">Distance</div><div class="val" id="roDist">8 m</div></div>
+        </div>
+
+        <div class="lab-formula-row">
+          <span>F = m × a</span>
+          <span>a = F ÷ m</span>
+          <span>s = ½ × a × t²</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EXPERIMENT 2 — GRAVITY
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="gravity-sim">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Experiment 2: Gravity</h2>
+        <p>Gravity pulls objects toward Earth. Set a height and drop the object to see it fall.</p>
+      </div>
+
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-globe-americas"></i> Gravity simulation</span>
+
+        <div class="lab-stage-wrap">
+          <div class="lab-stage">
+            <div class="gravity-track" aria-label="Object falling from a height toward the ground" role="img">
+              <div class="gravity-height-line"></div>
+              <div class="gravity-object" id="gravityObject">🟠</div>
+              <div class="gravity-ground-label">🌍</div>
+            </div>
+            <p class="lab-explain">Gravity pulls objects toward Earth. On Earth, this simulation uses g = 9.8 m/s².</p>
+          </div>
+
+          <div class="lab-controls">
+            <div class="slider-row">
+              <label for="heightSlider"><span>Height (m)</span><span id="heightVal">20</span></label>
+              <input type="range" class="form-range" id="heightSlider" min="5" max="100" value="20" step="5">
+            </div>
+            <div class="slider-row" style="margin-bottom:0;">
+              <label><span>Gravity</span><span>9.8 m/s²</span></label>
+            </div>
+            <div class="lab-btn-row">
+              <button type="button" class="btn btn-run" id="dropBtn">Drop Object</button>
+              <button type="button" class="btn btn-reset" id="resetGravityBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="readout-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="readout"><div class="lbl">Time</div><div class="val" id="roGTime">0.0 s</div></div>
+          <div class="readout"><div class="lbl">Height fallen</div><div class="val" id="roGHeight">0 m</div></div>
+          <div class="readout"><div class="lbl">Velocity</div><div class="val" id="roGVel">0.0 m/s</div></div>
+        </div>
+
+        <div class="lab-formula-row">
+          <span>v = g × t</span>
+          <span>d = ½ × g × t²</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EXPERIMENT 3 — PRESSURE
+  ==================================================================== -->
+  <section class="section" id="pressure-sim">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Experiment 3: Pressure</h2>
+        <p>Pressure is force spread over an area. The same force over a smaller area creates greater pressure.</p>
+      </div>
+
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-arrows-collapse"></i> Pressure simulation</span>
+
+        <div class="lab-stage-wrap">
+          <div class="lab-stage">
+            <div class="pressure-visual">
+              <div class="pressure-block">
+                <div class="pressure-contact" id="pressureContact" style="width:120px; height:70px;"></div>
+                <div class="pressure-surface"></div>
+                <div class="pressure-value-tag">Contact area shown to scale</div>
+              </div>
+            </div>
+            <p class="lab-explain" id="pressureExplain">Same force, smaller area → greater pressure.</p>
+          </div>
+
+          <div class="lab-controls">
+            <div class="slider-row">
+              <label for="pForceSlider"><span>Force (N)</span><span id="pForceVal">100</span></label>
+              <input type="range" class="form-range" id="pForceSlider" min="10" max="500" value="100" step="10">
+            </div>
+            <div class="slider-row" style="margin-bottom:0;">
+              <label for="pAreaSlider"><span>Area (m²)</span><span id="pAreaVal">2.0</span></label>
+              <input type="range" class="form-range" id="pAreaSlider" min="0.2" max="5" value="2" step="0.2">
+            </div>
+            <div class="lab-btn-row">
+              <button type="button" class="btn btn-run" data-preset="large">Large Area</button>
+              <button type="button" class="btn btn-reset" data-preset="small">Small Area</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-flow">
+          <span>Force = <b id="calcPF">100</b> N</span><i class="bi bi-arrow-right"></i>
+          <span>Area = <b id="calcPA">2.0</b> m²</span><i class="bi bi-arrow-right"></i>
+          <span>P = F ÷ A</span><i class="bi bi-arrow-right"></i>
+          <span>P = <b id="calcPResult">50</b> Pa</span>
+        </div>
+
+        <div class="lab-formula-row"><span>P = F ÷ A</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       EXPERIMENT 4 — MOTION
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;" id="motion-sim">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2>Experiment 4: Motion</h2>
+        <p>Distance, speed and time are connected. Change the speed and time to see how far the object travels.</p>
+      </div>
+
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-speedometer2"></i> Motion simulation</span>
+
+        <div class="lab-stage-wrap">
+          <div class="lab-stage">
+            <div class="motion-track-wrap">
+              <div class="motion-track">
+                <div class="motion-progress" id="motionProgress"></div>
+                <div class="motion-icon" id="motionIcon">🚗</div>
+              </div>
+              <div class="motion-marks">
+                <span>0 m</span><span id="motionMidLabel">25 m</span><span id="motionEndLabel">50 m</span>
+              </div>
+            </div>
+            <p class="lab-explain">Distance = Speed × Time. A faster speed or a longer time both mean a greater distance.</p>
+          </div>
+
+          <div class="lab-controls">
+            <div class="slider-row">
+              <label for="speedSlider"><span>Speed (m/s)</span><span id="speedVal">5</span></label>
+              <input type="range" class="form-range" id="speedSlider" min="1" max="20" value="5" step="1">
+            </div>
+            <div class="slider-row" style="margin-bottom:0;">
+              <label for="motionTimeSlider"><span>Time (s)</span><span id="motionTimeVal">10</span></label>
+              <input type="range" class="form-range" id="motionTimeSlider" min="1" max="30" value="10" step="1">
+            </div>
+            <div class="lab-btn-row">
+              <button type="button" class="btn btn-run" id="runMotionBtn">Run</button>
+              <button type="button" class="btn btn-reset" id="resetMotionBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="readout-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="readout"><div class="lbl">Speed</div><div class="val" id="roSpeed">5 m/s</div></div>
+          <div class="readout"><div class="lbl">Time</div><div class="val" id="roMTime">10 s</div></div>
+          <div class="readout"><div class="lbl">Distance</div><div class="val" id="roMDist">50 m</div></div>
+        </div>
+
+        <div class="lab-formula-row"><span>Distance = Speed × Time</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FORMULA CHEAT SHEET
+  ==================================================================== -->
+  <section class="section" id="formulas">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Physics Formula Box</h2>
+        <p class="mx-auto">Every formula used in this lab, explained simply.</p>
+      </div>
+      <div class="row g-3 mt-3">
+        <div class="col-sm-6 col-lg-4 reveal">
+          <div class="formula-card">
+            <div class="eq">F = m × a</div>
+            <ul>
+              <li><span>F = Force</span><span>N</span></li>
+              <li><span>m = Mass</span><span>kg</span></li>
+              <li><span>a = Acceleration</span><span>m/s²</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <div class="formula-card">
+            <div class="eq">v = d ÷ t</div>
+            <ul>
+              <li><span>v = Speed</span><span>m/s</span></li>
+              <li><span>d = Distance</span><span>m</span></li>
+              <li><span>t = Time</span><span>s</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <div class="formula-card">
+            <div class="eq">d = v × t</div>
+            <ul>
+              <li><span>d = Distance</span><span>m</span></li>
+              <li><span>v = Speed</span><span>m/s</span></li>
+              <li><span>t = Time</span><span>s</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <div class="formula-card">
+            <div class="eq">P = F ÷ A</div>
+            <ul>
+              <li><span>P = Pressure</span><span>Pa</span></li>
+              <li><span>F = Force</span><span>N</span></li>
+              <li><span>A = Area</span><span>m²</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <div class="formula-card">
+            <div class="eq">W = m × g</div>
+            <ul>
+              <li><span>W = Weight</span><span>N</span></li>
+              <li><span>m = Mass</span><span>kg</span></li>
+              <li><span>g = Gravity</span><span>m/s²</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       TRY IT YOURSELF
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Can You Solve It?</h2>
+        <p class="mx-auto">Use what you've learned about force and acceleration.</p>
+      </div>
+
+      <div class="quiz-card reveal mt-4">
+        <div class="quiz-question">A box has a mass of 5 kg. A force of 20 N acts on it. What is its acceleration?</div>
+        <div class="quiz-options" id="physQuizOptions"></div>
+        <div class="quiz-feedback" id="physQuizFeedback" role="status"></div>
+        <div class="quiz-steps" id="physQuizSteps">a = F ÷ m<br>a = 20 ÷ 5<br>a = 4 m/s²</div>
+        <button type="button" class="btn btn-phys-outline quiz-retry" id="physQuizRetry">Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       DID YOU KNOW
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="fact-panel reveal">
+        <div class="ico-badge"><i class="bi bi-stars"></i></div>
+        <h2 class="h5 mb-1" style="font-weight:700;">Did You Know?</h2>
+        <p id="physFactText">A force can make an object start moving, stop moving, speed up, slow down or change direction.</p>
+        <button class="btn btn-phys-outline mt-2" id="physFactBtn" type="button">
+          <i class="bi bi-arrow-repeat me-1"></i> Show Another Fact
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Making science easier to see, understand and explore.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-4 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   S1 SCIENCE LAB — Physics page script (internal js/main.js + js/physics.js
+   equivalent, inlined per request)
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------------------------------------------------------
+     SHARED (main.js-equivalent): navbar state, mobile menu, reveal,
+     smooth scroll — same behaviour as the Home page.
+  --------------------------------------------------------------- */
+  var nav = document.getElementById("labNav");
+  function updateNavState() { nav.classList.toggle("is-scrolled", window.scrollY > 12); }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl).hide();
+        }
+      });
+    });
+  }
+
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  document.querySelectorAll('[data-scroll-to], a[href^="#"]').forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("data-scroll-to") || this.getAttribute("href");
+      if (targetId && targetId.length > 1 && targetId.indexOf("#") === 0) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+
+  /* =================================================================
+     EXPERIMENT 1 — FORCE
+     Functions: initializeForceSimulation, calculateForce, updateForceVisualization
+  ================================================================= */
+  var forceSlider = document.getElementById("forceSlider");
+  var massSlider = document.getElementById("massSlider");
+  var timeSlider = document.getElementById("timeSlider");
+  var forceVal = document.getElementById("forceVal");
+  var massVal = document.getElementById("massVal");
+  var timeVal = document.getElementById("timeVal");
+  var forceBox = document.getElementById("forceBox");
+  var forcePerson = document.getElementById("forcePerson");
+  var forceArrow = document.getElementById("forceArrow");
+  var forceGraph = document.getElementById("forceGraph");
+  var forceCtx = forceGraph.getContext("2d");
+  var forceExplain = document.getElementById("forceExplain");
+  var forceAnim = null;
+
+  var TRACK_MAX_PERCENT = 82; /* how far right the box/person may travel, in % of track width */
+
+  function calculateForce(force, mass, time) {
+    var acceleration = force / mass;
+    var distance = 0.5 * acceleration * time * time;
+    return { acceleration: acceleration, distance: distance };
+  }
+
+  function updateForceVisualization(force, mass, time, result) {
+    document.getElementById("calcF").textContent = force;
+    document.getElementById("calcM").textContent = mass;
+    document.getElementById("calcA").textContent = result.acceleration.toFixed(1);
+
+    document.getElementById("roForce").textContent = force + " N";
+    document.getElementById("roMass").textContent = mass + " kg";
+    document.getElementById("roAccel").textContent = result.acceleration.toFixed(1) + " m/s²";
+    document.getElementById("roTime").textContent = time + " s";
+    document.getElementById("roDist").textContent = result.distance.toFixed(1) + " m";
+
+    /* Arrow length scales with force (visual only) */
+    var arrowWidth = 24 + (force / 100) * 90;
+    forceArrow.style.width = arrowWidth + "px";
+
+    if (result.acceleration < 3) {
+      forceExplain.textContent = "A small force on this mass gives a gentle acceleration — the box moves slowly.";
+    } else if (result.acceleration < 10) {
+      forceExplain.textContent = "The stronger the force, the greater the acceleration when the mass stays the same.";
+    } else {
+      forceExplain.textContent = "A large force on a light mass gives a strong acceleration — the box shoots forward.";
+    }
+
+    drawForceGraph(result.acceleration, time);
+  }
+
+  function drawForceGraph(acceleration, maxTime) {
+    var w = forceGraph.width, h = forceGraph.height;
+    forceCtx.clearRect(0, 0, w, h);
+    var padding = 28;
+    var maxDistance = 0.5 * acceleration * maxTime * maxTime || 1;
+
+    /* axes */
+    forceCtx.strokeStyle = "rgba(255,255,255,.25)";
+    forceCtx.lineWidth = 1;
+    forceCtx.beginPath();
+    forceCtx.moveTo(padding, 10);
+    forceCtx.lineTo(padding, h - padding);
+    forceCtx.lineTo(w - 10, h - padding);
+    forceCtx.stroke();
+
+    forceCtx.fillStyle = "#9FB1D6";
+    forceCtx.font = "11px JetBrains Mono, monospace";
+    forceCtx.fillText("Distance", padding + 4, 20);
+    forceCtx.fillText("Time", w - 46, h - 8);
+
+    /* curve: s = 1/2 a t^2 */
+    forceCtx.strokeStyle = "#06B6D4";
+    forceCtx.lineWidth = 2.5;
+    forceCtx.beginPath();
+    var steps = 40;
+    for (var i = 0; i <= steps; i++) {
+      var t = (maxTime * i) / steps;
+      var s = 0.5 * acceleration * t * t;
+      var x = padding + ((w - padding - 20) * t) / maxTime;
+      var y = (h - padding) - ((h - padding - 20) * s) / maxDistance;
+      if (i === 0) forceCtx.moveTo(x, y); else forceCtx.lineTo(x, y);
+    }
+    forceCtx.stroke();
+  }
+
+  function readForceInputs() {
+    return {
+      force: parseFloat(forceSlider.value),
+      mass: parseFloat(massSlider.value),
+      time: parseFloat(timeSlider.value)
+    };
+  }
+
+  function refreshForce() {
+    var inputs = readForceInputs();
+    forceVal.textContent = inputs.force;
+    massVal.textContent = inputs.mass;
+    timeVal.textContent = inputs.time;
+    var result = calculateForce(inputs.force, inputs.mass, inputs.time);
+    updateForceVisualization(inputs.force, inputs.mass, inputs.time, result);
+    return { inputs: inputs, result: result };
+  }
+
+  function runForceExperiment() {
+    if (forceAnim) cancelAnimationFrame(forceAnim);
+    var data = refreshForce();
+    var startPercent = 9;
+    var endPercent = Math.min(TRACK_MAX_PERCENT, startPercent + (data.result.distance / 12) * (TRACK_MAX_PERCENT - startPercent));
+    var durationMs = prefersReducedMotion ? 0 : Math.min(3000, Math.max(500, data.inputs.time * 350));
+    var startTime = null;
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = durationMs === 0 ? 1 : Math.min(1, (ts - startTime) / durationMs);
+      var eased = 1 - Math.pow(1 - progress, 2);
+      var currentPercent = startPercent + (endPercent - startPercent) * eased;
+      forceBox.style.left = (currentPercent + 6) + "%";
+      forcePerson.style.left = startPercent + (endPercent - startPercent) * eased * 0.4 + "%";
+      forceArrow.style.left = (parseFloat(forcePerson.style.left) + 5) + "%";
+      if (progress < 1) {
+        forceAnim = requestAnimationFrame(step);
+      }
+    }
+    forceAnim = requestAnimationFrame(step);
+  }
+
+  function resetForce() {
+    if (forceAnim) cancelAnimationFrame(forceAnim);
+    forceBox.style.left = "14%";
+    forcePerson.style.left = "4%";
+    forceArrow.style.left = "9%";
+    forceSlider.value = 20; massSlider.value = 5; timeSlider.value = 2;
+    refreshForce();
+  }
+
+  function initializeForceSimulation() {
+    [forceSlider, massSlider, timeSlider].forEach(function (el) {
+      el.addEventListener("input", refreshForce);
+    });
+    document.getElementById("startForceBtn").addEventListener("click", runForceExperiment);
+    document.getElementById("resetForceBtn").addEventListener("click", resetForce);
+    window.addEventListener("resize", function () { refreshForce(); });
+    refreshForce();
+  }
+
+  initializeForceSimulation();
+
+  /* =================================================================
+     EXPERIMENT 2 — GRAVITY
+     Functions: initializeGravitySimulation, calculateGravity, updateGravityVisualization
+  ================================================================= */
+  var heightSlider = document.getElementById("heightSlider");
+  var heightVal = document.getElementById("heightVal");
+  var gravityObject = document.getElementById("gravityObject");
+  var gTimeEl = document.getElementById("roGTime");
+  var gHeightEl = document.getElementById("roGHeight");
+  var gVelEl = document.getElementById("roGVel");
+  var gravityAnim = null;
+  var G = 9.8;
+
+  function calculateGravity(t) {
+    var velocity = G * t;
+    var fallen = 0.5 * G * t * t;
+    return { velocity: velocity, fallen: fallen };
+  }
+
+  function updateGravityVisualization(t, fallen, velocity, heightPx, topOffsetPx) {
+    gTimeEl.textContent = t.toFixed(1) + " s";
+    gHeightEl.textContent = Math.round(fallen) + " m";
+    gVelEl.textContent = velocity.toFixed(1) + " m/s";
+    gravityObject.style.top = topOffsetPx + "px";
+  }
+
+  function dropObject() {
+    if (gravityAnim) cancelAnimationFrame(gravityAnim);
+    var height = parseFloat(heightSlider.value);
+    var totalTime = Math.sqrt((2 * height) / G);
+    var trackHeightPx = document.querySelector(".gravity-track").clientHeight - 48;
+    var startTime = null;
+    var durationMs = prefersReducedMotion ? 0 : Math.min(3200, Math.max(600, totalTime * 500));
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = durationMs === 0 ? 1 : Math.min(1, (ts - startTime) / durationMs);
+      var t = progress * totalTime;
+      var g = calculateGravity(t);
+      var fallRatio = height > 0 ? g.fallen / height : 0;
+      var topOffset = 16 + Math.min(1, fallRatio) * trackHeightPx;
+      updateGravityVisualization(t, Math.min(g.fallen, height), progress >= 1 ? G * totalTime : g.velocity, height, topOffset);
+      if (progress < 1) {
+        gravityAnim = requestAnimationFrame(step);
+      }
+    }
+    gravityAnim = requestAnimationFrame(step);
+  }
+
+  function resetGravity() {
+    if (gravityAnim) cancelAnimationFrame(gravityAnim);
+    gravityObject.style.top = "16px";
+    gTimeEl.textContent = "0.0 s";
+    gHeightEl.textContent = "0 m";
+    gVelEl.textContent = "0.0 m/s";
+  }
+
+  function initializeGravitySimulation() {
+    heightSlider.addEventListener("input", function () {
+      heightVal.textContent = heightSlider.value;
+      resetGravity();
+    });
+    document.getElementById("dropBtn").addEventListener("click", dropObject);
+    document.getElementById("resetGravityBtn").addEventListener("click", resetGravity);
+  }
+
+  initializeGravitySimulation();
+
+  /* =================================================================
+     EXPERIMENT 3 — PRESSURE
+     Functions: initializePressureSimulation, calculatePressure
+  ================================================================= */
+  var pForceSlider = document.getElementById("pForceSlider");
+  var pAreaSlider = document.getElementById("pAreaSlider");
+  var pForceVal = document.getElementById("pForceVal");
+  var pAreaVal = document.getElementById("pAreaVal");
+  var pressureContact = document.getElementById("pressureContact");
+  var pressureExplain = document.getElementById("pressureExplain");
+
+  function calculatePressure(force, area) {
+    return area > 0 ? force / area : 0;
+  }
+
+  function refreshPressure() {
+    var force = parseFloat(pForceSlider.value);
+    var area = parseFloat(pAreaSlider.value);
+    pForceVal.textContent = force;
+    pAreaVal.textContent = area.toFixed(1);
+
+    var pressure = calculatePressure(force, area);
+    document.getElementById("calcPF").textContent = force;
+    document.getElementById("calcPA").textContent = area.toFixed(1);
+    document.getElementById("calcPResult").textContent = pressure.toFixed(1);
+
+    /* visual size scales with sqrt(area); color intensity hints at pressure */
+    var widthPx = 40 + Math.sqrt(area) * 55;
+    var heightPx = 30 + Math.min(80, pressure * 0.5);
+    pressureContact.style.width = widthPx + "px";
+    pressureContact.style.height = heightPx + "px";
+
+    if (pressure > 150) {
+      pressureExplain.textContent = "A small area is concentrating the same force into a much smaller space — pressure is high.";
+    } else if (pressure > 50) {
+      pressureExplain.textContent = "Same force, smaller area → greater pressure.";
+    } else {
+      pressureExplain.textContent = "Spreading the same force over a larger area lowers the pressure.";
+    }
+  }
+
+  function initializePressureSimulation() {
+    pForceSlider.addEventListener("input", refreshPressure);
+    pAreaSlider.addEventListener("input", refreshPressure);
+    document.querySelectorAll("[data-preset]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (btn.getAttribute("data-preset") === "large") { pAreaSlider.value = 5; }
+        else { pAreaSlider.value = 0.4; }
+        refreshPressure();
+      });
+    });
+    refreshPressure();
+  }
+
+  initializePressureSimulation();
+
+  /* =================================================================
+     EXPERIMENT 4 — MOTION
+     Functions: initializeMotionSimulation, calculateDistance
+  ================================================================= */
+  var speedSlider = document.getElementById("speedSlider");
+  var motionTimeSlider = document.getElementById("motionTimeSlider");
+  var speedVal = document.getElementById("speedVal");
+  var motionTimeVal = document.getElementById("motionTimeVal");
+  var motionProgress = document.getElementById("motionProgress");
+  var motionIcon = document.getElementById("motionIcon");
+  var motionAnim = null;
+
+  function calculateDistance(speed, time) { return speed * time; }
+
+  function refreshMotionReadouts() {
+    var speed = parseFloat(speedSlider.value);
+    var time = parseFloat(motionTimeSlider.value);
+    var distance = calculateDistance(speed, time);
+    speedVal.textContent = speed;
+    motionTimeVal.textContent = time;
+    document.getElementById("roSpeed").textContent = speed + " m/s";
+    document.getElementById("roMTime").textContent = time + " s";
+    document.getElementById("roMDist").textContent = distance + " m";
+    document.getElementById("motionMidLabel").textContent = Math.round(distance / 2) + " m";
+    document.getElementById("motionEndLabel").textContent = distance + " m";
+    return { speed: speed, time: time, distance: distance };
+  }
+
+  function runMotion() {
+    if (motionAnim) cancelAnimationFrame(motionAnim);
+    refreshMotionReadouts();
+    var startTime = null;
+    var durationMs = prefersReducedMotion ? 0 : 2600;
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = durationMs === 0 ? 1 : Math.min(1, (ts - startTime) / durationMs);
+      motionProgress.style.width = (progress * 100) + "%";
+      motionIcon.style.left = (progress * 100) + "%";
+      if (progress < 1) {
+        motionAnim = requestAnimationFrame(step);
+      }
+    }
+    motionAnim = requestAnimationFrame(step);
+  }
+
+  function resetMotion() {
+    if (motionAnim) cancelAnimationFrame(motionAnim);
+    motionProgress.style.width = "0%";
+    motionIcon.style.left = "0%";
+  }
+
+  function initializeMotionSimulation() {
+    speedSlider.addEventListener("input", function () { refreshMotionReadouts(); resetMotion(); });
+    motionTimeSlider.addEventListener("input", function () { refreshMotionReadouts(); resetMotion(); });
+    document.getElementById("runMotionBtn").addEventListener("click", runMotion);
+    document.getElementById("resetMotionBtn").addEventListener("click", resetMotion);
+    refreshMotionReadouts();
+  }
+
+  initializeMotionSimulation();
+
+  /* =================================================================
+     TRY IT YOURSELF — Force challenge
+  ================================================================= */
+  function initPhysicsChallenge() {
+    var options = [
+      { label: "2 m/s²", correct: false },
+      { label: "4 m/s²", correct: true },
+      { label: "10 m/s²", correct: false },
+      { label: "25 m/s²", correct: false }
+    ];
+    var optionsEl = document.getElementById("physQuizOptions");
+    var feedbackEl = document.getElementById("physQuizFeedback");
+    var stepsEl = document.getElementById("physQuizSteps");
+    var retryBtn = document.getElementById("physQuizRetry");
+
+    function render() {
+      optionsEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      feedbackEl.className = "quiz-feedback";
+      stepsEl.classList.remove("show");
+      retryBtn.classList.remove("show");
+
+      options.forEach(function (opt) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "quiz-option";
+        b.textContent = opt.label;
+        b.addEventListener("click", function () {
+          if (opt.correct) {
+            b.classList.add("correct");
+            feedbackEl.textContent = "Excellent! 🎉";
+            feedbackEl.className = "quiz-feedback correct";
+            stepsEl.classList.add("show");
+            optionsEl.querySelectorAll(".quiz-option").forEach(function (o) { o.disabled = true; });
+          } else {
+            b.classList.add("incorrect");
+            feedbackEl.textContent = "Not quite. Let's try the formula again.";
+            feedbackEl.className = "quiz-feedback incorrect";
+            retryBtn.classList.add("show");
+          }
+        });
+        optionsEl.appendChild(b);
+      });
+    }
+
+    retryBtn.addEventListener("click", render);
+    render();
+  }
+
+  initPhysicsChallenge();
+
+  /* =================================================================
+     DID YOU KNOW — Physics facts (stored locally, no API)
+  ================================================================= */
+  var physFacts = [
+    "A force can make an object start moving, stop moving, speed up, slow down or change direction.",
+    "Without gravity, you would float away instead of walking on the ground.",
+    "A heavier object and a lighter object fall at the same rate if we ignore air resistance.",
+    "Ice skates have a small blade so your weight presses down with very high pressure, helping you glide.",
+    "The speed of an object tells you how fast it moves, but not which direction — that's called velocity.",
+    "Astronauts float in space because they are constantly falling around the Earth.",
+    "The stronger the force on the same mass, the faster it speeds up.",
+    "Friction is a force that slows things down when two surfaces rub together.",
+    "A snowshoe spreads your weight over a larger area, so you sink less into snow.",
+    "Energy cannot be created or destroyed — it only changes from one form to another."
+  ];
+  var physFactIndex = 0;
+  var physFactTextEl = document.getElementById("physFactText");
+  var physFactBtn = document.getElementById("physFactBtn");
+
+  function showNextPhysFact() {
+    var nextIndex;
+    do { nextIndex = Math.floor(Math.random() * physFacts.length); }
+    while (nextIndex === physFactIndex && physFacts.length > 1);
+    physFactIndex = nextIndex;
+
+    if (prefersReducedMotion) {
+      physFactTextEl.textContent = physFacts[physFactIndex];
+      return;
+    }
+    physFactTextEl.classList.add("fading");
+    window.setTimeout(function () {
+      physFactTextEl.textContent = physFacts[physFactIndex];
+      physFactTextEl.classList.remove("fading");
+    }, 200);
+  }
+
+  if (physFactBtn) physFactBtn.addEventListener("click", showNextPhysFact);
+
+})();
+</script>
+</body>
+</html>

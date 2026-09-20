@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biology — S1 Science Lab</title>
+<meta name="description" content="Explore cells, plants, the human body, photosynthesis and ecosystems through interactive simulations on S1 Science Lab.">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — Biology page (internal styles)
+   Same token system as index.html / chemistry.html / physics.html
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F4FBF7;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --navy:#0B1226;
+  --card-radius:20px;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,sans-serif;
+  --mono:"JetBrains Mono",monospace;
+
+  --bio-primary:#16A34A;
+  --bio-secondary:#059669;
+  --bio-teal:#0D9488;
+  --bio-sky:#38BDF8;
+  --bio-navy:#062012;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{ font-family:var(--body); color:var(--ink); background:var(--paper); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+a{ text-decoration:none; }
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+a:focus-visible, button:focus-visible, .btn:focus-visible, [tabindex]:focus-visible, .cell-hotspot:focus-visible{
+  outline:3px solid var(--bio-teal); outline-offset:2px; border-radius:8px;
+}
+.skip-link{ position:absolute; left:-999px; top:auto; background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px; z-index:2000; }
+.skip-link:focus{ left:1rem; top:1rem; }
+
+.lab-nav{ position:sticky; top:0; z-index:1000; padding:.65rem 0; background:rgba(244,251,247,.78);
+  backdrop-filter:blur(14px) saturate(160%); -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06); transition:box-shadow .25s ease, background .25s ease; }
+.lab-nav.is-scrolled{ box-shadow:0 6px 24px rgba(15,23,42,.08); background:rgba(244,251,247,.94); }
+.lab-brand{ display:flex; align-items:center; gap:.6rem; font-family:var(--display); font-weight:700; font-size:1.15rem; color:var(--ink); }
+.lab-brand .mark{ width:38px; height:38px; border-radius:11px; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--bio-primary),var(--bio-teal)); color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(22,163,74,.35); }
+.lab-brand .mark i{ display:block; line-height:1; }
+.lab-brand:hover{ color:var(--ink); }
+.lab-links .nav-link{ color:var(--ink-soft); font-weight:600; font-size:.95rem; padding:.5rem .85rem !important; border-radius:10px;
+  transition:color .15s ease, background .15s ease; }
+.lab-links .nav-link:hover{ color:var(--bio-primary); background:rgba(22,163,74,.08); }
+.lab-links .nav-link.active{ color:var(--bio-primary); background:rgba(22,163,74,.12); }
+.btn-bio-primary{ background:linear-gradient(135deg,var(--bio-primary),var(--bio-secondary)); color:#fff; font-weight:700; border:none;
+  padding:.55rem 1.35rem; border-radius:12px; box-shadow:0 8px 20px rgba(22,163,74,.28);
+  transition:transform .15s ease, box-shadow .15s ease; }
+.btn-bio-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(22,163,74,.4); }
+.btn-bio-outline{ border:1.5px solid rgba(15,23,42,.15); color:var(--ink); font-weight:600; padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff; transition:border-color .15s ease, transform .15s ease; }
+.btn-bio-outline:hover{ color:var(--ink); border-color:var(--bio-primary); transform:translateY(-2px); }
+.btn-bio-ghost{ border:1.5px solid rgba(255,255,255,.28); color:#fff; font-weight:600; padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.05); transition:border-color .15s ease, background .15s ease, transform .15s ease; }
+.btn-bio-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.1); transform:translateY(-2px); }
+
+.bio-hero{ position:relative; color:#fff; padding:5.5rem 0 6.5rem; overflow:hidden; isolation:isolate;
+  background:radial-gradient(120% 140% at 20% -10%, #14532D 0%, var(--bio-navy) 55%, #02140C 100%); }
+.bio-hero::before{ content:""; position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(52,211,153,.28) 1.3px, transparent 1.4px);
+  background-size:34px 34px; mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%); }
+.bio-eyebrow{ display:inline-flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.78rem; color:#A7F3D0;
+  background:rgba(16,185,129,.14); border:1px solid rgba(52,211,153,.4); padding:.35rem .8rem; border-radius:999px; }
+.bio-hero h1{ font-size:clamp(2.15rem,4.4vw,3.4rem); font-weight:700; line-height:1.1; margin:1.1rem 0; }
+.bio-hero h1 .accent{ background:linear-gradient(100deg,#6EE7B7,#38BDF8 55%,#C4B5FD);
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.bio-hero p.lead-copy{ color:#D1FAE5; font-size:1.06rem; max-width:34rem; line-height:1.65; }
+.bio-hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+.bio-lab-art{ position:relative; width:100%; max-width:460px; margin-inline:auto; z-index:1; }
+.bio-lab-art svg{ width:100%; height:auto; overflow:visible; }
+.float-a{ animation:floatA 6s ease-in-out infinite; }
+.float-b{ animation:floatA 7.5s ease-in-out infinite; animation-delay:.4s; }
+.float-c{ animation:floatA 5.2s ease-in-out infinite; animation-delay:.8s; }
+.spin-dna{ animation:spinA 18s linear infinite; transform-origin:210px 90px; }
+.sway{ animation:sway 3.6s ease-in-out infinite; transform-origin:bottom center; }
+.particle{ animation:drift 8s ease-in-out infinite; }
+@keyframes floatA{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+@keyframes spinA{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+@keyframes sway{ 0%,100%{ transform:rotate(-4deg);} 50%{ transform:rotate(4deg);} }
+@keyframes drift{ 0%,100%{ transform:translate(0,0); opacity:.55;} 50%{ transform:translate(8px,-14px); opacity:.95;} }
+
+.section{ padding:5.5rem 0; }
+.section-tight{ padding:4.5rem 0; }
+.section-head{ max-width:680px; }
+.section-head h2{ font-size:clamp(1.7rem,3vw,2.3rem); font-weight:700; margin-bottom:.6rem; }
+.section-head p{ color:var(--ink-soft); font-size:1.03rem; line-height:1.6; }
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.is-visible{ opacity:1; transform:none; }
+.step-flow{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; font-family:var(--mono); font-size:.78rem;
+  color:var(--ink-soft); margin-bottom:1rem; }
+.step-flow span{ padding:.25rem .6rem; border-radius:999px; background:#fff; border:1px solid rgba(15,23,42,.08); }
+.step-flow i{ font-size:.7rem; }
+.model-note{ font-size:.78rem; color:var(--ink-soft); margin-top:.75rem; }
+
+.concept-card{ background:#fff; border-radius:var(--card-radius); padding:1.9rem; height:100%;
+  border:1px solid rgba(15,23,42,.06); box-shadow:0 1px 2px rgba(15,23,42,.04); transition:transform .2s ease, box-shadow .2s ease; }
+.concept-card:hover{ transform:translateY(-6px); box-shadow:0 16px 32px rgba(15,23,42,.1); }
+.concept-card .icon-tile{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; font-size:1.3rem; color:#fff; margin-bottom:1rem; }
+.concept-card h3{ font-size:1.15rem; font-weight:700; margin-bottom:.5rem; }
+.concept-card p{ color:var(--ink-soft); font-size:.95rem; line-height:1.6; margin:0; }
+
+.topic-card{ background:#fff; border-radius:16px; padding:1.5rem; height:100%; border:1px solid rgba(15,23,42,.06);
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; display:flex; flex-direction:column; }
+.topic-card:hover{ transform:translateY(-5px); box-shadow:0 14px 28px rgba(15,23,42,.09); border-color:var(--bio-primary); }
+.topic-card .ico{ width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:1.15rem; color:#fff;
+  background:linear-gradient(135deg,var(--bio-primary),var(--bio-teal)); margin-bottom:.9rem; }
+.topic-card h3{ font-size:1.02rem; font-weight:700; margin-bottom:.4rem; }
+.topic-card p{ color:var(--ink-soft); font-size:.88rem; line-height:1.5; margin-bottom:.9rem; flex:1; }
+.topic-card a, .topic-card button{ align-self:flex-start; font-weight:700; font-size:.87rem; color:var(--bio-primary); background:none; border:none; padding:0;
+  display:inline-flex; align-items:center; gap:.35rem; }
+.topic-card a:hover, .topic-card button:hover{ text-decoration:underline; color:var(--bio-primary); }
+
+.lab-panel{ background:linear-gradient(160deg,#052016 0%, #0B3B2A 100%); border-radius:26px; color:#fff; padding:2.2rem; overflow:hidden; }
+.lab-panel-badge{ display:inline-flex; align-items:center; gap:.45rem; font-family:var(--mono); font-size:.75rem; color:#A7F3D0;
+  background:rgba(16,185,129,.14); border:1px solid rgba(52,211,153,.35); padding:.3rem .7rem; border-radius:999px; }
+.lab-stage-wrap{ display:grid; grid-template-columns:1.2fr .8fr; gap:1.6rem; margin-top:1.3rem; }
+@media (max-width:991.98px){ .lab-stage-wrap{ grid-template-columns:1fr; } }
+.lab-stage{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1.1rem; }
+.lab-controls{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:1.3rem; }
+.lab-controls h3{ font-size:1.05rem; font-weight:700; }
+.lab-controls p, .lab-explain{ font-size:.9rem; color:#D1FAE5; line-height:1.55; }
+.cell-switch{ display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+.cell-switch button{ flex:1; min-width:120px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.04); color:#fff;
+  border-radius:10px; padding:.55rem .6rem; font-size:.85rem; font-weight:700; min-height:44px; }
+.cell-switch button.active, .cell-switch button:hover{ background:rgba(16,185,129,.22); border-color:#6EE7B7; }
+.cell-svg-wrap{ width:100%; }
+.cell-svg-wrap svg{ width:100%; height:auto; max-height:460px; display:block; }
+.cell-hotspot{ cursor:pointer; transition:filter .2s ease, opacity .2s ease; }
+.cell-hotspot:hover{ filter:brightness(1.12); }
+.cell-hotspot.is-selected{ filter:drop-shadow(0 0 8px #FDE68A) brightness(1.15); }
+.plant-only{ display:none; }
+.cell-diagram.is-plant .plant-only{ display:block; }
+.cell-diagram.is-plant .animal-hide{ display:none; }
+.info-chip{ display:inline-block; font-family:var(--mono); font-size:.72rem; padding:.2rem .55rem; border-radius:999px;
+  background:rgba(56,189,248,.18); color:#BAE6FD; margin-bottom:.5rem; }
+.function-box{ background:rgba(0,0,0,.22); border-radius:12px; padding:.85rem 1rem; margin-top:.8rem; }
+.function-box .lbl{ font-size:.72rem; color:#A7F3D0; margin-bottom:.2rem; }
+
+.seg-group{ display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1rem; }
+.seg-group button{ min-height:42px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.04); color:#fff;
+  border-radius:9px; padding:.4rem .75rem; font-size:.8rem; font-weight:600; }
+.seg-group button.active{ background:rgba(16,185,129,.24); border-color:#6EE7B7; }
+.seg-group legend, .control-label{ font-weight:700; font-size:.83rem; color:#D1FAE5; display:block; margin-bottom:.4rem; }
+.readout-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:.7rem; margin-top:.4rem; }
+@media (min-width:576px){ .readout-grid.readout-5{ grid-template-columns:repeat(5,1fr); } }
+.readout{ background:rgba(255,255,255,.06); border-radius:10px; padding:.6rem .7rem; text-align:center; }
+.readout .lbl{ font-size:.68rem; color:#A7C4B6; margin-bottom:.15rem; }
+.readout .val{ font-family:var(--mono); font-weight:700; font-size:.95rem; color:#fff; }
+.photo-visual{ position:relative; min-height:280px; }
+.photo-plant{ transition:filter .4s ease, transform .4s ease; transform-origin:bottom center; }
+.photo-plant.wilt{ filter:saturate(.4) brightness(.85); transform:rotate(3deg); }
+.photo-plant.dark{ filter:brightness(.45) saturate(.6); }
+.photo-plant.thrive{ filter:saturate(1.25) brightness(1.08); }
+.bubble-o2, .bubble-co2{ animation:bubbleRise 3.2s ease-in infinite; }
+@keyframes bubbleRise{ 0%{ opacity:.9; transform:translateY(0);} 100%{ opacity:0; transform:translateY(-48px);} }
+.meter{ height:10px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden; margin-top:.35rem; }
+.meter span{ display:block; height:100%; width:0%; background:linear-gradient(90deg,#34D399,#38BDF8); border-radius:999px; transition:width .4s ease; }
+
+.lungs-svg{ width:100%; height:auto; max-height:380px; }
+.lung{ transform-box:fill-box; transform-origin:center; transition:transform .7s ease; }
+.lungs-stage.inhale .lung{ transform:scale(1.12); }
+.lungs-stage.exhale .lung{ transform:scale(.9); }
+.diaphragm{ transition:transform .7s ease; }
+.lungs-stage.inhale .diaphragm{ transform:translateY(10px); }
+.lungs-stage.exhale .diaphragm{ transform:translateY(-4px); }
+.air-flow{ opacity:0; transition:opacity .4s ease; }
+.lungs-stage.inhale .air-in{ opacity:1; }
+.lungs-stage.exhale .air-out{ opacity:1; }
+
+.digest-layout{ display:grid; grid-template-columns:1.1fr .9fr; gap:1.4rem; }
+@media (max-width:991.98px){ .digest-layout{ grid-template-columns:1fr; } }
+.organs-list{ display:flex; flex-direction:column; gap:.45rem; }
+.organs-list button{ text-align:left; border:1.5px solid rgba(15,23,42,.08); background:#fff; border-radius:12px; padding:.75rem 1rem;
+  font-weight:700; min-height:44px; color:var(--ink); }
+.organs-list button.active{ border-color:var(--bio-primary); background:#ECFDF5; }
+.digest-svg-wrap svg{ width:100%; height:auto; max-height:420px; }
+.food-dot{ offset-path:path("M180 42 C180 42, 180 90, 180 118 C180 150, 168 168, 178 210 C190 255, 150 280, 168 318 C180 345, 200 360, 210 390");
+  offset-distance:0%; animation:none; }
+.food-dot.moving{ animation:foodTravel 7s linear forwards; }
+@keyframes foodTravel{ to{ offset-distance:100%; } }
+.organ-hot{ cursor:pointer; }
+.organ-hot.is-selected{ filter:drop-shadow(0 0 6px #FBBF24); }
+
+.plant-explore svg{ width:100%; height:auto; max-height:440px; }
+.plant-part{ cursor:pointer; }
+.plant-part.is-selected{ filter:drop-shadow(0 0 7px #FDE68A); }
+
+.eco-chain, .food-chain{ display:flex; flex-wrap:wrap; align-items:stretch; justify-content:center; gap:.7rem; }
+.eco-node, .chain-node{ background:#fff; border:1.5px solid rgba(15,23,42,.08); border-radius:16px; padding:1rem .9rem; min-width:118px;
+  flex:1 1 118px; max-width:160px; text-align:center; cursor:pointer; min-height:44px; }
+.eco-node:hover, .chain-node:hover, .eco-node.active, .chain-node.active{ border-color:var(--bio-primary); transform:translateY(-3px);
+  box-shadow:0 10px 22px rgba(15,23,42,.08); }
+.eco-node .emoji, .chain-node .emoji{ font-size:1.7rem; display:block; margin-bottom:.35rem; }
+.chain-arrow{ display:flex; align-items:center; color:var(--bio-primary); font-weight:700; }
+@media (max-width:575.98px){ .chain-arrow{ width:100%; justify-content:center; transform:rotate(90deg); height:1.2rem; } }
+.role-badge{ display:inline-block; font-family:var(--mono); font-size:.7rem; padding:.2rem .5rem; border-radius:999px; margin-top:.3rem; }
+.role-producer{ background:#DCFCE7; color:#166534; }
+.role-consumer{ background:#DBEAFE; color:#1E40AF; }
+.role-decomposer{ background:#F3E8FF; color:#6B21A8; }
+
+.mrs-card{ background:#fff; border-radius:16px; padding:1.25rem; height:100%; border:1px solid rgba(15,23,42,.06); }
+.mrs-card .ico{ width:40px; height:40px; border-radius:11px; display:grid; place-items:center; color:#fff; margin-bottom:.7rem; }
+.mrs-card h3{ font-size:.98rem; font-weight:700; }
+.mrs-card p{ font-size:.85rem; color:var(--ink-soft); margin:0; line-height:1.5; }
+.mrs-card .ex{ font-size:.78rem; color:var(--bio-secondary); font-weight:600; margin-top:.45rem; }
+
+.quiz-card{ background:#fff; border-radius:24px; border:1px solid rgba(15,23,42,.07); box-shadow:0 16px 36px rgba(15,23,42,.08);
+  padding:2.2rem; max-width:720px; margin-inline:auto; }
+.quiz-progress{ font-family:var(--mono); font-size:.78rem; color:var(--ink-soft); margin-bottom:.6rem; }
+.quiz-question{ font-size:1.15rem; font-weight:700; margin-bottom:1.3rem; }
+.quiz-options{ display:grid; gap:.7rem; }
+.quiz-option{ text-align:left; background:var(--paper); border:1.5px solid rgba(15,23,42,.08); border-radius:12px; padding:.85rem 1.1rem;
+  font-weight:600; font-size:.95rem; color:var(--ink); min-height:44px; }
+.quiz-option:hover{ border-color:var(--bio-primary); }
+.quiz-option.correct{ border-color:var(--green); background:rgba(22,163,74,.08); }
+.quiz-option.incorrect{ border-color:#EF4444; background:rgba(239,68,68,.07); }
+.quiz-feedback{ margin-top:1.1rem; font-weight:600; font-size:.95rem; min-height:1.4em; }
+.quiz-feedback.correct{ color:var(--green); }
+.quiz-feedback.incorrect{ color:#DC2626; }
+.quiz-next{ margin-top:1.2rem; display:none; }
+.quiz-next.show{ display:inline-flex; }
+.quiz-score{ font-family:var(--mono); font-size:.85rem; color:var(--ink-soft); margin-top:1.4rem; }
+
+.fact-panel{ background:linear-gradient(135deg,#ECFDF5,#E0F2FE); border:1px solid rgba(22,163,74,.15); border-radius:24px;
+  padding:2.5rem; text-align:center; max-width:760px; margin-inline:auto; }
+.fact-panel .ico-badge{ width:54px; height:54px; border-radius:50%; display:grid; place-items:center; margin:0 auto 1rem;
+  background:linear-gradient(135deg,var(--bio-primary),var(--purple)); color:#fff; font-size:1.3rem; }
+#bioFactText{ font-family:var(--display); font-weight:600; font-size:clamp(1.05rem,2.3vw,1.35rem); color:var(--ink);
+  min-height:3.2em; display:flex; align-items:center; justify-content:center; transition:opacity .25s ease; }
+#bioFactText.fading{ opacity:0; }
+
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:#6EE7B7; }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+@media (max-width:575.98px){
+  .lab-panel{ padding:1.2rem; border-radius:18px; }
+  .bio-hero{ padding:4rem 0 4.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .float-a,.float-b,.float-c,.spin-dna,.sway,.particle,.bubble-o2,.bubble-co2,.food-dot.moving{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  .lung, .diaphragm, .photo-plant, .meter span{ transition:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="#topics" class="btn btn-bio-primary">Start Learning</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <header class="bio-hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="bio-eyebrow"><i class="bi bi-heart-pulse"></i> Biology Lab</span>
+          <h1>Explore the World of <span class="accent">Life</span></h1>
+          <p class="lead-copy">Discover cells, plants, the human body, ecosystems and the amazing systems that keep living things alive.</p>
+          <div class="bio-hero-actions">
+            <a href="#topics" class="btn btn-bio-primary">Start Exploring</a>
+            <a href="#cell-explorer" class="btn btn-bio-ghost">Explore a Cell</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="bio-lab-art" role="img" aria-label="Illustration of a biology lab with DNA, a microscope, a plant, a heart, a cell and the Earth">
+            <svg viewBox="0 0 440 400" xmlns="http://www.w3.org/2000/svg">
+              <circle class="particle" cx="40" cy="70" r="4" fill="#6EE7B7" opacity=".6"/>
+              <circle class="particle float-b" cx="400" cy="120" r="5" fill="#C4B5FD" opacity=".7"/>
+              <circle class="particle float-c" cx="60" cy="300" r="3.5" fill="#38BDF8" opacity=".7"/>
+              <circle class="particle" cx="380" cy="310" r="4" fill="#A7F3D0" opacity=".6" style="animation-delay:1.2s"/>
+
+              <g class="spin-dna" aria-hidden="true">
+                <text x="188" y="80" font-size="42">🧬</text>
+              </g>
+              <g class="float-a" transform="translate(320,40)">
+                <text font-size="40">🔬</text>
+              </g>
+              <g class="sway" transform="translate(40,180)">
+                <text font-size="48">🌱</text>
+              </g>
+              <g class="float-b" transform="translate(330,210)">
+                <text font-size="40">🫀</text>
+              </g>
+              <g class="float-c" transform="translate(150,230)">
+                <ellipse rx="46" ry="34" fill="#86EFAC" fill-opacity=".35" stroke="#6EE7B7" stroke-width="2"/>
+                <circle cx="-6" cy="-2" r="12" fill="#A7F3D0"/>
+                <circle cx="14" cy="8" r="6" fill="#34D399"/>
+                <text x="-12" y="48" font-size="13" fill="#A7F3D0" font-family="Inter,sans-serif">🦠 Cell</text>
+              </g>
+              <g class="float-a" transform="translate(250,300)">
+                <text font-size="42">🌍</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section" id="what-is-biology" aria-labelledby="whatBioHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <div class="step-flow"><span>See</span><i class="bi bi-arrow-right"></i><span>Understand</span></div>
+        <h2 id="whatBioHeading">What is Biology?</h2>
+        <p>Biology is the study of living things and how they grow, survive, reproduce and interact with their environment.</p>
+      </div>
+      <div class="row g-4 mt-2">
+        <div class="col-md-4 reveal">
+          <article class="concept-card">
+            <div class="icon-tile" style="background:linear-gradient(135deg,#16A34A,#059669);"><i class="bi bi-bug"></i></div>
+            <h3>Living Things</h3>
+            <p>Plants, animals, humans and microorganisms are examples of living things.</p>
+          </article>
+        </div>
+        <div class="col-md-4 reveal">
+          <article class="concept-card">
+            <div class="icon-tile" style="background:linear-gradient(135deg,#0D9488,#38BDF8);"><i class="bi bi-circle-half"></i></div>
+            <h3>Cells</h3>
+            <p>Cells are the basic units that make up living organisms.</p>
+          </article>
+        </div>
+        <div class="col-md-4 reveal">
+          <article class="concept-card">
+            <div class="icon-tile" style="background:linear-gradient(135deg,#7C3AED,#38BDF8);"><i class="bi bi-activity"></i></div>
+            <h3>Life Processes</h3>
+            <p>Living things carry out processes such as nutrition, respiration, growth and reproduction.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="topics" style="background:#fff;" aria-labelledby="topicsHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="topicsHeading">What Would You Like to Explore?</h2>
+        <p>Choose a topic, then click, watch and test ideas in the lab below.</p>
+      </div>
+      <div class="row g-3 mt-2">
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-circle"></i></div>
+            <h3>Cell</h3>
+            <p>Look inside animal and plant cells and learn what each part does.</p>
+            <a href="#cell-explorer">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-person"></i></div>
+            <h3>Human Body</h3>
+            <p>See how breathing and digestion keep your body working.</p>
+            <a href="#respiration">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-flower1"></i></div>
+            <h3>Plants</h3>
+            <p>Click roots, stem, leaves and flowers to learn their jobs.</p>
+            <a href="#plant-explorer">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-sun"></i></div>
+            <h3>Photosynthesis</h3>
+            <p>Change light, water and carbon dioxide and watch a plant respond.</p>
+            <a href="#photosynthesis">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-lungs"></i></div>
+            <h3>Respiration</h3>
+            <p>Animate inhaling and exhaling to see how air moves in and out.</p>
+            <a href="#respiration">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-sm-6 col-lg-4 reveal">
+          <article class="topic-card">
+            <div class="ico"><i class="bi bi-globe2"></i></div>
+            <h3>Ecosystems</h3>
+            <p>Follow energy from plants to animals and decomposers.</p>
+            <a href="#ecosystem">Explore <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cell-explorer" aria-labelledby="cellHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <div class="step-flow"><span>See</span><i class="bi bi-arrow-right"></i><span>Click</span><i class="bi bi-arrow-right"></i><span>Explore</span></div>
+        <h2 id="cellHeading">Explore a Cell</h2>
+        <p>Click a part of the cell to learn its name and job. Switch between animal and plant cells.</p>
+      </div>
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-intersect"></i> Simplified educational model</span>
+        <div class="lab-stage-wrap">
+          <div class="lab-stage">
+            <div class="cell-switch" role="group" aria-label="Choose cell type">
+              <button type="button" id="btnAnimalCell" class="active" aria-pressed="true">Animal cell</button>
+              <button type="button" id="btnPlantCell" aria-pressed="false">Plant cell</button>
+            </div>
+            <div class="cell-svg-wrap">
+              <svg id="cellDiagram" class="cell-diagram is-animal" viewBox="0 0 420 380" role="img" aria-labelledby="cellTitle cellDesc">
+                <title id="cellTitle">Interactive cell diagram</title>
+                <desc id="cellDesc">Click labelled parts to read what they do. This is a simplified educational model, not a real microscope image.</desc>
+                <g class="plant-only" id="part-cellwall">
+                  <rect class="cell-hotspot" data-part="cellwall" x="18" y="18" width="384" height="344" rx="28" fill="#BBF7D0" stroke="#166534" stroke-width="10" tabindex="0" role="button" aria-label="Cell wall"/>
+                </g>
+                <ellipse class="cell-hotspot animal-hide" id="part-membrane-animal" data-part="membrane" cx="210" cy="190" rx="168" ry="148" fill="#FEF3C7" stroke="#F59E0B" stroke-width="8" tabindex="0" role="button" aria-label="Cell membrane"/>
+                <rect class="cell-hotspot plant-only" id="part-membrane-plant" data-part="membrane" x="36" y="36" width="348" height="308" rx="20" fill="#ECFDF5" stroke="#F59E0B" stroke-width="5" tabindex="0" role="button" aria-label="Cell membrane"/>
+                <ellipse class="cell-hotspot animal-hide" data-part="cytoplasm" cx="210" cy="190" rx="150" ry="130" fill="#FEF9C3" fill-opacity=".55" tabindex="0" role="button" aria-label="Cytoplasm"/>
+                <rect class="cell-hotspot plant-only" data-part="cytoplasm" x="48" y="48" width="324" height="284" rx="14" fill="#A7F3D0" fill-opacity=".35" tabindex="0" role="button" aria-label="Cytoplasm"/>
+                <ellipse class="cell-hotspot plant-only" data-part="vacuole" cx="168" cy="200" rx="78" ry="96" fill="#7DD3FC" fill-opacity=".75" stroke="#0284C7" stroke-width="2" tabindex="0" role="button" aria-label="Vacuole"/>
+                <text class="plant-only" x="140" y="205" fill="#0C4A6E" font-size="12" font-weight="700" pointer-events="none">Vacuole</text>
+                <g class="cell-hotspot" data-part="nucleus" tabindex="0" role="button" aria-label="Nucleus">
+                  <circle cx="268" cy="150" r="42" fill="#C4B5FD" stroke="#6D28D9" stroke-width="3"/>
+                  <circle cx="268" cy="150" r="14" fill="#7C3AED"/>
+                  <text x="248" y="112" fill="#4C1D95" font-size="12" font-weight="700">Nucleus</text>
+                </g>
+                <g class="cell-hotspot" data-part="mitochondria" tabindex="0" role="button" aria-label="Mitochondria">
+                  <ellipse cx="120" cy="120" rx="28" ry="14" fill="#FDBA74" stroke="#C2410C" stroke-width="2"/>
+                  <path d="M104 120 Q120 110 136 120 Q120 130 104 120" fill="none" stroke="#9A3412" stroke-width="1.5"/>
+                  <ellipse cx="300" cy="250" rx="26" ry="13" fill="#FDBA74" stroke="#C2410C" stroke-width="2"/>
+                  <text x="78" y="98" fill="#9A3412" font-size="11" font-weight="700">Mitochondria</text>
+                </g>
+                <g class="cell-hotspot" data-part="ribosomes" tabindex="0" role="button" aria-label="Ribosomes">
+                  <circle cx="150" cy="250" r="5" fill="#334155"/>
+                  <circle cx="168" cy="262" r="4.5" fill="#334155"/>
+                  <circle cx="132" cy="268" r="4" fill="#334155"/>
+                  <circle cx="330" cy="120" r="5" fill="#334155"/>
+                  <circle cx="342" cy="136" r="4" fill="#334155"/>
+                  <text x="118" y="292" fill="#1E293B" font-size="11" font-weight="700">Ribosomes</text>
+                </g>
+                <g class="cell-hotspot plant-only" data-part="chloroplast" tabindex="0" role="button" aria-label="Chloroplast">
+                  <ellipse cx="310" cy="300" rx="32" ry="16" fill="#22C55E" stroke="#166534" stroke-width="2"/>
+                  <ellipse cx="90" cy="300" rx="30" ry="15" fill="#16A34A" stroke="#166534" stroke-width="2"/>
+                  <text x="250" y="328" fill="#14532D" font-size="12" font-weight="700">Chloroplast</text>
+                </g>
+                <text class="animal-hide" x="150" y="48" fill="#92400E" font-size="12" font-weight="700">Cell membrane</text>
+                <text class="plant-only" x="150" y="30" fill="#14532D" font-size="12" font-weight="700">Cell wall</text>
+              </svg>
+            </div>
+            <p class="model-note" style="color:#A7C4B6;">Simplified educational model. Real cells are more complex and look different under a microscope.</p>
+          </div>
+          <div class="lab-controls">
+            <p class="info-chip" id="cellTypeChip">Animal cell</p>
+            <h3 id="cellPartName">Choose a part</h3>
+            <p id="cellPartExplain">Tap a labelled structure on the diagram. The highlight and this panel will tell you what it does.</p>
+            <div class="function-box">
+              <div class="lbl">Function</div>
+              <p class="mb-0" id="cellPartFunction">Waiting for your click…</p>
+            </div>
+            <p class="mt-3 mb-0" id="cellCompareNote" style="color:#A7F3D0;">Plant cells have structures such as a cell wall and chloroplasts that animal cells do not.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="photosynthesis" style="background:#fff;" aria-labelledby="photoHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <div class="step-flow"><span>Observe</span><i class="bi bi-arrow-right"></i><span>Try</span></div>
+        <h2 id="photoHeading">Experiment: Photosynthesis</h2>
+        <p>Plants use light energy, water and carbon dioxide to make glucose and release oxygen.</p>
+      </div>
+      <p class="reveal mt-3 mb-0" style="font-family:var(--mono); font-size:.95rem;">
+        Carbon dioxide + Water <strong>+ Light energy</strong> → Glucose + Oxygen
+      </p>
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-info-circle"></i> Educational model — not a precise measurement of real photosynthesis.</span>
+        <div class="lab-stage-wrap">
+          <div class="lab-stage photo-visual">
+            <svg viewBox="0 0 420 300" role="img" aria-label="Animated plant using light, water and carbon dioxide">
+              <text id="sunIcon" x="180" y="42" font-size="36">☀️</text>
+              <text x="200" y="62" font-size="16" fill="#A7F3D0">↓ light</text>
+              <g id="photoPlant" class="photo-plant">
+                <rect x="198" y="150" width="10" height="90" fill="#166534" rx="3"/>
+                <ellipse cx="176" cy="150" rx="28" ry="14" fill="#22C55E" transform="rotate(-25 176 150)"/>
+                <ellipse cx="230" cy="148" rx="28" ry="14" fill="#16A34A" transform="rotate(25 230 148)"/>
+                <ellipse cx="210" cy="128" rx="22" ry="12" fill="#4ADE80"/>
+                <text x="188" y="258" font-size="28">🌱</text>
+              </g>
+              <g id="co2Bubbles">
+                <circle class="bubble-co2" cx="70" cy="210" r="8" fill="#38BDF8" opacity=".8"/>
+                <text x="40" y="240" fill="#BAE6FD" font-size="13">↑ CO₂</text>
+              </g>
+              <g id="h2oMarks">
+                <text x="300" y="250" fill="#7DD3FC" font-size="13">↓ H₂O</text>
+              </g>
+              <g id="o2Bubbles">
+                <circle class="bubble-o2" cx="320" cy="120" r="7" fill="#86EFAC"/>
+                <circle class="bubble-o2" cx="340" cy="140" r="5" fill="#6EE7B7" style="animation-delay:.8s"/>
+                <text x="310" y="90" fill="#A7F3D0" font-size="13">↑ O₂</text>
+              </g>
+            </svg>
+          </div>
+          <div class="lab-controls">
+            <fieldset class="mb-2">
+              <legend class="control-label">Light</legend>
+              <div class="seg-group" id="lightControls">
+                <button type="button" data-light="off">Off</button>
+                <button type="button" data-light="on" class="active">On</button>
+              </div>
+            </fieldset>
+            <fieldset class="mb-2">
+              <legend class="control-label">Water</legend>
+              <div class="seg-group" id="waterControls">
+                <button type="button" data-water="low">Low</button>
+                <button type="button" data-water="normal" class="active">Normal</button>
+                <button type="button" data-water="high">High</button>
+              </div>
+            </fieldset>
+            <fieldset class="mb-2">
+              <legend class="control-label">Carbon dioxide</legend>
+              <div class="seg-group" id="co2Controls">
+                <button type="button" data-co2="low">Low</button>
+                <button type="button" data-co2="normal" class="active">Normal</button>
+                <button type="button" data-co2="high">High</button>
+              </div>
+            </fieldset>
+            <div class="readout-grid readout-5">
+              <div class="readout"><div class="lbl">Light</div><div class="val" id="readLight">ON</div></div>
+              <div class="readout"><div class="lbl">Water</div><div class="val" id="readWater">Normal</div></div>
+              <div class="readout"><div class="lbl">CO₂</div><div class="val" id="readCo2">Normal</div></div>
+              <div class="readout"><div class="lbl">Plant activity</div><div class="val" id="readActivity">High</div></div>
+              <div class="readout"><div class="lbl">Model</div><div class="val">Simple</div></div>
+            </div>
+            <div class="mt-3">
+              <div class="lbl" style="font-size:.75rem;color:#A7C4B6;">Oxygen released (model)</div>
+              <div class="meter" aria-hidden="true"><span id="o2Meter"></span></div>
+              <div class="lbl mt-2" style="font-size:.75rem;color:#A7C4B6;">Glucose made (model)</div>
+              <div class="meter" aria-hidden="true"><span id="gluMeter"></span></div>
+            </div>
+            <p class="lab-explain mt-3 mb-0" id="photoExplain">With light on and normal water and CO₂, the plant can photosynthesise well.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="respiration" aria-labelledby="breathHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="breathHeading">How Do We Breathe?</h2>
+        <p>During inhalation, air enters the lungs. During exhalation, air leaves the lungs.</p>
+      </div>
+      <div class="lab-panel reveal mt-4">
+        <span class="lab-panel-badge"><i class="bi bi-lungs"></i> Simplified educational model</span>
+        <div class="lab-stage-wrap">
+          <div class="lab-stage lungs-stage" id="lungsStage">
+            <svg class="lungs-svg" viewBox="0 0 360 340" role="img" aria-label="Nose, trachea, lungs and diaphragm">
+              <text x="155" y="28" font-size="13" fill="#A7F3D0">Nose</text>
+              <ellipse cx="180" cy="42" rx="22" ry="12" fill="#FECACA"/>
+              <rect x="172" y="52" width="16" height="52" rx="6" fill="#FDBA74"/>
+              <text x="196" y="80" font-size="12" fill="#FDE68A">Trachea</text>
+              <g class="lung" id="lungL">
+                <ellipse cx="130" cy="170" rx="48" ry="72" fill="#FCA5A5" stroke="#B91C1C" stroke-width="2"/>
+              </g>
+              <g class="lung" id="lungR">
+                <ellipse cx="230" cy="170" rx="48" ry="72" fill="#FCA5A5" stroke="#B91C1C" stroke-width="2"/>
+              </g>
+              <text x="148" y="175" font-size="13" fill="#7F1D1D" font-weight="700">Lungs</text>
+              <path class="diaphragm" d="M78 250 Q180 268 282 250" stroke="#38BDF8" stroke-width="8" fill="none" stroke-linecap="round"/>
+              <text x="130" y="292" fill="#BAE6FD" font-size="12">Diaphragm</text>
+              <g class="air-flow air-in">
+                <text x="20" y="90" fill="#86EFAC" font-size="12">Air in ↓</text>
+              </g>
+              <g class="air-flow air-out">
+                <text x="270" y="90" fill="#FDE68A" font-size="12">Air out ↑</text>
+              </g>
+            </svg>
+          </div>
+          <div class="lab-controls">
+            <div class="d-flex gap-2 flex-wrap">
+              <button type="button" class="btn btn-bio-primary" id="btnInhale">Inhale</button>
+              <button type="button" class="btn btn-bio-outline" id="btnExhale" style="color:#fff;border-color:rgba(255,255,255,.3);background:transparent;">Exhale</button>
+            </div>
+            <p class="lab-explain mt-3" id="breathExplain">Press Inhale. The diaphragm moves down and the lungs get larger as air comes in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="digestion" style="background:#fff;" aria-labelledby="digestHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="digestHeading">A Journey Through Digestion</h2>
+        <p>Food is broken down so nutrients can be absorbed. Click each organ. Then watch a simplified food journey.</p>
+      </div>
+      <div class="digest-layout reveal mt-4">
+        <div>
+          <div class="digest-svg-wrap lab-panel" style="padding:1rem;">
+            <svg viewBox="0 0 360 430" role="img" aria-label="Digestive organs from mouth to large intestine">
+              <circle class="organ-hot" data-organ="mouth" cx="180" cy="40" r="22" fill="#FCA5A5" tabindex="0" role="button" aria-label="Mouth"/>
+              <text x="210" y="46" fill="#fff" font-size="12">Mouth</text>
+              <rect class="organ-hot" data-organ="oesophagus" x="172" y="62" width="16" height="70" fill="#FDBA74" tabindex="0" role="button" aria-label="Oesophagus"/>
+              <text x="196" y="100" fill="#FDE68A" font-size="12">Oesophagus</text>
+              <ellipse class="organ-hot" data-organ="stomach" cx="176" cy="200" rx="42" ry="32" fill="#FB7185" tabindex="0" role="button" aria-label="Stomach"/>
+              <text x="226" y="205" fill="#fff" font-size="12">Stomach</text>
+              <path class="organ-hot" data-organ="small" d="M150 240 C120 270 210 280 160 320 C120 350 210 360 180 390" fill="none" stroke="#F59E0B" stroke-width="14" stroke-linecap="round" tabindex="0" role="button" aria-label="Small intestine"/>
+              <text x="24" y="320" fill="#FDE68A" font-size="12">Small intestine</text>
+              <path class="organ-hot" data-organ="large" d="M80 250 H280 V400 H100" fill="none" stroke="#84CC16" stroke-width="10" tabindex="0" role="button" aria-label="Large intestine"/>
+              <text x="200" y="418" fill="#BBF7D0" font-size="12">Large intestine</text>
+              <circle class="food-dot" id="foodDot" r="8" fill="#FACC15" cx="180" cy="42"/>
+            </svg>
+          </div>
+          <button type="button" class="btn btn-bio-primary mt-3" id="btnWatchFood">Watch food move</button>
+        </div>
+        <div>
+          <div class="organs-list" id="organButtons">
+            <button type="button" data-organ="mouth">Mouth</button>
+            <button type="button" data-organ="oesophagus">Oesophagus</button>
+            <button type="button" data-organ="stomach">Stomach</button>
+            <button type="button" data-organ="small">Small intestine</button>
+            <button type="button" data-organ="large">Large intestine</button>
+          </div>
+          <article class="concept-card mt-3" style="box-shadow:none;">
+            <h3 id="organName">Mouth</h3>
+            <p id="organExplain">Teeth chew food and saliva starts to break it down.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="plant-explorer" aria-labelledby="plantHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="plantHeading">Plant Explorer</h2>
+        <p>Click each part of the plant. Watch the leaves and flower move gently.</p>
+      </div>
+      <div class="lab-stage-wrap reveal mt-4">
+        <div class="lab-stage plant-explore" style="background:#fff;border:1px solid rgba(15,23,42,.08);">
+          <svg viewBox="0 0 360 420" role="img" aria-label="Interactive flowering plant">
+            <rect x="0" y="300" width="360" height="120" fill="#D6B589"/>
+            <g class="plant-part" data-plant="roots" tabindex="0" role="button" aria-label="Roots">
+              <path d="M180 300 Q160 350 140 400" stroke="#92400E" stroke-width="4" fill="none"/>
+              <path d="M180 300 Q200 360 220 400" stroke="#92400E" stroke-width="4" fill="none"/>
+              <path d="M180 300 Q180 370 170 410" stroke="#78350F" stroke-width="3" fill="none"/>
+            </g>
+            <g class="plant-part sway" data-plant="stem" tabindex="0" role="button" aria-label="Stem">
+              <rect x="172" y="120" width="16" height="180" rx="6" fill="#166534"/>
+            </g>
+            <g class="plant-part sway" data-plant="leaves" tabindex="0" role="button" aria-label="Leaves">
+              <ellipse cx="130" cy="180" rx="40" ry="18" fill="#22C55E"/>
+              <ellipse cx="230" cy="200" rx="40" ry="18" fill="#16A34A"/>
+            </g>
+            <g class="plant-part float-a" data-plant="flower" tabindex="0" role="button" aria-label="Flower">
+              <circle cx="180" cy="100" r="22" fill="#F472B6"/>
+              <circle cx="180" cy="100" r="10" fill="#FDE68A"/>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <article class="concept-card h-100">
+            <p class="info-chip" style="background:#DCFCE7;color:#166534;">Plant organ</p>
+            <h3 id="plantPartName">Choose a part</h3>
+            <p id="plantPartExplain">Tap the roots, stem, leaves or flower.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ecosystem" style="background:#fff;" aria-labelledby="ecoHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="ecoHeading">Ecosystem Simulation</h2>
+        <p>An ecosystem includes living organisms and their environment. Click each part of this simple model.</p>
+      </div>
+      <div class="eco-chain reveal mt-4">
+        <button type="button" class="eco-node" data-eco="sun"><span class="emoji">☀️</span>Sun<span class="role-badge role-producer">Energy source</span></button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="eco-node" data-eco="plants"><span class="emoji">🌱</span>Plants<span class="role-badge role-producer">Producer</span></button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="eco-node" data-eco="herbivore"><span class="emoji">🐛</span>Herbivore<span class="role-badge role-consumer">Consumer</span></button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="eco-node" data-eco="predator"><span class="emoji">🐦</span>Predator<span class="role-badge role-consumer">Consumer</span></button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="eco-node" data-eco="decomposers"><span class="emoji">🍄</span>Decomposers<span class="role-badge role-decomposer">Decomposer</span></button>
+      </div>
+      <article class="concept-card reveal mt-4">
+        <h3 id="ecoName">Sun</h3>
+        <p id="ecoExplain" class="mb-0">The Sun provides light energy that plants can capture.</p>
+      </article>
+      <p class="model-note">Simplified educational model of energy flow. Real ecosystems have many more species and connections.</p>
+    </div>
+  </section>
+
+  <section class="section" id="food-chain" aria-labelledby="foodHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="foodHeading">Food Chain</h2>
+        <p>A food chain shows who eats whom. Click an organism to see its role.</p>
+      </div>
+      <div class="food-chain reveal mt-4">
+        <button type="button" class="chain-node" data-chain="grass"><span class="emoji">🌱</span>Grass</button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="chain-node" data-chain="hopper"><span class="emoji">🐛</span>Grasshopper</button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="chain-node" data-chain="frog"><span class="emoji">🐸</span>Frog</button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="chain-node" data-chain="snake"><span class="emoji">🐍</span>Snake</button>
+        <span class="chain-arrow" aria-hidden="true">↓</span>
+        <button type="button" class="chain-node" data-chain="eagle"><span class="emoji">🦅</span>Eagle</button>
+      </div>
+      <article class="concept-card reveal mt-4">
+        <h3 id="chainName">Grass</h3>
+        <p id="chainExplain" class="mb-0">Grass is a producer because it makes its own food using photosynthesis.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="life-processes" style="background:#fff;" aria-labelledby="lifeHeading">
+    <div class="container container-narrow">
+      <div class="section-head reveal">
+        <h2 id="lifeHeading">Life Processes</h2>
+        <p>Scientists often remember seven life processes. Here they are in everyday language.</p>
+      </div>
+      <div class="row g-3 mt-2">
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#16A34A;"><i class="bi bi-arrows-move"></i></div><h3>Movement</h3><p>Living things can move themselves or parts of themselves.</p><p class="ex">Example: You walk. A plant grows towards light.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#0D9488;"><i class="bi bi-lungs"></i></div><h3>Respiration</h3><p>Cells release energy from food so the organism can stay alive.</p><p class="ex">Example: Your cells use oxygen to help release energy from glucose.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#38BDF8;"><i class="bi bi-eye"></i></div><h3>Sensitivity</h3><p>Living things detect and respond to changes around them.</p><p class="ex">Example: You pull your hand away from something hot.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#7C3AED;"><i class="bi bi-graph-up-arrow"></i></div><h3>Growth</h3><p>Living things increase in size and develop over time.</p><p class="ex">Example: A seedling becomes a taller plant.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#DB2777;"><i class="bi bi-heart"></i></div><h3>Reproduction</h3><p>Living things produce offspring of the same kind.</p><p class="ex">Example: Flowering plants make seeds. Animals have young.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#F59E0B;"><i class="bi bi-droplet"></i></div><h3>Excretion</h3><p>Living things remove waste produced by their cells.</p><p class="ex">Example: You breathe out carbon dioxide. You also produce urine.</p></article></div>
+        <div class="col-sm-6 col-lg-4 reveal"><article class="mrs-card"><div class="ico" style="background:#2563EB;"><i class="bi bi-apple"></i></div><h3>Nutrition</h3><p>Living things take in materials they need for energy and growth.</p><p class="ex">Example: You eat food. Plants make glucose using light.</p></article></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="challenge" aria-labelledby="quizHeading">
+    <div class="container container-narrow">
+      <div class="section-head text-center mx-auto reveal">
+        <h2 id="quizHeading">Biology Challenge</h2>
+        <p>Try these questions. If you miss one, look back at the lab and try again.</p>
+      </div>
+      <div class="quiz-card reveal mt-3">
+        <div class="quiz-progress" id="quizProgress">Question 1</div>
+        <p class="quiz-question" id="quizQuestion"></p>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback" role="status"></div>
+        <button type="button" class="btn btn-bio-primary quiz-next" id="quizNextBtn">Next question</button>
+        <p class="quiz-score" id="quizScore"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="fact-panel reveal">
+        <div class="ico-badge"><i class="bi bi-stars"></i></div>
+        <h2 class="h5 mb-1" style="font-weight:700;">Did You Know?</h2>
+        <p id="bioFactText">Your body is made of trillions of cells.</p>
+        <button class="btn btn-bio-outline mt-2" id="bioFactBtn" type="button">
+          <i class="bi bi-arrow-repeat me-1"></i> Show Another Fact
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Making science easier to see, understand and explore.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-4 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ==========================================================================
+   S1 SCIENCE LAB — Biology page script (internal biology.js + main.js equivalent)
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var nav = document.getElementById("labNav");
+  function updateNavState() {
+    nav.classList.toggle("is-scrolled", window.scrollY > 12);
+  }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl).hide();
+        }
+      });
+    });
+  }
+
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("href");
+      if (targetId.length > 1) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+
+  /* ------------------------------------------------------------------
+     CELL EXPLORER
+  ------------------------------------------------------------------ */
+  var CELL_PARTS = {
+    nucleus: {
+      name: "Nucleus",
+      explain: "The nucleus contains genetic material and helps control many activities of the cell.",
+      fn: "Control centre — DNA here helps the cell know what to do."
+    },
+    mitochondria: {
+      name: "Mitochondria",
+      explain: "They help release usable energy from food for cell activities.",
+      fn: "Often called the cell’s energy helpers."
+    },
+    membrane: {
+      name: "Cell Membrane",
+      explain: "It controls what enters and leaves the cell.",
+      fn: "A thin, flexible barrier around the cell."
+    },
+    cytoplasm: {
+      name: "Cytoplasm",
+      explain: "It is the jelly-like material where many cell activities happen.",
+      fn: "Fills the cell and holds organelles in place."
+    },
+    ribosomes: {
+      name: "Ribosomes",
+      explain: "They help make proteins.",
+      fn: "Tiny protein-building structures."
+    },
+    chloroplast: {
+      name: "Chloroplast",
+      explain: "Plant cells use chloroplasts to capture light energy for photosynthesis.",
+      fn: "Contains green chlorophyll that traps light."
+    },
+    cellwall: {
+      name: "Cell Wall",
+      explain: "It gives plant cells support and helps keep their shape.",
+      fn: "A strong outer layer found in plant cells, not animal cells."
+    },
+    vacuole: {
+      name: "Vacuole",
+      explain: "It stores substances such as water and dissolved materials.",
+      fn: "Plant cells usually have one large central vacuole."
+    }
+  };
+
+  function showCellPart(key) {
+    var data = CELL_PARTS[key];
+    if (!data) return;
+    document.getElementById("cellPartName").textContent = data.name;
+    document.getElementById("cellPartExplain").textContent = data.explain;
+    document.getElementById("cellPartFunction").textContent = data.fn;
+    document.querySelectorAll(".cell-hotspot").forEach(function (el) {
+      el.classList.toggle("is-selected", el.getAttribute("data-part") === key);
+    });
+  }
+
+  function switchCellType(type) {
+    var diagram = document.getElementById("cellDiagram");
+    var animalBtn = document.getElementById("btnAnimalCell");
+    var plantBtn = document.getElementById("btnPlantCell");
+    var isPlant = type === "plant";
+    diagram.classList.toggle("is-plant", isPlant);
+    diagram.classList.toggle("is-animal", !isPlant);
+    animalBtn.classList.toggle("active", !isPlant);
+    plantBtn.classList.toggle("active", isPlant);
+    animalBtn.setAttribute("aria-pressed", String(!isPlant));
+    plantBtn.setAttribute("aria-pressed", String(isPlant));
+    document.getElementById("cellTypeChip").textContent = isPlant ? "Plant cell" : "Animal cell";
+    document.getElementById("cellCompareNote").textContent = isPlant
+      ? "Plant cells have structures such as a cell wall and chloroplasts that animal cells do not."
+      : "This animal cell has a membrane, cytoplasm, nucleus, mitochondria and ribosomes. It does not have a cell wall or chloroplasts.";
+    showCellPart(isPlant ? "cellwall" : "membrane");
+  }
+
+  function initializeCellExplorer() {
+    document.getElementById("btnAnimalCell").addEventListener("click", function () { switchCellType("animal"); });
+    document.getElementById("btnPlantCell").addEventListener("click", function () { switchCellType("plant"); });
+    document.querySelectorAll(".cell-hotspot").forEach(function (el) {
+      function activate() { showCellPart(el.getAttribute("data-part")); }
+      el.addEventListener("click", activate);
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
+      });
+    });
+    switchCellType("animal");
+  }
+
+  initializeCellExplorer();
+
+  /* ------------------------------------------------------------------
+     PHOTOSYNTHESIS
+  ------------------------------------------------------------------ */
+  var photoState = { light: "on", water: "normal", co2: "normal" };
+
+  function updatePlantActivity() {
+    var lightOn = photoState.light === "on";
+    var level = { low: 1, normal: 2, high: 3 };
+    var score = 0;
+    if (lightOn) score = Math.min(level[photoState.water], level[photoState.co2]);
+    var labels = ["Off", "Low", "Medium", "High"];
+    var activity = lightOn ? labels[score] : "Off";
+    var percent = lightOn ? (score / 3) * 100 : 0;
+
+    document.getElementById("readLight").textContent = lightOn ? "ON" : "OFF";
+    document.getElementById("readWater").textContent = photoState.water.charAt(0).toUpperCase() + photoState.water.slice(1);
+    document.getElementById("readCo2").textContent = photoState.co2.charAt(0).toUpperCase() + photoState.co2.slice(1);
+    document.getElementById("readActivity").textContent = activity;
+    document.getElementById("o2Meter").style.width = percent + "%";
+    document.getElementById("gluMeter").style.width = percent + "%";
+
+    var plant = document.getElementById("photoPlant");
+    plant.classList.remove("wilt", "dark", "thrive");
+    if (!lightOn) plant.classList.add("dark");
+    else if (photoState.water === "low") plant.classList.add("wilt");
+    else if (score === 3) plant.classList.add("thrive");
+
+    document.getElementById("sunIcon").style.opacity = lightOn ? "1" : ".25";
+    var bubbleSpeed = prefersReducedMotion ? "none" : (score >= 2 ? "2.2s" : score === 1 ? "4s" : "none");
+    document.querySelectorAll(".bubble-o2, .bubble-co2").forEach(function (b) {
+      b.style.animation = (!lightOn || score === 0 || prefersReducedMotion) ? "none" : "bubbleRise " + (bubbleSpeed === "none" ? "3s" : bubbleSpeed) + " ease-in infinite";
+      b.style.opacity = (!lightOn || score === 0) ? ".15" : ".9";
+    });
+
+    var msg = "Without light, photosynthesis cannot happen, even if water and CO₂ are present.";
+    if (lightOn && score === 3) msg = "Plenty of light, water and carbon dioxide — the model plant is making lots of glucose and releasing oxygen.";
+    else if (lightOn && score === 2) msg = "With light on and normal water and CO₂, the plant can photosynthesise well.";
+    else if (lightOn && score === 1) msg = "Light is on, but low water or CO₂ slows the model plant down.";
+    document.getElementById("photoExplain").textContent = msg;
+  }
+
+  function initializePhotosynthesis() {
+    document.querySelectorAll("#lightControls button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        photoState.light = btn.getAttribute("data-light");
+        document.querySelectorAll("#lightControls button").forEach(function (b) { b.classList.toggle("active", b === btn); });
+        updatePlantActivity();
+      });
+    });
+    document.querySelectorAll("#waterControls button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        photoState.water = btn.getAttribute("data-water");
+        document.querySelectorAll("#waterControls button").forEach(function (b) { b.classList.toggle("active", b === btn); });
+        updatePlantActivity();
+      });
+    });
+    document.querySelectorAll("#co2Controls button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        photoState.co2 = btn.getAttribute("data-co2");
+        document.querySelectorAll("#co2Controls button").forEach(function (b) { b.classList.toggle("active", b === btn); });
+        updatePlantActivity();
+      });
+    });
+    updatePlantActivity();
+  }
+
+  initializePhotosynthesis();
+
+  /* ------------------------------------------------------------------
+     RESPIRATORY SYSTEM
+  ------------------------------------------------------------------ */
+  function animateBreathing(mode) {
+    var stage = document.getElementById("lungsStage");
+    stage.classList.remove("inhale", "exhale");
+    stage.classList.add(mode);
+    document.getElementById("breathExplain").textContent = mode === "inhale"
+      ? "During inhalation, the diaphragm moves down and the lungs expand as air enters."
+      : "During exhalation, the lungs become smaller as air leaves the body.";
+  }
+
+  function initializeRespiratorySimulation() {
+    document.getElementById("btnInhale").addEventListener("click", function () { animateBreathing("inhale"); });
+    document.getElementById("btnExhale").addEventListener("click", function () { animateBreathing("exhale"); });
+    animateBreathing("inhale");
+  }
+
+  initializeRespiratorySimulation();
+
+  /* ------------------------------------------------------------------
+     DIGESTIVE SYSTEM
+  ------------------------------------------------------------------ */
+  var ORGANS = {
+    mouth: { name: "Mouth", text: "Teeth chew food and saliva starts to break it down." },
+    oesophagus: { name: "Oesophagus", text: "A tube that pushes food down from the mouth to the stomach." },
+    stomach: { name: "Stomach", text: "Food is mixed with digestive juices and broken down further." },
+    small: { name: "Small intestine", text: "Most digested nutrients are absorbed into the blood here." },
+    large: { name: "Large intestine", text: "Water is absorbed here and leftover material forms faeces." }
+  };
+
+  function showOrgan(key) {
+    var data = ORGANS[key];
+    document.getElementById("organName").textContent = data.name;
+    document.getElementById("organExplain").textContent = data.text;
+    document.querySelectorAll("[data-organ]").forEach(function (el) {
+      el.classList.toggle("active", el.getAttribute("data-organ") === key);
+      el.classList.toggle("is-selected", el.getAttribute("data-organ") === key);
+    });
+  }
+
+  function initializeDigestiveSystem() {
+    document.querySelectorAll("[data-organ]").forEach(function (el) {
+      el.addEventListener("click", function () { showOrgan(el.getAttribute("data-organ")); });
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showOrgan(el.getAttribute("data-organ")); }
+      });
+    });
+    var food = document.getElementById("foodDot");
+    document.getElementById("btnWatchFood").addEventListener("click", function () {
+      food.classList.remove("moving");
+      void food.offsetWidth;
+      if (!prefersReducedMotion) food.classList.add("moving");
+    });
+    showOrgan("mouth");
+  }
+
+  initializeDigestiveSystem();
+
+  /* ------------------------------------------------------------------
+     PLANT EXPLORER
+  ------------------------------------------------------------------ */
+  var PLANT_PARTS = {
+    roots: { name: "Roots", text: "Absorb water and mineral nutrients from the soil." },
+    stem: { name: "Stem", text: "Supports the plant and transports materials." },
+    leaves: { name: "Leaves", text: "Carry out photosynthesis." },
+    flower: { name: "Flower", text: "Helps many flowering plants reproduce." }
+  };
+
+  function initializePlantExplorer() {
+    document.querySelectorAll(".plant-part").forEach(function (el) {
+      function go() {
+        var key = el.getAttribute("data-plant");
+        document.getElementById("plantPartName").textContent = PLANT_PARTS[key].name;
+        document.getElementById("plantPartExplain").textContent = PLANT_PARTS[key].text;
+        document.querySelectorAll(".plant-part").forEach(function (p) { p.classList.toggle("is-selected", p === el); });
+      }
+      el.addEventListener("click", go);
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
+      });
+    });
+  }
+
+  initializePlantExplorer();
+
+  /* ------------------------------------------------------------------
+     ECOSYSTEM + FOOD CHAIN
+  ------------------------------------------------------------------ */
+  var ECO = {
+    sun: { name: "Sun", text: "The Sun provides light energy that plants can capture. It is not a living organism, but it is part of the environment." },
+    plants: { name: "Plants (producers)", text: "Producers make their own food using photosynthesis. They start most food chains." },
+    herbivore: { name: "Herbivore (consumer)", text: "A consumer that eats plants. Energy stored in the plant is passed on when it is eaten." },
+    predator: { name: "Predator (consumer)", text: "A consumer that eats other animals. Energy moves along the chain again." },
+    decomposers: { name: "Decomposers", text: "Decomposers break down dead material and waste, returning nutrients to the soil." }
+  };
+
+  var CHAIN = {
+    grass: { name: "Grass", text: "Grass is a producer because it makes its own food using photosynthesis." },
+    hopper: { name: "Grasshopper", text: "The grasshopper is a primary consumer. It eats the producer (grass)." },
+    frog: { name: "Frog", text: "The frog is a secondary consumer. It eats the grasshopper." },
+    snake: { name: "Snake", text: "The snake is a consumer that eats the frog, so energy moves further along the chain." },
+    eagle: { name: "Eagle", text: "The eagle is a top consumer in this simple chain. It eats the snake." }
+  };
+
+  function initializeEcosystem() {
+    document.querySelectorAll(".eco-node").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-eco");
+        document.getElementById("ecoName").textContent = ECO[key].name;
+        document.getElementById("ecoExplain").textContent = ECO[key].text;
+        document.querySelectorAll(".eco-node").forEach(function (b) { b.classList.toggle("active", b === btn); });
+      });
+    });
+    document.querySelectorAll(".chain-node").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-chain");
+        document.getElementById("chainName").textContent = CHAIN[key].name;
+        document.getElementById("chainExplain").textContent = CHAIN[key].text;
+        document.querySelectorAll(".chain-node").forEach(function (b) { b.classList.toggle("active", b === btn); });
+      });
+    });
+  }
+
+  initializeEcosystem();
+
+  /* ------------------------------------------------------------------
+     QUIZ
+  ------------------------------------------------------------------ */
+  function initializeBiologyQuiz() {
+    var questions = [
+      {
+        q: "Which part of the cell controls many cell activities?",
+        options: ["A. Cell wall", "B. Nucleus", "C. Vacuole", "D. Cytoplasm"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 The nucleus contains genetic material and helps control many cell activities.",
+        incorrectMsg: "Not quite. Look at the cell explorer again."
+      },
+      {
+        q: "Which structures do plant cells have that animal cells do not?",
+        options: ["A. Nucleus only", "B. Cell wall and chloroplasts", "C. Cytoplasm only", "D. Ribosomes only"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 Plant cells have a cell wall and chloroplasts. Animal cells do not.",
+        incorrectMsg: "Not quite. Switch to the plant cell in the explorer and compare."
+      },
+      {
+        q: "What do plants release during photosynthesis?",
+        options: ["A. Only carbon dioxide", "B. Oxygen", "C. Soil", "D. Nitrogen gas only"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 Plants make glucose and release oxygen.",
+        incorrectMsg: "Not quite. Try the photosynthesis experiment again."
+      },
+      {
+        q: "What happens during inhalation?",
+        options: ["A. Air leaves the lungs", "B. Air enters the lungs", "C. Food enters the stomach", "D. The heart stops"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 During inhalation, air enters the lungs.",
+        incorrectMsg: "Not quite. Press Inhale in the breathing lab."
+      },
+      {
+        q: "Where are most digested nutrients absorbed?",
+        options: ["A. Mouth", "B. Small intestine", "C. Large intestine", "D. Oesophagus"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 Most digested nutrients are absorbed in the small intestine.",
+        incorrectMsg: "Not quite. Click the small intestine in the digestion journey."
+      },
+      {
+        q: "Why is grass called a producer?",
+        options: ["A. It eats insects", "B. It makes its own food using photosynthesis", "C. It hunts frogs", "D. It is a decomposer"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 Producers make their own food using photosynthesis.",
+        incorrectMsg: "Not quite. Open the food chain and click Grass."
+      },
+      {
+        q: "What is the job of roots?",
+        options: ["A. Make seeds", "B. Absorb water and mineral nutrients from the soil", "C. Attract bees only", "D. Produce oxygen in the flower"],
+        correct: 1,
+        correctMsg: "Excellent! 🎉 Roots absorb water and minerals from the soil.",
+        incorrectMsg: "Not quite. Click the roots in Plant Explorer."
+      }
+    ];
+
+    var current = 0;
+    var score = 0;
+    var answered = false;
+    var progressEl = document.getElementById("quizProgress");
+    var questionEl = document.getElementById("quizQuestion");
+    var optionsEl = document.getElementById("quizOptions");
+    var feedbackEl = document.getElementById("quizFeedback");
+    var nextBtn = document.getElementById("quizNextBtn");
+    var scoreEl = document.getElementById("quizScore");
+
+    function renderQuestion() {
+      answered = false;
+      var qData = questions[current];
+      progressEl.textContent = "Question " + (current + 1) + " of " + questions.length;
+      questionEl.textContent = qData.q;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "quiz-feedback";
+      nextBtn.classList.remove("show");
+      optionsEl.innerHTML = "";
+      qData.options.forEach(function (opt, idx) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "quiz-option";
+        b.textContent = opt;
+        b.addEventListener("click", function () { handleAnswer(idx, b); });
+        optionsEl.appendChild(b);
+      });
+      scoreEl.textContent = "Score: " + score + " / " + questions.length;
+    }
+
+    function handleAnswer(idx, btnEl) {
+      var qData = questions[current];
+      if (answered) return;
+      if (idx === qData.correct) {
+        btnEl.classList.add("correct");
+        feedbackEl.textContent = qData.correctMsg;
+        feedbackEl.className = "quiz-feedback correct";
+        score++;
+        answered = true;
+        scoreEl.textContent = "Score: " + score + " / " + questions.length;
+        nextBtn.classList.add("show");
+        optionsEl.querySelectorAll(".quiz-option").forEach(function (b) { b.disabled = true; });
+      } else {
+        btnEl.classList.add("incorrect");
+        feedbackEl.textContent = qData.incorrectMsg;
+        feedbackEl.className = "quiz-feedback incorrect";
+      }
+    }
+
+    nextBtn.addEventListener("click", function () {
+      current = (current + 1) % questions.length;
+      if (current === 0) score = 0;
+      renderQuestion();
+    });
+    renderQuestion();
+  }
+
+  initializeBiologyQuiz();
+
+  var bioFacts = [
+    "Your body is made of trillions of cells.",
+    "Plants release oxygen during photosynthesis.",
+    "Some organisms are made of only one cell.",
+    "Mitochondria help cells release energy from food.",
+    "The small intestine is where most digested nutrients enter the blood.",
+    "A food chain always starts with a producer, such as a plant.",
+    "Plant cells have a cell wall that animal cells do not.",
+    "Decomposers recycle nutrients by breaking down dead material."
+  ];
+  var bioFactIndex = 0;
+  var bioFactTextEl = document.getElementById("bioFactText");
+  var bioFactBtn = document.getElementById("bioFactBtn");
+
+  function showNextBioFact() {
+    var nextIndex;
+    do { nextIndex = Math.floor(Math.random() * bioFacts.length); }
+    while (nextIndex === bioFactIndex && bioFacts.length > 1);
+    bioFactIndex = nextIndex;
+    if (prefersReducedMotion) {
+      bioFactTextEl.textContent = bioFacts[bioFactIndex];
+      return;
+    }
+    bioFactTextEl.classList.add("fading");
+    window.setTimeout(function () {
+      bioFactTextEl.textContent = bioFacts[bioFactIndex];
+      bioFactTextEl.classList.remove("fading");
+    }, 200);
+  }
+
+  if (bioFactBtn) bioFactBtn.addEventListener("click", showNextBioFact);
+})();
+</script>
+</body>
+</html>

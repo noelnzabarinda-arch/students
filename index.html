@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S1 Science Lab — Discover Science. Explore. Experiment. Learn.</title>
+<meta name="description" content="S1 Science Lab helps S1 students learn Physics, Chemistry and Biology through interactive simulations, animations and simple explanations.">
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   S1 SCIENCE LAB — internal styles
+   Token system:
+   --ink        #0F172A   primary text
+   --ink-soft   #475569   secondary text
+   --paper      #F8FAFC   page background
+   --blue       #2563EB   Physics / primary
+   --cyan       #06B6D4   secondary / accents
+   --purple     #7C3AED   discovery
+   --green      #16A34A   Biology
+   --orange     #F59E0B   Chemistry / energy
+   --navy       #0B1226   hero / dark surfaces
+   ========================================================================== */
+:root{
+  --ink:#0F172A;
+  --ink-soft:#475569;
+  --paper:#F8FAFC;
+  --blue:#2563EB;
+  --cyan:#06B6D4;
+  --purple:#7C3AED;
+  --green:#16A34A;
+  --orange:#F59E0B;
+  --navy:#0B1226;
+  --navy-2:#101B36;
+  --card-radius:20px;
+  --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+}
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  background:var(--paper);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,h4,.font-display{ font-family:var(--display); letter-spacing:-0.01em; }
+
+a{ text-decoration:none; }
+
+.container-narrow{ max-width:1180px; margin:0 auto; padding-inline:1.25rem; }
+
+/* focus visibility */
+a:focus-visible, button:focus-visible, .btn:focus-visible{
+  outline:3px solid var(--cyan);
+  outline-offset:2px;
+  border-radius:8px;
+}
+
+/* ---------------------------------------------------------------------- */
+/* NAVBAR */
+/* ---------------------------------------------------------------------- */
+.lab-nav{
+  position:sticky; top:0; z-index:1000;
+  padding:.65rem 0;
+  background:rgba(248,250,252,.75);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  transition:box-shadow .25s ease, background .25s ease;
+}
+.lab-nav.is-scrolled{
+  box-shadow:0 6px 24px rgba(15,23,42,.08);
+  background:rgba(248,250,252,.92);
+}
+.lab-brand{
+  display:flex; align-items:center; gap:.6rem;
+  font-family:var(--display); font-weight:700; font-size:1.15rem;
+  color:var(--ink);
+}
+.lab-brand .mark{
+  width:38px; height:38px; border-radius:11px;
+  display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; font-size:1.15rem;
+  box-shadow:0 6px 16px rgba(37,99,235,.35);
+}
+.lab-brand:hover{ color:var(--ink); }
+
+.lab-links .nav-link{
+  color:var(--ink-soft);
+  font-weight:600;
+  font-size:.95rem;
+  padding:.5rem .85rem !important;
+  border-radius:10px;
+  transition:color .15s ease, background .15s ease;
+}
+.lab-links .nav-link:hover{ color:var(--blue); background:rgba(37,99,235,.07); }
+.lab-links .nav-link.active{ color:var(--blue); background:rgba(37,99,235,.1); }
+
+.btn-lab-primary{
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; font-weight:600; border:none;
+  padding:.55rem 1.35rem; border-radius:12px;
+  box-shadow:0 8px 20px rgba(37,99,235,.28);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-lab-primary:hover{ color:#fff; transform:translateY(-2px); box-shadow:0 12px 26px rgba(37,99,235,.36); }
+
+.btn-lab-outline{
+  border:1.5px solid rgba(15,23,42,.15);
+  color:var(--ink); font-weight:600;
+  padding:.55rem 1.35rem; border-radius:12px;
+  background:#fff;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.btn-lab-outline:hover{ color:var(--ink); border-color:var(--blue); transform:translateY(-2px); }
+
+/* ---------------------------------------------------------------------- */
+/* HERO */
+/* ---------------------------------------------------------------------- */
+.hero{
+  position:relative;
+  background:radial-gradient(120% 140% at 15% -10%, #16264F 0%, var(--navy) 55%, #060A16 100%);
+  color:#fff;
+  padding:5.5rem 0 6.5rem;
+  overflow:hidden;
+  isolation:isolate;
+}
+.hero::before{ /* faint grid, like lab graph paper */
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(80% 80% at 50% 30%, #000 40%, transparent 100%);
+  z-index:0;
+}
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.78rem;
+  color:#A5F3FC;
+  background:rgba(6,182,212,.12);
+  border:1px solid rgba(6,182,212,.35);
+  padding:.35rem .8rem; border-radius:999px;
+}
+.hero h1{
+  font-size:clamp(2.25rem, 4.6vw, 3.6rem);
+  font-weight:700; line-height:1.08;
+  margin:1.1rem 0 1.1rem;
+}
+.hero h1 .accent{
+  background:linear-gradient(100deg, var(--cyan), #7dd3fc 60%, var(--purple));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.lead-copy{
+  color:#C7D2E3; font-size:1.08rem; max-width:34rem; line-height:1.65;
+}
+.hero-actions{ display:flex; gap:.85rem; flex-wrap:wrap; margin-top:1.6rem; }
+
+.btn-hero-primary{
+  background:linear-gradient(135deg,var(--cyan), #3b82f6);
+  color:#04121F; font-weight:700; border:none;
+  padding:.75rem 1.5rem; border-radius:13px;
+  box-shadow:0 10px 28px rgba(6,182,212,.35);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-hero-primary:hover{ color:#04121F; transform:translateY(-2px); box-shadow:0 14px 34px rgba(6,182,212,.45); }
+
+.btn-hero-ghost{
+  border:1.5px solid rgba(255,255,255,.25);
+  color:#fff; font-weight:600;
+  padding:.75rem 1.5rem; border-radius:13px;
+  background:rgba(255,255,255,.04);
+  transition:border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.btn-hero-ghost:hover{ color:#fff; border-color:#fff; background:rgba(255,255,255,.09); transform:translateY(-2px); }
+
+/* Hero illustration — pure SVG/CSS lab scene */
+.hero-lab{
+  position:relative;
+  width:100%; max-width:460px; margin-inline:auto;
+  z-index:1;
+}
+.hero-lab svg{ width:100%; height:auto; overflow:visible; }
+
+.orbit-ring{ transform-origin:center; animation:spin 22s linear infinite; }
+.orbit-ring.reverse{ animation-direction:reverse; animation-duration:30s; }
+.electron{ transform-origin:center; }
+
+.float-slow{ animation:float 6s ease-in-out infinite; }
+.float-slower{ animation:float 8s ease-in-out infinite; }
+.float-med{ animation:float 5s ease-in-out infinite; }
+.spin-slow{ animation:spin 18s linear infinite; transform-origin:center; }
+.pulse-dot{ animation:pulse 2.4s ease-in-out infinite; }
+.drift{ animation:drift 9s ease-in-out infinite; }
+
+@keyframes float{
+  0%,100%{ transform:translateY(0px); }
+  50%{ transform:translateY(-12px); }
+}
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+@keyframes pulse{
+  0%,100%{ opacity:.4; r:3; }
+  50%{ opacity:1; r:5; }
+}
+@keyframes drift{
+  0%,100%{ transform:translate(0,0); }
+  50%{ transform:translate(6px,-8px); }
+}
+
+/* ---------------------------------------------------------------------- */
+/* SECTION SCAFFOLDING */
+/* ---------------------------------------------------------------------- */
+.section{ padding:5.5rem 0; }
+.section-tight{ padding:4.5rem 0; }
+.section-head{ max-width:640px; }
+.section-head h2{
+  font-size:clamp(1.7rem,3vw,2.35rem);
+  font-weight:700; margin-bottom:.6rem;
+}
+.section-head p{ color:var(--ink-soft); font-size:1.05rem; line-height:1.6; }
+
+.reveal{
+  opacity:0; transform:translateY(22px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+/* ---------------------------------------------------------------------- */
+/* SUBJECT CARDS */
+/* ---------------------------------------------------------------------- */
+.subject-card{
+  position:relative;
+  background:#fff;
+  border-radius:var(--card-radius);
+  padding:2.1rem 1.9rem 2rem;
+  height:100%;
+  border:1px solid rgba(15,23,42,.06);
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  overflow:hidden;
+}
+.subject-card::after{
+  content:""; position:absolute; inset:auto -30% -40% auto;
+  width:220px; height:220px; border-radius:50%;
+  background:var(--accent, var(--blue)); opacity:.06;
+  transition:opacity .25s ease;
+}
+.subject-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 20px 40px rgba(15,23,42,.12);
+  border-color:var(--accent, var(--blue));
+}
+.subject-card:hover::after{ opacity:.12; }
+.subject-card .icon-tile{
+  width:58px; height:58px; border-radius:16px;
+  display:grid; place-items:center; font-size:1.5rem;
+  color:#fff; background:var(--accent, var(--blue));
+  margin-bottom:1.2rem;
+  box-shadow:0 8px 18px color-mix(in srgb, var(--accent, var(--blue)) 45%, transparent);
+  transition:transform .25s ease;
+}
+.subject-card:hover .icon-tile{ transform:rotate(-6deg) scale(1.06); }
+.subject-card h3{ font-size:1.3rem; font-weight:700; margin-bottom:.55rem; }
+.subject-card p{ color:var(--ink-soft); font-size:.97rem; line-height:1.6; margin-bottom:1.4rem; }
+.subject-card .card-link{
+  font-weight:700; color:var(--accent, var(--blue));
+  display:inline-flex; align-items:center; gap:.4rem;
+}
+.subject-card .card-link i{ transition:transform .2s ease; }
+.subject-card:hover .card-link i{ transform:translateX(4px); }
+
+.subject-physics{ --accent:var(--blue); }
+.subject-chemistry{ --accent:var(--orange); }
+.subject-biology{ --accent:var(--green); }
+
+/* ---------------------------------------------------------------------- */
+/* LEARN BY DOING — timeline */
+/* ---------------------------------------------------------------------- */
+.timeline{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem;
+  position:relative;
+}
+.timeline::before{
+  content:"";
+  position:absolute; top:26px; left:6%; right:6%; height:2px;
+  background:repeating-linear-gradient(90deg, rgba(37,99,235,.25) 0 10px, transparent 10px 18px);
+  z-index:0;
+}
+.timeline-step{ position:relative; z-index:1; }
+.timeline-step .num{
+  width:52px; height:52px; border-radius:50%;
+  display:grid; place-items:center;
+  font-family:var(--mono); font-weight:600; font-size:.95rem;
+  background:#fff; border:2px solid var(--blue); color:var(--blue);
+  margin-bottom:1rem;
+}
+.timeline-step h4{ font-weight:700; font-size:1.05rem; margin-bottom:.4rem; }
+.timeline-step p{ color:var(--ink-soft); font-size:.93rem; line-height:1.55; }
+
+@media (max-width:767.98px){
+  .timeline{ grid-template-columns:1fr; gap:1.9rem; }
+  .timeline::before{ display:none; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* SIMULATION PREVIEW */
+/* ---------------------------------------------------------------------- */
+.sim-panel{
+  background:linear-gradient(160deg, var(--navy) 0%, #14224a 100%);
+  border-radius:24px;
+  color:#fff;
+  padding:2.4rem;
+  position:relative;
+  overflow:hidden;
+}
+.sim-badge{
+  display:inline-flex; align-items:center; gap:.45rem;
+  font-family:var(--mono); font-size:.75rem;
+  color:#A5F3FC; background:rgba(6,182,212,.12);
+  border:1px solid rgba(6,182,212,.35);
+  padding:.3rem .7rem; border-radius:999px;
+}
+.sim-stage{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  padding:1.5rem;
+  margin-top:1.4rem;
+}
+.sim-track{ position:relative; height:110px; }
+.sim-ground{
+  position:absolute; left:0; right:0; bottom:14px; height:2px;
+  background:rgba(255,255,255,.18);
+}
+.sim-box{
+  position:absolute; bottom:14px; left:8%;
+  width:46px; height:46px; border-radius:8px;
+  background:linear-gradient(135deg,var(--orange), #fbbf24);
+  box-shadow:0 8px 18px rgba(245,158,11,.35);
+  animation:push-box 4s ease-in-out infinite;
+}
+@keyframes push-box{
+  0%{ left:8%; }
+  45%{ left:68%; }
+  55%{ left:68%; }
+  100%{ left:8%; }
+}
+.sim-arm{
+  position:absolute; bottom:30px; left:0; width:34px; height:6px;
+  background:var(--cyan); border-radius:3px;
+  animation:push-arm 4s ease-in-out infinite;
+}
+@keyframes push-arm{
+  0%{ left:2%; opacity:1; }
+  40%{ left:60%; opacity:1; }
+  46%{ opacity:0; }
+  54%{ opacity:0; }
+  60%{ left:2%; opacity:0; }
+  70%{ opacity:1; }
+  100%{ left:2%; opacity:1; }
+}
+.sim-readout{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:.9rem 1.6rem;
+  margin-top:1.5rem; font-family:var(--mono); font-size:.86rem;
+}
+.sim-readout div{ display:flex; justify-content:space-between; color:#C7D2E3; }
+.sim-readout span{ color:#fff; font-weight:600; }
+.sim-formula{
+  margin-top:1.4rem; padding-top:1.2rem;
+  border-top:1px dashed rgba(255,255,255,.15);
+  font-family:var(--mono); font-size:.98rem; color:#A5F3FC;
+  display:flex; flex-wrap:wrap; gap:1.4rem;
+}
+
+/* ---------------------------------------------------------------------- */
+/* WHY STUDENTS WILL LOVE IT */
+/* ---------------------------------------------------------------------- */
+.feature-tile{
+  display:flex; gap:1rem; align-items:flex-start;
+  padding:1.5rem; border-radius:16px;
+  transition:background .2s ease;
+}
+.feature-tile:hover{ background:#fff; box-shadow:0 10px 26px rgba(15,23,42,.07); }
+.feature-tile .ico{
+  flex:0 0 auto; width:48px; height:48px; border-radius:13px;
+  display:grid; place-items:center; font-size:1.2rem; color:#fff;
+}
+.feature-tile h4{ font-weight:700; font-size:1.05rem; margin-bottom:.35rem; }
+.feature-tile p{ color:var(--ink-soft); font-size:.93rem; line-height:1.55; margin:0; }
+
+/* ---------------------------------------------------------------------- */
+/* DID YOU KNOW */
+/* ---------------------------------------------------------------------- */
+.fact-panel{
+  background:linear-gradient(135deg, #EEF4FF, #F5F0FF);
+  border:1px solid rgba(124,58,237,.12);
+  border-radius:24px;
+  padding:2.6rem;
+  text-align:center;
+  max-width:760px; margin-inline:auto;
+}
+.fact-panel .ico-badge{
+  width:56px; height:56px; border-radius:50%;
+  display:grid; place-items:center; margin:0 auto 1.1rem;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff; font-size:1.35rem;
+}
+#factText{
+  font-family:var(--display); font-weight:600;
+  font-size:clamp(1.1rem,2.4vw,1.4rem);
+  color:var(--ink); min-height:3.2em;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity .25s ease;
+}
+#factText.fading{ opacity:0; }
+
+/* ---------------------------------------------------------------------- */
+/* FINAL CTA */
+/* ---------------------------------------------------------------------- */
+.final-cta{
+  position:relative;
+  background:radial-gradient(120% 160% at 85% 0%, #16264F 0%, var(--navy) 60%, #060A16 100%);
+  border-radius:28px;
+  color:#fff; text-align:center;
+  padding:4rem 2rem;
+  overflow:hidden;
+  isolation:isolate;
+}
+.final-cta::before{
+  content:"";
+  position:absolute; inset:0; z-index:0;
+  background-image:radial-gradient(rgba(6,182,212,.5) 1.4px, transparent 1.4px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(70% 90% at 50% 30%, #000 30%, transparent 100%);
+}
+.final-cta h2{ font-size:clamp(1.8rem,3.6vw,2.5rem); font-weight:700; position:relative; z-index:1; }
+.final-cta p{ color:#C7D2E3; font-size:1.05rem; margin:.8rem 0 1.8rem; position:relative; z-index:1; }
+.final-cta .btn-hero-primary{ position:relative; z-index:1; }
+
+/* ---------------------------------------------------------------------- */
+/* FOOTER */
+/* ---------------------------------------------------------------------- */
+.lab-footer{ background:var(--navy); color:#C7D2E3; padding:3.5rem 0 1.6rem; }
+.lab-footer .lab-brand{ color:#fff; }
+.lab-footer a.footer-link{ color:#C7D2E3; font-size:.93rem; }
+.lab-footer a.footer-link:hover{ color:var(--cyan); }
+.lab-footer hr{ border-color:rgba(255,255,255,.1); margin:2.2rem 0 1.4rem; }
+.lab-footer .fine{ font-size:.83rem; color:#7A8AAE; }
+
+/* ---------------------------------------------------------------------- */
+/* Skip link */
+/* ---------------------------------------------------------------------- */
+.skip-link{
+  position:absolute; left:-999px; top:auto;
+  background:#fff; color:var(--ink); padding:.6rem 1rem; border-radius:8px;
+  z-index:2000;
+}
+.skip-link:focus{ left:1rem; top:1rem; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .orbit-ring, .electron, .float-slow, .float-slower, .float-med,
+  .spin-slow, .pulse-dot, .drift, .sim-box, .sim-arm{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ======================================================================
+     NAVBAR
+====================================================================== -->
+<nav class="navbar navbar-expand-lg lab-nav" id="labNav" aria-label="Main navigation">
+  <div class="container container-narrow">
+    <a class="navbar-brand lab-brand" href="index.html">
+      <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+      S1 Science Lab
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#labNavCollapse"
+            aria-controls="labNavCollapse" aria-expanded="false" aria-label="Toggle navigation menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="labNavCollapse">
+      <ul class="navbar-nav lab-links mx-lg-auto my-3 my-lg-0 gap-lg-1">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="physics.html">Physics</a></li>
+        <li class="nav-item"><a class="nav-link" href="chemistry.html">Chemistry</a></li>
+        <li class="nav-item"><a class="nav-link" href="biology.html">Biology</a></li>
+        <li class="nav-item"><a class="nav-link" href="simulations.html">Simulations</a></li>
+        <li class="nav-item"><a class="nav-link" href="quizzes.html">Quizzes</a></li>
+        <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+      </ul>
+      <a href="start-learning.html" class="btn btn-lab-primary">Start Learning</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+  ==================================================================== -->
+  <header class="hero">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-5">
+        <div class="col-lg-6">
+          <span class="hero-eyebrow"><i class="bi bi-broadcast"></i> S1 Science Lab</span>
+          <h1>Discover Science.<br>Explore. Experiment. <span class="accent">Learn.</span></h1>
+          <p class="lead-copy">Learn Physics, Chemistry and Biology through interactive experiments, animations and simple explanations designed for S1 students.</p>
+          <div class="hero-actions">
+            <a href="physics.html" class="btn btn-hero-primary">Explore Science</a>
+            <a href="simulations.html" class="btn btn-hero-ghost">Try a Simulation</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-lab" role="img" aria-label="Illustration of a science laboratory scene with an atom, a microscope, a flask and floating molecules">
+            <svg viewBox="0 0 420 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Orbiting atom, center -->
+              <g transform="translate(210,190)">
+                <ellipse class="orbit-ring" rx="120" ry="46" stroke="#06B6D4" stroke-width="1.6" opacity="0.55"/>
+                <ellipse class="orbit-ring reverse" rx="120" ry="46" stroke="#7C3AED" stroke-width="1.6" opacity="0.45" transform="rotate(60)"/>
+                <ellipse class="orbit-ring" rx="120" ry="46" stroke="#3B82F6" stroke-width="1.6" opacity="0.45" transform="rotate(120)"/>
+                <circle r="16" fill="url(#nucleusGrad)"/>
+                <circle class="electron spin-slow" r="4.5" cx="120" cy="0" fill="#67E8F9"/>
+                <circle class="electron spin-slow" r="4.5" cx="-104" cy="-40" fill="#C4B5FD" style="animation-direction:reverse;"/>
+                <circle class="electron spin-slow" r="4.5" cx="60" cy="104" fill="#93C5FD" style="animation-duration:14s;"/>
+              </g>
+
+              <!-- Flask, bottom left -->
+              <g class="float-slow" transform="translate(46,268)">
+                <path d="M18 0 H34 V28 L54 74 A10 10 0 0 1 45 88 H7 A10 10 0 0 1 -2 74 L18 28 Z"
+                      fill="#0F172A" fill-opacity="0.04" stroke="#2563EB" stroke-width="2.5"/>
+                <path d="M-1 66 H53" stroke="#2563EB" stroke-width="2"/>
+                <path d="M4 70 Q26 84 48 70 L45 88 A10 10 0 0 1 45 88 H7 A10 10 0 0 1 4 70 Z" fill="#06B6D4" fill-opacity="0.55"/>
+                <circle class="pulse-dot" cx="26" cy="52" r="3" fill="#F59E0B"/>
+                <circle class="pulse-dot" cx="16" cy="60" r="2.4" fill="#F59E0B" style="animation-delay:.6s"/>
+              </g>
+
+              <!-- Microscope, bottom right -->
+              <g class="float-med" transform="translate(296,250)">
+                <rect x="-10" y="70" width="70" height="8" rx="3" fill="#0F172A" fill-opacity="0.08"/>
+                <path d="M22 70 V44" stroke="#16A34A" stroke-width="6" stroke-linecap="round"/>
+                <path d="M22 44 L2 20" stroke="#16A34A" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="2" cy="20" r="7" fill="#16A34A"/>
+                <rect x="14" y="30" width="26" height="10" rx="4" fill="#0F172A" fill-opacity="0.85"/>
+                <path d="M22 70 h34" stroke="#16A34A" stroke-width="6" stroke-linecap="round"/>
+              </g>
+
+              <!-- Floating molecule, top right -->
+              <g class="drift" transform="translate(330,66)">
+                <line x1="0" y1="0" x2="26" y2="14" stroke="#7C3AED" stroke-width="2"/>
+                <line x1="0" y1="0" x2="-8" y2="26" stroke="#7C3AED" stroke-width="2"/>
+                <circle cx="0" cy="0" r="7" fill="#7C3AED"/>
+                <circle cx="26" cy="14" r="5" fill="#A78BFA"/>
+                <circle cx="-8" cy="26" r="5" fill="#A78BFA"/>
+              </g>
+
+              <!-- Lightning bolt, top left -->
+              <g class="float-slower" transform="translate(58,70)">
+                <path d="M18 0 L0 26 H12 L4 52 L30 20 H16 Z" fill="#F59E0B"/>
+              </g>
+
+              <!-- Small formula label -->
+              <g class="float-slow" transform="translate(150,26)">
+                <rect x="-6" y="-18" width="86" height="30" rx="9" fill="#FFFFFF" stroke="#0F172A" stroke-opacity="0.08"/>
+                <text x="37" y="2" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="#2563EB" font-weight="600">E = mc²</text>
+              </g>
+
+              <defs>
+                <radialGradient id="nucleusGrad" cx="0.35" cy="0.3" r="0.9">
+                  <stop offset="0%" stop-color="#7DD3FC"/>
+                  <stop offset="100%" stop-color="#2563EB"/>
+                </radialGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       EXPLORE THE SCIENCES
+  ==================================================================== -->
+  <section class="section" id="subjects">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Explore the World of Science</h2>
+        <p class="mx-auto">Choose a subject and discover how the world around you works.</p>
+      </div>
+
+      <div class="row g-4 mt-2">
+        <div class="col-md-4 reveal">
+          <article class="subject-card subject-physics">
+            <div class="icon-tile"><i class="bi bi-lightning-charge-fill"></i></div>
+            <h3>Physics</h3>
+            <p>Discover force, gravity, pressure, motion, energy, light and more through interactive experiments.</p>
+            <a href="physics.html" class="card-link">Explore Physics <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-md-4 reveal">
+          <article class="subject-card subject-chemistry">
+            <div class="icon-tile"><i class="bi bi-droplet-half"></i></div>
+            <h3>Chemistry</h3>
+            <p>Explore atoms, elements, the periodic table, states of matter, mixtures and chemical changes.</p>
+            <a href="chemistry.html" class="card-link">Explore Chemistry <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+        <div class="col-md-4 reveal">
+          <article class="subject-card subject-biology">
+            <div class="icon-tile"><i class="bi bi-flower2"></i></div>
+            <h3>Biology</h3>
+            <p>Discover cells, plants, the human body, ecosystems and the amazing world of living things.</p>
+            <a href="biology.html" class="card-link">Explore Biology <i class="bi bi-arrow-right"></i></a>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       LEARN BY DOING
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Learn by Doing</h2>
+        <p class="mx-auto">Every topic follows the same simple path, from idea to understanding.</p>
+      </div>
+
+      <div class="timeline mt-5 reveal">
+        <div class="timeline-step">
+          <div class="num">01</div>
+          <h4>Learn</h4>
+          <p>Understand the idea with simple explanations.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="num">02</div>
+          <h4>Explore</h4>
+          <p>Interact with a visual simulation.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="num">03</div>
+          <h4>Observe</h4>
+          <p>See what changes when you change the conditions.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="num">04</div>
+          <h4>Understand</h4>
+          <p>Use formulas, calculations and challenges to test your knowledge.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FEATURED SIMULATION PREVIEW
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="row align-items-center gy-4 mb-4">
+        <div class="col-lg-7 reveal">
+          <h2 class="mb-2" style="font-size:clamp(1.7rem,3vw,2.35rem); font-weight:700;">Science Comes Alive</h2>
+          <p class="text-secondary mb-0" style="font-size:1.05rem;">A preview of what's coming in Simulations: push a box, change the numbers, and watch force and motion work together in real time.</p>
+        </div>
+      </div>
+
+      <div class="sim-panel reveal">
+        <span class="sim-badge"><i class="bi bi-eye"></i> Home page preview</span>
+        <div class="sim-stage">
+          <div class="sim-track">
+            <div class="sim-arm" aria-hidden="true"></div>
+            <div class="sim-box" aria-hidden="true"></div>
+            <div class="sim-ground" aria-hidden="true"></div>
+          </div>
+          <div class="sim-readout">
+            <div>Force <span>20 N</span></div>
+            <div>Mass <span>5 kg</span></div>
+            <div>Distance <span>10 m</span></div>
+            <div>Time <span>5 s</span></div>
+          </div>
+          <div class="sim-formula">
+            <span>F = m × a</span>
+            <span>Distance = Speed × Time</span>
+          </div>
+        </div>
+        <a href="simulations.html" class="btn btn-hero-primary mt-4">Explore Simulations</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       WHY STUDENTS WILL LOVE IT
+  ==================================================================== -->
+  <section class="section section-tight" style="background:#fff;">
+    <div class="container container-narrow">
+      <div class="section-head reveal mx-auto text-center">
+        <h2>Why Students Will Love It</h2>
+        <p class="mx-auto">Built to make science feel like something you do, not just something you read.</p>
+      </div>
+
+      <div class="row g-3 mt-4">
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--blue);"><i class="bi bi-joystick"></i></span>
+            <div>
+              <h4>Interactive Simulations</h4>
+              <p>See science happening instead of only reading about it.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--purple);"><i class="bi bi-chat-square-text"></i></span>
+            <div>
+              <h4>Simple Explanations</h4>
+              <p>Complex ideas are explained using language students can understand.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--green);"><i class="bi bi-eye"></i></span>
+            <div>
+              <h4>Visual Learning</h4>
+              <p>Animations, diagrams and experiments make concepts easier to remember.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 reveal">
+          <div class="feature-tile">
+            <span class="ico" style="background:var(--orange);"><i class="bi bi-patch-question"></i></span>
+            <div>
+              <h4>Practice &amp; Challenges</h4>
+              <p>Test your understanding with interactive questions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       DID YOU KNOW
+  ==================================================================== -->
+  <section class="section">
+    <div class="container container-narrow">
+      <div class="fact-panel reveal">
+        <div class="ico-badge"><i class="bi bi-stars"></i></div>
+        <h2 class="h5 text-uppercase-none mb-1" style="font-weight:700;">Did You Know?</h2>
+        <p id="factText">Gravity keeps us connected to Earth.</p>
+        <button class="btn btn-lab-outline mt-2" id="factBtn" type="button">
+          <i class="bi bi-arrow-repeat me-1"></i> Show Another Fact
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       FINAL CTA
+  ==================================================================== -->
+  <section class="section section-tight">
+    <div class="container container-narrow">
+      <div class="final-cta reveal">
+        <h2>Ready to Explore Science?</h2>
+        <p>Start your journey through Physics, Chemistry and Biology.</p>
+        <a href="physics.html" class="btn btn-hero-primary">Start Learning</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================================================================
+     FOOTER
+====================================================================== -->
+<footer class="lab-footer">
+  <div class="container container-narrow">
+    <div class="row gy-4">
+      <div class="col-lg-4">
+        <div class="lab-brand mb-2">
+          <span class="mark" aria-hidden="true"><i class="bi bi-radioactive"></i></span>
+          S1 Science Lab
+        </div>
+        <p class="mb-0" style="max-width:26rem;">Making science easier to see, understand and explore.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row row-cols-2 row-cols-sm-4 g-3">
+          <div class="col"><a class="footer-link" href="index.html">Home</a></div>
+          <div class="col"><a class="footer-link" href="physics.html">Physics</a></div>
+          <div class="col"><a class="footer-link" href="chemistry.html">Chemistry</a></div>
+          <div class="col"><a class="footer-link" href="biology.html">Biology</a></div>
+          <div class="col"><a class="footer-link" href="simulations.html">Simulations</a></div>
+          <div class="col"><a class="footer-link" href="quizzes.html">Quizzes</a></div>
+          <div class="col"><a class="footer-link" href="about.html">About</a></div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <p class="fine mb-0">© 2026 S1 Science Lab</p>
+  </div>
+</footer>
+
+<!-- Bootstrap bundle (needed for the navbar collapse toggle) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ==========================================================================
+   S1 SCIENCE LAB — internal script
+   Handles: navbar scroll state, scroll-reveal, science fact rotator,
+   smooth scroll for in-page links, and reduced-motion awareness.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------------------------------------------------------
+     Navbar: add a stronger background/shadow once the page scrolls
+  --------------------------------------------------------------- */
+  var nav = document.getElementById("labNav");
+  function updateNavState() {
+    if (window.scrollY > 12) {
+      nav.classList.add("is-scrolled");
+    } else {
+      nav.classList.remove("is-scrolled");
+    }
+  }
+  updateNavState();
+  window.addEventListener("scroll", updateNavState, { passive: true });
+
+  /* Close the mobile menu automatically after a link is tapped */
+  var navCollapseEl = document.getElementById("labNavCollapse");
+  if (navCollapseEl) {
+    navCollapseEl.querySelectorAll(".nav-link, .btn").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (navCollapseEl.classList.contains("show") && window.bootstrap) {
+          var instance = window.bootstrap.Collapse.getOrCreateInstance(navCollapseEl);
+          instance.hide();
+        }
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Scroll-reveal: fade + rise elements into view as the user scrolls.
+     Skips entirely (shows everything immediately) if the visitor
+     has requested reduced motion.
+  --------------------------------------------------------------- */
+  var revealEls = document.querySelectorAll(".reveal");
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+
+    revealEls.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* ---------------------------------------------------------------
+     Did You Know? — rotate through a small set of science facts.
+     Facts are stored locally; no API is used.
+  --------------------------------------------------------------- */
+  var scienceFacts = [
+    "Gravity keeps us connected to Earth.",
+    "Water expands when it freezes, which is why ice floats.",
+    "A bolt of lightning is roughly five times hotter than the surface of the Sun.",
+    "Your body has enough carbon in it to fill about 9,000 pencils.",
+    "Sound cannot travel through the vacuum of space because there is no matter to carry it.",
+    "Bananas are naturally slightly radioactive because of the potassium they contain.",
+    "The human brain generates enough electricity to power a small light bulb.",
+    "Honey never spoils if it is stored properly, even after thousands of years.",
+    "A single bolt of lightning contains enough energy to toast about 100,000 slices of bread.",
+    "Octopuses have three hearts and blue blood."
+  ];
+  var factIndex = 0;
+  var factTextEl = document.getElementById("factText");
+  var factBtn = document.getElementById("factBtn");
+
+  function showNextFact() {
+    var nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * scienceFacts.length);
+    } while (nextIndex === factIndex && scienceFacts.length > 1);
+    factIndex = nextIndex;
+
+    if (prefersReducedMotion) {
+      factTextEl.textContent = scienceFacts[factIndex];
+      return;
+    }
+
+    factTextEl.classList.add("fading");
+    window.setTimeout(function () {
+      factTextEl.textContent = scienceFacts[factIndex];
+      factTextEl.classList.remove("fading");
+    }, 200);
+  }
+
+  if (factBtn) {
+    factBtn.addEventListener("click", showNextFact);
+  }
+
+  /* ---------------------------------------------------------------
+     Smooth scroll for in-page anchor links (e.g. #subjects)
+  --------------------------------------------------------------- */
+  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+    anchor.addEventListener("click", function (e) {
+      var targetId = this.getAttribute("href");
+      if (targetId.length > 1) {
+        var target = document.querySelector(targetId);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+        }
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
